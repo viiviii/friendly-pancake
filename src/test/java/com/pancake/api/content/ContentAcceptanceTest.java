@@ -62,34 +62,4 @@ class ContentAcceptanceTest {
         return objectMapper.writeValueAsString(object);
     }
 
-    private class ContentRequest {
-
-        private final String url;
-        private final String title;
-
-        private ContentRequest(String url, String title) {
-            this.url = url;
-            this.title = title;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-    }
-
-    private class ContentResponse {
-        private final Long id;
-
-        private ContentResponse(Long id) {
-            this.id = id;
-        }
-
-        public Long getId() {
-            return id;
-        }
-    }
 }
