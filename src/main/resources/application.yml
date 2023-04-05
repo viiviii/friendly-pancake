@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/pancake
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create # TODO: 운영에서는 validate 또는 none 사용해야 함
+    properties:
+      hibernate:
+        format_sql: true # SQL 줄바꿈 등 예쁘게 출력
+
+logging.level:
+  org.hibernate.SQL: debug # SQL logger 통해 출력
