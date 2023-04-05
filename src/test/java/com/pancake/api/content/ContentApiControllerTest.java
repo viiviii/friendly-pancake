@@ -34,7 +34,7 @@ class ContentApiControllerTest {
         //given
         var request = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
 
-        given(contentService.save(any())).willReturn(new Content(1L));
+        given(contentService.save(any())).willReturn(new Content(1L, request.getUrl(), request.getTitle()));
 
         //when
         var result = post("/api/contents", asJsonString(request));

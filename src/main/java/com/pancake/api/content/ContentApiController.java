@@ -21,6 +21,6 @@ public class ContentApiController {
     public ResponseEntity<ContentResponse> save(@RequestBody ContentRequest request) {
         final Content content = contentService.save(request);
 
-        return status(CREATED).body(new ContentResponse(content.getId()));
+        return status(CREATED).body(new ContentResponse(content.id()));
     }
 }

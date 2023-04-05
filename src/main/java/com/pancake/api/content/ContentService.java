@@ -5,6 +5,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContentService {
     public Content save(ContentRequest request) {
-        return new Content(1L);
+        return new Content(1L, request.getUrl(), request.getTitle());
     }
 }
