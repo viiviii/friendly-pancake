@@ -1,4 +1,4 @@
-package com.pancake.api.content;
+package com.pancake.api.content.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

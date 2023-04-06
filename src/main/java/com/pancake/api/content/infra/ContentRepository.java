@@ -1,5 +1,6 @@
-package com.pancake.api.content;
+package com.pancake.api.content.infra;
 
+import com.pancake.api.content.domain.Content;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;

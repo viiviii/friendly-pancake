@@ -1,5 +1,6 @@
-package com.pancake.api.content;
+package com.pancake.api.content.application.dto;
 
+import com.pancake.api.content.domain.Content;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,5 @@ public class ContentResponse {
 
     public static ContentResponse fromEntity(Content content) {
         return new ContentResponse(content.id(), content.title(), content.url());
-
     }
 }

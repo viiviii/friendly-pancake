@@ -1,5 +1,9 @@
-package com.pancake.api.content;
+package com.pancake.api.content.api;
 
+import com.pancake.api.content.application.ContentService;
+import com.pancake.api.content.application.dto.ContentRequest;
+import com.pancake.api.content.application.dto.ContentResponse;
+import com.pancake.api.content.domain.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

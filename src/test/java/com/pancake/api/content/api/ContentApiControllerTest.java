@@ -1,6 +1,9 @@
-package com.pancake.api.content;
+package com.pancake.api.content.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pancake.api.content.application.ContentService;
+import com.pancake.api.content.application.dto.ContentRequest;
+import com.pancake.api.content.domain.Content;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
