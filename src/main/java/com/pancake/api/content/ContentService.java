@@ -1,10 +1,21 @@
 package com.pancake.api.content;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class ContentService {
+
+    private final ContentRepository contentRepository;
+
     public Content save(ContentRequest request) {
-        return new Content(1L, request.getUrl(), request.getTitle());
+        return contentRepository.save(request.toEntity());
+    }
+
+    public List<Content> getAll() {
+        return contentRepository.findAll();
     }
 }

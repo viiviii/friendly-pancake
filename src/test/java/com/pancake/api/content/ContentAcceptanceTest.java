@@ -10,13 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
+@Sql("/database_cleanup.sql")
 @SuppressWarnings("NonAsciiCharacters")
 class ContentAcceptanceTest {
 
@@ -37,10 +38,41 @@ class ContentAcceptanceTest {
         var 컨텐츠 = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
 
         //when
-        var 응답 = 등록("/api/contents", asJsonString(컨텐츠)).as(ContentResponse.class);
+        var 등록된_컨텐츠 = 등록("/api/contents", asJsonString(컨텐츠)).as(ContentResponse.class);
 
         //then
-        assertThat(응답.getId()).isNotNull();
+        assertThat(등록된_컨텐츠.getId()).isNotNull();
+    }
+
+    @Test
+    void 모든_컨텐츠를_조회한다() throws Exception {
+        //given
+        컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
+        컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+
+        //when
+        var 모든_컨텐츠 = 조회("/api/contents").as(ContentResponse[].class);
+
+        //then
+        assertThat(모든_컨텐츠)
+                .extracting(ContentResponse::getTitle)
+                .containsExactly("하울의 움직이는 성", "이웃집 토토로");
+    }
+
+    private void 컨텐츠_등록(String url, String title) throws Exception {
+        등록("/api/contents", asJsonString(new ContentRequest(url, title))).as(ContentResponse.class);
+    }
+
+    protected ExtractableResponse<Response> 조회(String path, Object... pathParams) {
+        //@formatter:off
+        return given()
+                .log().all()
+        .when()
+                .get(path, pathParams)
+        .then()
+                .log().all()
+                .extract();
+        //@formatter:on
     }
 
     private ExtractableResponse<Response> 등록(String path, String inputJsonForCreate) {
@@ -53,7 +85,6 @@ class ContentAcceptanceTest {
                 .post(path)
         .then()
                 .log().all()
-                .statusCode(HttpStatus.CREATED.value())
                 .extract();
         //@formatter:on
     }
@@ -61,5 +92,4 @@ class ContentAcceptanceTest {
     protected String asJsonString(Object object) throws Exception {
         return objectMapper.writeValueAsString(object);
     }
-
 }

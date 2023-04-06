@@ -10,6 +10,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -30,7 +33,7 @@ class ContentApiControllerTest {
 
 
     @Test
-    void save() throws Exception {
+    void saveContentApi() throws Exception {
         //given
         var request = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
 
@@ -45,6 +48,34 @@ class ContentApiControllerTest {
         result.andExpectAll(
                 status().isCreated(),
                 jsonPath("$.id").exists()
+        );
+    }
+
+    @Test
+    void getAllContentsApi() throws Exception {
+        //given
+        var totoro = new Content(1L, "https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        var howlMovingCastle = new Content(1L, "https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
+
+        given(contentService.getAll()).willReturn(List.of(totoro, howlMovingCastle));
+
+
+        //when
+        var result = get("/api/contents");
+
+
+        //then
+        result.andExpectAll(
+                status().isOk(),
+                jsonPath("$..url").value(contains(totoro.url(), howlMovingCastle.url())),
+                jsonPath("$..title").value(contains(totoro.title(), howlMovingCastle.title()))
+        );
+    }
+
+
+    private ResultActions get(String path, Object... uriVariables) throws Exception {
+        return mockMvc.perform(
+                MockMvcRequestBuilders.get(path, uriVariables)
         );
     }
 

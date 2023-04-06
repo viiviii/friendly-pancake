@@ -8,6 +8,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContentRequest {
+    
     private String url;
     private String title;
+
+    public Content toEntity() {
+        return new Content(url, title);
+    }
 }
