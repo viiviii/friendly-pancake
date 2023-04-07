@@ -61,9 +61,29 @@ class ContentAcceptanceTest {
                 .containsExactly("하울의 움직이는 성", "이웃집 토토로");
     }
 
+
+    @Test
+    void 컨텐츠를_시청_처리한다() throws Exception {
+        //given
+        var 등록된_컨텐츠_아이디 = 등록된_컨텐츠().getId();
+
+        //when
+        var 시청_처리 = 변경("/api/contents/{id}/watch", 등록된_컨텐츠_아이디).as(Boolean.class);
+
+        //then
+        assertThat(시청_처리).isTrue();
+    }
+
     private void 컨텐츠_등록(String url, String title) throws Exception {
         등록("/api/contents", asJsonString(new ContentRequest(url, title))).as(ContentResponse.class);
     }
+
+    private ContentResponse 등록된_컨텐츠() throws Exception {
+        var 컨텐츠 = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
+
+        return 등록("/api/contents", asJsonString(컨텐츠)).as(ContentResponse.class);
+    }
+
 
     protected ExtractableResponse<Response> 조회(String path, Object... pathParams) {
         //@formatter:off
@@ -85,6 +105,18 @@ class ContentAcceptanceTest {
                 .body(inputJsonForCreate)
         .when()
                 .post(path)
+        .then()
+                .log().all()
+                .extract();
+        //@formatter:on
+    }
+
+    protected ExtractableResponse<Response> 변경(String path, Object... pathParams) {
+        //@formatter:off
+        return given()
+                .log().all()
+        .when()
+                .patch(path, pathParams)
         .then()
                 .log().all()
                 .extract();

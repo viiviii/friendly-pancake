@@ -36,4 +36,11 @@ public class ContentApiController {
                 .map(ContentResponse::fromEntity)
                 .toList());
     }
+
+    @PatchMapping("{id}/watch")
+    public ResponseEntity<Boolean> watchContent(@PathVariable Long id) {
+        final boolean watched = contentService.watch(id);
+
+        return status(OK).body(watched);
+    }
 }

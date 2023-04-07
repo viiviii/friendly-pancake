@@ -46,9 +46,20 @@ class ContentServiceTest {
                 );
     }
 
+    @Test
+    void watched() {
+        //given
+        var contentId = savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명").id();
 
-    private void savedContent(String url, String title) {
-        contentService.save(new ContentRequest(url, title));
+        //when
+        var watched = contentService.watch(contentId);
+
+        //then
+        assertThat(watched).isTrue();
+    }
+
+    private Content savedContent(String url, String title) {
+        return contentService.save(new ContentRequest(url, title));
     }
 
 }

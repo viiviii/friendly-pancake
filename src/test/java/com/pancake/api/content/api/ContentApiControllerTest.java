@@ -16,11 +16,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ContentApiController.class)
 class ContentApiControllerTest {
@@ -75,6 +76,23 @@ class ContentApiControllerTest {
         );
     }
 
+    @Test
+    void watchContentApi() throws Exception {
+        //given
+        given(contentService.watch(anyLong())).willReturn(true);
+
+        //when
+        var result = patch("/api/contents/{id}/watch", 6789);
+
+        //then
+        verify(contentService).watch(6789);
+
+        result.andExpectAll(
+                status().isOk(),
+                content().string(equalTo("true"))
+        );
+    }
+
 
     private ResultActions get(String path, Object... uriVariables) throws Exception {
         return mockMvc.perform(
@@ -87,6 +105,12 @@ class ContentApiControllerTest {
                 MockMvcRequestBuilders.post(path)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(inputJsonForCreate)
+        );
+    }
+
+    protected final ResultActions patch(String urlTemplate, Object... uriVariables) throws Exception {
+        return mockMvc.perform(
+                MockMvcRequestBuilders.patch(urlTemplate, uriVariables)
         );
     }
 

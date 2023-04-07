@@ -21,4 +21,8 @@ public class ContentService {
     public List<Content> getAll() {
         return contentRepository.findAll();
     }
+
+    public boolean watch(long id) {
+        return true;
+    }
 }
