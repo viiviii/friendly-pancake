@@ -30,13 +30,30 @@ class ContentServiceTest {
     }
 
     @Test
-    void getAll() {
+    void getAllContents() {
         //given
         savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
         savedContent("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
 
         //when
-        var contents = contentService.getAll();
+        var contents = contentService.getAllContents();
+
+        //then
+        assertThat(contents).extracting(Content::url, Content::title)
+                .containsExactly(
+                        tuple("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명"),
+                        tuple("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로")
+                );
+    }
+
+    @Test
+    void getUnwatchedContents() {
+        //given
+        savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
+        savedContent("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+
+        //when
+        var contents = contentService.getUnwatchedContents();
 
         //then
         assertThat(contents).extracting(Content::url, Content::title)

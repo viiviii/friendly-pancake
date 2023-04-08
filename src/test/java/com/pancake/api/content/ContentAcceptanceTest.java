@@ -47,7 +47,7 @@ class ContentAcceptanceTest {
     }
 
     @Test
-    void 모든_컨텐츠를_조회한다() throws Exception {
+    void 컨텐츠를_모두_조회한다() throws Exception {
         //given
         컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
         컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
@@ -61,6 +61,20 @@ class ContentAcceptanceTest {
                 .containsExactly("하울의 움직이는 성", "이웃집 토토로");
     }
 
+    @Test
+    void 시청할_컨텐츠를_모두_조회한다() throws Exception {
+        //given
+        컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
+        컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+
+        //when
+        var 모든_컨텐츠 = 조회("/api/contents/unwatched").as(ContentResponse[].class);
+
+        //then
+        assertThat(모든_컨텐츠)
+                .extracting(ContentResponse::getTitle)
+                .containsExactly("하울의 움직이는 성", "이웃집 토토로");
+    }
 
     @Test
     void 컨텐츠를_시청_처리한다() throws Exception {
@@ -71,7 +85,7 @@ class ContentAcceptanceTest {
         var 시청_처리 = 변경("/api/contents/{id}/watch", 등록된_컨텐츠_아이디).as(Boolean.class);
 
         //then
-        assertThat(시청_처리).isTrue();
+        assertThat(시청_처리).isTrue(); // TODO
     }
 
     private void 컨텐츠_등록(String url, String title) throws Exception {

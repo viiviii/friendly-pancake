@@ -10,4 +10,6 @@ public interface ContentRepository extends Repository<Content, Long> {
     Content save(Content content);
 
     List<Content> findAll();
+
+    List<Content> findByWatchedFalse();
 }

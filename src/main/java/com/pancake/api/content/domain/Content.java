@@ -25,9 +25,10 @@ public class Content {
 
     private String title;
 
+    private boolean watched;
+
     public Content(String url, String title) {
-        this.url = url;
-        this.title = title;
+        this(null, url, title, false);
     }
 
     public Long id() {
@@ -40,5 +41,9 @@ public class Content {
 
     public String title() {
         return this.title;
+    }
+
+    public boolean isWatched() {
+        return this.watched;
     }
 }

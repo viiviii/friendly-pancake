@@ -18,8 +18,12 @@ public class ContentService {
         return contentRepository.save(request.toEntity());
     }
 
-    public List<Content> getAll() {
+    public List<Content> getAllContents() {
         return contentRepository.findAll();
+    }
+
+    public List<Content> getUnwatchedContents() {
+        return contentRepository.findByWatchedFalse();
     }
 
     public boolean watch(long id) {
