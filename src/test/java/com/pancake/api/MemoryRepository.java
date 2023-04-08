@@ -1,4 +1,4 @@
-package com.pancake.api.helper;
+package com.pancake.api;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
