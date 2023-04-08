@@ -46,4 +46,10 @@ public class Content {
     public boolean isWatched() {
         return this.watched;
     }
+
+    public boolean watch() {
+        watched = true;
+
+        return true;
+    }
 }

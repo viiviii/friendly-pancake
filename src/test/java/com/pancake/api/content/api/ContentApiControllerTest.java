@@ -96,6 +96,25 @@ class ContentApiControllerTest {
     }
 
     @Test
+    void getWatchedContentsApi() throws Exception {
+        //given
+        var totoro = watchedContent(1L, "https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        var howlMovingCastle = watchedContent(1L, "https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
+
+        given(contentService.getWatchedContents()).willReturn(List.of(totoro, howlMovingCastle));
+
+        //when
+        var result = get("/api/contents/watched");
+
+        //then
+        result.andExpectAll(
+                status().isOk(),
+                jsonPath("$..url").value(contains(totoro.url(), howlMovingCastle.url())),
+                jsonPath("$..title").value(contains(totoro.title(), howlMovingCastle.title()))
+        );
+    }
+
+    @Test
     void patchWatchedContentApi() throws Exception {
         //given
         given(contentService.watch(anyLong())).willReturn(true);
@@ -113,9 +132,16 @@ class ContentApiControllerTest {
     }
 
     private Content unwatchedContent(long id, String url, String title) {
-        return new Content(id, url, title, false);
+        return createContent(id, url, title, false);
     }
 
+    private Content watchedContent(long id, String url, String title) {
+        return createContent(id, url, title, true);
+    }
+
+    private Content createContent(long id, String url, String title, boolean watched) {
+        return new Content(id, url, title, watched);
+    }
 
     private ResultActions get(String path, Object... uriVariables) throws Exception {
         return mockMvc.perform(

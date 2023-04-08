@@ -5,6 +5,7 @@ import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.infra.ContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,7 +27,15 @@ public class ContentService {
         return contentRepository.findByWatchedFalse();
     }
 
+    public List<Content> getWatchedContents() {
+        return contentRepository.findByWatchedTrue();
+    }
+
+    @Transactional
     public boolean watch(long id) {
-        return true;
+        final var content = contentRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+
+        return content.watch();
     }
 }

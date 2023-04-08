@@ -16,6 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -68,36 +69,63 @@ class ContentAcceptanceTest {
         컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
 
         //when
-        var 모든_컨텐츠 = 조회("/api/contents/unwatched").as(ContentResponse[].class);
+        var 시청할_컨텐츠_목록 = 조회("/api/contents/unwatched").as(ContentResponse[].class);
 
         //then
-        assertThat(모든_컨텐츠)
+        assertThat(시청할_컨텐츠_목록)
                 .extracting(ContentResponse::getTitle)
+                .containsExactly("하울의 움직이는 성", "이웃집 토토로");
+    }
+
+    @Test
+    void 시청한_컨텐츠를_모두_조회한다() throws Exception {
+        //given
+        시청(컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성").getId());
+        시청(컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로").getId());
+
+        //when
+        var 시청한_컨텐츠_목록 = 조회("/api/contents/watched").as(ContentResponse[].class);
+
+        //then
+        assertThat(시청한_컨텐츠_목록).extracting(ContentResponse::getTitle)
                 .containsExactly("하울의 움직이는 성", "이웃집 토토로");
     }
 
     @Test
     void 컨텐츠를_시청_처리한다() throws Exception {
         //given
-        var 등록된_컨텐츠_아이디 = 등록된_컨텐츠().getId();
+        컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        var 시청할_컨텐츠 = 컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
+
 
         //when
-        var 시청_처리 = 변경("/api/contents/{id}/watch", 등록된_컨텐츠_아이디).as(Boolean.class);
+        변경("/api/contents/{id}/watch", 시청할_컨텐츠.getId()).as(Boolean.class);
 
         //then
-        assertThat(시청_처리).isTrue(); // TODO
+        assertAll(
+                () -> assertThat(시청할_컨텐츠_목록_조회()).extracting(ContentResponse::getTitle)
+                        .contains("이웃집 토토로")
+                        .doesNotContain("하울의 움직이는 성"),
+                () -> assertThat(시청한_컨텐츠_목록_조회()).extracting(ContentResponse::getTitle)
+                        .containsExactly("하울의 움직이는 성")
+        );
     }
 
-    private void 컨텐츠_등록(String url, String title) throws Exception {
-        등록("/api/contents", asJsonString(new ContentRequest(url, title))).as(ContentResponse.class);
+    private ContentResponse 컨텐츠_등록(String url, String title) throws Exception {
+        return 등록("/api/contents", asJsonString(new ContentRequest(url, title))).as(ContentResponse.class);
     }
 
-    private ContentResponse 등록된_컨텐츠() throws Exception {
-        var 컨텐츠 = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
-
-        return 등록("/api/contents", asJsonString(컨텐츠)).as(ContentResponse.class);
+    private ContentResponse[] 시청할_컨텐츠_목록_조회() {
+        return 조회("/api/contents/unwatched").as(ContentResponse[].class);
     }
 
+    private ContentResponse[] 시청한_컨텐츠_목록_조회() {
+        return 조회("/api/contents/watched").as(ContentResponse[].class);
+    }
+
+    private void 시청(long 컨텐츠_아이디) {
+        변경("/api/contents/{id}/watch", 컨텐츠_아이디).as(Boolean.class);
+    }
 
     protected ExtractableResponse<Response> 조회(String path, Object... pathParams) {
         //@formatter:off

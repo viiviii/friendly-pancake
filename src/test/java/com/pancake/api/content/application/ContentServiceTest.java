@@ -64,7 +64,24 @@ class ContentServiceTest {
     }
 
     @Test
-    void watched() {
+    void getWatchedContents() {
+        //given
+        savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명").watch();
+        savedContent("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로").watch();
+
+        //when
+        var contents = contentService.getWatchedContents();
+
+        //then
+        assertThat(contents).extracting(Content::url, Content::title)
+                .containsExactly(
+                        tuple("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명"),
+                        tuple("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로")
+                );
+    }
+
+    @Test
+    void watch() {
         //given
         var contentId = savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명").id();
 
