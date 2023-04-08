@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 
+import static com.pancake.api.content.NetflixConstant.PONYO;
+import static com.pancake.api.content.NetflixConstant.TOTORO;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -38,65 +40,63 @@ class ContentAcceptanceTest {
     @Test
     void 컨텐츠를_등록한다() throws Exception {
         //given
-        var 컨텐츠 = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
+        var 컨텐츠 = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
 
         //when
         var 등록된_컨텐츠 = 등록("/api/contents", asJsonString(컨텐츠)).as(ContentResponse.class);
 
         //then
-        assertThat(등록된_컨텐츠.getId()).isNotNull();
+        assertThat(등록된_컨텐츠.getId()).isNotNull(); // TODO
     }
 
     @Test
     void 컨텐츠를_모두_조회한다() throws Exception {
         //given
-        컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
-        컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        컨텐츠_등록(TOTORO.URL, TOTORO.TITLE);
+        컨텐츠_등록(PONYO.URL, PONYO.TITLE);
 
         //when
         var 모든_컨텐츠 = 조회("/api/contents").as(ContentResponse[].class);
 
         //then
-        assertThat(모든_컨텐츠)
-                .extracting(ContentResponse::getTitle)
-                .containsExactly("하울의 움직이는 성", "이웃집 토토로");
+        assertThat(모든_컨텐츠).extracting(ContentResponse::getTitle)
+                .containsExactly(TOTORO.TITLE, PONYO.TITLE);
     }
 
     @Test
     void 시청할_컨텐츠를_모두_조회한다() throws Exception {
         //given
-        컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
-        컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        컨텐츠_등록(TOTORO.URL, TOTORO.TITLE);
+        컨텐츠_등록(PONYO.URL, PONYO.TITLE);
 
         //when
         var 시청할_컨텐츠_목록 = 조회("/api/contents/unwatched").as(ContentResponse[].class);
 
         //then
-        assertThat(시청할_컨텐츠_목록)
-                .extracting(ContentResponse::getTitle)
-                .containsExactly("하울의 움직이는 성", "이웃집 토토로");
+        assertThat(시청할_컨텐츠_목록).extracting(ContentResponse::getTitle)
+                .containsExactly(TOTORO.TITLE, PONYO.TITLE);
     }
 
     @Test
     void 시청한_컨텐츠를_모두_조회한다() throws Exception {
         //given
-        시청(컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성").getId());
-        시청(컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로").getId());
+        시청(컨텐츠_등록(TOTORO.URL, TOTORO.TITLE).getId());
+        시청(컨텐츠_등록(PONYO.URL, PONYO.TITLE).getId());
 
         //when
         var 시청한_컨텐츠_목록 = 조회("/api/contents/watched").as(ContentResponse[].class);
 
         //then
         assertThat(시청한_컨텐츠_목록).extracting(ContentResponse::getTitle)
-                .containsExactly("하울의 움직이는 성", "이웃집 토토로");
+                .containsExactly(TOTORO.TITLE, PONYO.TITLE);
     }
 
     @Test
     void 컨텐츠를_시청_처리한다() throws Exception {
         //given
-        컨텐츠_등록("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
-        var 시청할_컨텐츠 = 컨텐츠_등록("https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
+        컨텐츠_등록(TOTORO.URL, TOTORO.TITLE);
 
+        var 시청할_컨텐츠 = 컨텐츠_등록(PONYO.URL, PONYO.TITLE);
 
         //when
         변경("/api/contents/{id}/watch", 시청할_컨텐츠.getId()).as(Boolean.class);
@@ -104,10 +104,10 @@ class ContentAcceptanceTest {
         //then
         assertAll(
                 () -> assertThat(시청할_컨텐츠_목록_조회()).extracting(ContentResponse::getTitle)
-                        .contains("이웃집 토토로")
-                        .doesNotContain("하울의 움직이는 성"),
+                        .contains(TOTORO.TITLE)
+                        .doesNotContain(PONYO.TITLE),
                 () -> assertThat(시청한_컨텐츠_목록_조회()).extracting(ContentResponse::getTitle)
-                        .containsExactly("하울의 움직이는 성")
+                        .containsExactly(PONYO.TITLE)
         );
     }
 

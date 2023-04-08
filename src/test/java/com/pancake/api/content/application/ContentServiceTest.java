@@ -5,6 +5,8 @@ import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.infra.MemoryContentRepository;
 import org.junit.jupiter.api.Test;
 
+import static com.pancake.api.content.NetflixConstant.PONYO;
+import static com.pancake.api.content.NetflixConstant.TOTORO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -16,7 +18,7 @@ class ContentServiceTest {
     @Test
     void save() {
         //given
-        var request = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
+        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
 
         //when
         var actual = contentService.save(request);
@@ -24,16 +26,16 @@ class ContentServiceTest {
         //then
         assertAll(
                 () -> assertThat(actual.id()).isPositive(),
-                () -> assertThat(actual.url()).isEqualTo(request.getUrl()),
-                () -> assertThat(actual.title()).isEqualTo(request.getTitle())
+                () -> assertThat(actual.url()).isEqualTo(TOTORO.URL),
+                () -> assertThat(actual.title()).isEqualTo(TOTORO.TITLE)
         );
     }
 
     @Test
     void getAllContents() {
         //given
-        savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
-        savedContent("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        savedContent(TOTORO.URL, TOTORO.TITLE);
+        savedContent(PONYO.URL, PONYO.TITLE);
 
         //when
         var contents = contentService.getAllContents();
@@ -41,16 +43,16 @@ class ContentServiceTest {
         //then
         assertThat(contents).extracting(Content::url, Content::title)
                 .containsExactly(
-                        tuple("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명"),
-                        tuple("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로")
+                        tuple(TOTORO.URL, TOTORO.TITLE), // TODO
+                        tuple(PONYO.URL, PONYO.TITLE) // TODO
                 );
     }
 
     @Test
     void getUnwatchedContents() {
         //given
-        savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
-        savedContent("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        savedContent(TOTORO.URL, TOTORO.TITLE);
+        savedContent(PONYO.URL, PONYO.TITLE);
 
         //when
         var contents = contentService.getUnwatchedContents();
@@ -58,16 +60,16 @@ class ContentServiceTest {
         //then
         assertThat(contents).extracting(Content::url, Content::title)
                 .containsExactly(
-                        tuple("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명"),
-                        tuple("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로")
+                        tuple(TOTORO.URL, TOTORO.TITLE),
+                        tuple(PONYO.URL, PONYO.TITLE)
                 );
     }
 
     @Test
     void getWatchedContents() {
         //given
-        savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명").watch();
-        savedContent("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로").watch();
+        savedContent(TOTORO.URL, TOTORO.TITLE).watch();
+        savedContent(PONYO.URL, PONYO.TITLE).watch();
 
         //when
         var contents = contentService.getWatchedContents();
@@ -75,15 +77,15 @@ class ContentServiceTest {
         //then
         assertThat(contents).extracting(Content::url, Content::title)
                 .containsExactly(
-                        tuple("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명"),
-                        tuple("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로")
+                        tuple(TOTORO.URL, TOTORO.TITLE),
+                        tuple(PONYO.URL, PONYO.TITLE)
                 );
     }
 
     @Test
     void watch() {
         //given
-        var contentId = savedContent("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명").id();
+        var contentId = savedContent(TOTORO.URL, TOTORO.TITLE).id();
 
         //when
         var watched = contentService.watch(contentId);

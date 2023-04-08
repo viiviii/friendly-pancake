@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static com.pancake.api.content.NetflixConstant.PONYO;
+import static com.pancake.api.content.NetflixConstant.TOTORO;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +41,7 @@ class ContentApiControllerTest {
     @Test
     void postContentApi() throws Exception {
         //given
-        var request = new ContentRequest("https://www.netflix.com/watch/60023642?trackId=14234261", "센과 치히로의 행방불명");
+        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
 
         given(contentService.save(any())).willReturn(unwatchedContent(128L, request.getUrl(), request.getTitle()));
 
@@ -58,11 +60,10 @@ class ContentApiControllerTest {
     @Test
     void getAllContentsApi() throws Exception {
         //given
-        var totoro = unwatchedContent(1L, "https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
-        var howlMovingCastle = unwatchedContent(2L, "https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
-
-        given(contentService.getAllContents()).willReturn(List.of(totoro, howlMovingCastle));
-
+        given(contentService.getAllContents()).willReturn(List.of(
+                unwatchedContent(1L, TOTORO.URL, TOTORO.TITLE),
+                unwatchedContent(2L, PONYO.URL, PONYO.TITLE)
+        ));
 
         //when
         var result = get("/api/contents");
@@ -71,18 +72,18 @@ class ContentApiControllerTest {
         //then
         result.andExpectAll(
                 status().isOk(),
-                jsonPath("$..url").value(contains(totoro.url(), howlMovingCastle.url())),
-                jsonPath("$..title").value(contains(totoro.title(), howlMovingCastle.title()))
+                jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
+                jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
         );
     }
 
     @Test
     void getUnwatchedContentsApi() throws Exception {
         //given
-        var totoro = unwatchedContent(1L, "https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
-        var howlMovingCastle = unwatchedContent(1L, "https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
-
-        given(contentService.getUnwatchedContents()).willReturn(List.of(totoro, howlMovingCastle));
+        given(contentService.getUnwatchedContents()).willReturn(List.of(
+                unwatchedContent(1L, TOTORO.URL, TOTORO.TITLE),
+                unwatchedContent(2L, PONYO.URL, PONYO.TITLE)
+        ));
 
         //when
         var result = get("/api/contents/unwatched");
@@ -90,18 +91,18 @@ class ContentApiControllerTest {
         //then
         result.andExpectAll(
                 status().isOk(),
-                jsonPath("$..url").value(contains(totoro.url(), howlMovingCastle.url())),
-                jsonPath("$..title").value(contains(totoro.title(), howlMovingCastle.title()))
+                jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
+                jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
         );
     }
 
     @Test
     void getWatchedContentsApi() throws Exception {
         //given
-        var totoro = watchedContent(1L, "https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
-        var howlMovingCastle = watchedContent(1L, "https://www.netflix.com/watch/70028883?trackId=255824129", "하울의 움직이는 성");
-
-        given(contentService.getWatchedContents()).willReturn(List.of(totoro, howlMovingCastle));
+        given(contentService.getWatchedContents()).willReturn(List.of(
+                watchedContent(1L, TOTORO.URL, TOTORO.TITLE),
+                watchedContent(2L, PONYO.URL, PONYO.TITLE)
+        ));
 
         //when
         var result = get("/api/contents/watched");
@@ -109,8 +110,8 @@ class ContentApiControllerTest {
         //then
         result.andExpectAll(
                 status().isOk(),
-                jsonPath("$..url").value(contains(totoro.url(), howlMovingCastle.url())),
-                jsonPath("$..title").value(contains(totoro.title(), howlMovingCastle.title()))
+                jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
+                jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
         );
     }
 

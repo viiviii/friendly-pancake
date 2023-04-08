@@ -3,6 +3,7 @@ package com.pancake.api.content.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.pancake.api.content.NetflixConstant.TOTORO;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ContentTest {
@@ -11,7 +12,7 @@ class ContentTest {
     @Test
     void create() {
         //when
-        var content = new Content("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        var content = new Content(TOTORO.URL, TOTORO.TITLE);
 
         //then
         assertThat(content.isWatched()).isFalse();
@@ -22,7 +23,7 @@ class ContentTest {
     @Test
     void watch() {
         //given
-        var content = new Content("https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로");
+        var content = new Content(TOTORO.URL, TOTORO.TITLE); // TODO
 
         //when
         boolean watched = content.watch();
@@ -35,7 +36,7 @@ class ContentTest {
     @Test
     void isWatched() {
         //given
-        var content = new Content(null, "https://www.netflix.com/watch/60032294?trackId=254245392", "이웃집 토토로", true);
+        var content = new Content(null, TOTORO.URL, TOTORO.TITLE, true); // TODO
 
         //then
         assertThat(content.isWatched()).isTrue();
