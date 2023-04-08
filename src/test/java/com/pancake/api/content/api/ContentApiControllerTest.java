@@ -22,7 +22,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ContentApiController.class)
@@ -37,23 +36,23 @@ class ContentApiControllerTest {
     @MockBean
     private ContentService contentService;
 
-
     @Test
     void postContentApi() throws Exception {
         //given
         var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
+        var content = unwatchedContent(128, request.getUrl(), request.getTitle());
 
-        given(contentService.save(any())).willReturn(unwatchedContent(128L, request.getUrl(), request.getTitle()));
+        given(contentService.save(any())).willReturn(content);
 
         //when
-        var result = post("/api/contents", asJsonString(request));
+        var result = post("/api/contents", request);
 
         //then
-        verify(contentService).save(request);
-
         result.andExpectAll(
                 status().isCreated(),
-                jsonPath("$.id").exists()
+                jsonPath("$.id").value(equalTo(128)),
+                jsonPath("$.url").value(equalTo(TOTORO.URL)),
+                jsonPath("$.title").value(equalTo(TOTORO.TITLE))
         );
     }
 
@@ -61,17 +60,17 @@ class ContentApiControllerTest {
     void getAllContentsApi() throws Exception {
         //given
         given(contentService.getAllContents()).willReturn(List.of(
-                unwatchedContent(1L, TOTORO.URL, TOTORO.TITLE),
-                unwatchedContent(2L, PONYO.URL, PONYO.TITLE)
+                unwatchedContent(1001, TOTORO.URL, TOTORO.TITLE),
+                unwatchedContent(1002, PONYO.URL, PONYO.TITLE)
         ));
 
         //when
         var result = get("/api/contents");
 
-
         //then
         result.andExpectAll(
                 status().isOk(),
+                jsonPath("$..id").value(contains(1001, 1002)),
                 jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
                 jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
         );
@@ -81,8 +80,8 @@ class ContentApiControllerTest {
     void getUnwatchedContentsApi() throws Exception {
         //given
         given(contentService.getUnwatchedContents()).willReturn(List.of(
-                unwatchedContent(1L, TOTORO.URL, TOTORO.TITLE),
-                unwatchedContent(2L, PONYO.URL, PONYO.TITLE)
+                unwatchedContent(1001, TOTORO.URL, TOTORO.TITLE),
+                unwatchedContent(1002, PONYO.URL, PONYO.TITLE)
         ));
 
         //when
@@ -91,6 +90,7 @@ class ContentApiControllerTest {
         //then
         result.andExpectAll(
                 status().isOk(),
+                jsonPath("$..id").value(contains(1001, 1002)),
                 jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
                 jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
         );
@@ -100,8 +100,8 @@ class ContentApiControllerTest {
     void getWatchedContentsApi() throws Exception {
         //given
         given(contentService.getWatchedContents()).willReturn(List.of(
-                watchedContent(1L, TOTORO.URL, TOTORO.TITLE),
-                watchedContent(2L, PONYO.URL, PONYO.TITLE)
+                watchedContent(1001, TOTORO.URL, TOTORO.TITLE),
+                watchedContent(1002, PONYO.URL, PONYO.TITLE)
         ));
 
         //when
@@ -110,22 +110,21 @@ class ContentApiControllerTest {
         //then
         result.andExpectAll(
                 status().isOk(),
+                jsonPath("$..id").value(contains(1001, 1002)),
                 jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
                 jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
         );
     }
 
     @Test
-    void patchWatchedContentApi() throws Exception {
+    void patchWatchContentApi() throws Exception {
         //given
         given(contentService.watch(anyLong())).willReturn(true);
 
         //when
-        var result = patch("/api/contents/{id}/watch", 6789);
+        var result = patch("/api/contents/{id}/watch", 1234);
 
         //then
-        verify(contentService).watch(6789);
-
         result.andExpectAll(
                 status().isOk(),
                 content().string(equalTo("true"))
@@ -150,15 +149,15 @@ class ContentApiControllerTest {
         );
     }
 
-    private ResultActions post(String path, String inputJsonForCreate) throws Exception {
+    private ResultActions post(String path, Object body) throws Exception {
         return mockMvc.perform(
                 MockMvcRequestBuilders.post(path)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(inputJsonForCreate)
+                        .content(asJsonString(body))
         );
     }
 
-    protected final ResultActions patch(String urlTemplate, Object... uriVariables) throws Exception {
+    private ResultActions patch(String urlTemplate, Object... uriVariables) throws Exception {
         return mockMvc.perform(
                 MockMvcRequestBuilders.patch(urlTemplate, uriVariables)
         );
