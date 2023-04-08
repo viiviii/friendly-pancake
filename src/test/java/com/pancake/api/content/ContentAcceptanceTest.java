@@ -18,7 +18,6 @@ import static com.pancake.api.content.NetflixConstant.PONYO;
 import static com.pancake.api.content.NetflixConstant.TOTORO;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -38,96 +37,105 @@ class ContentAcceptanceTest {
     }
 
     @Test
-    void 컨텐츠를_등록한다() throws Exception {
+    void 컨텐츠를_등록할_수_있다() throws Exception {
         //given
-        var 컨텐츠 = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
+        var 등록할_컨텐츠_주소 = "https://www.netflix.com/watch/60023642?trackId=14234261";
+        var 등록할_컨텐츠_제목 = "센과 치히로의 행방불명";
 
         //when
-        var 등록된_컨텐츠 = 등록("/api/contents", asJsonString(컨텐츠)).as(ContentResponse.class);
+        var 등록된_컨텐츠 = 컨텐츠를_등록한다(등록할_컨텐츠_주소, 등록할_컨텐츠_제목);
 
         //then
-        assertThat(등록된_컨텐츠.getId()).isNotNull(); // TODO
+        assertThat(컨텐츠를_모두_조회한다()).containsExactly(등록된_컨텐츠);
     }
 
     @Test
-    void 컨텐츠를_모두_조회한다() throws Exception {
+    void 컨텐츠를_시청_처리_할_수_있다() throws Exception {
         //given
-        컨텐츠_등록(TOTORO.URL, TOTORO.TITLE);
-        컨텐츠_등록(PONYO.URL, PONYO.TITLE);
+        var 포뇨 = 포뇨_컨텐츠();
 
         //when
-        var 모든_컨텐츠 = 조회("/api/contents").as(ContentResponse[].class);
+        컨텐츠를_시청_처리_한다(포뇨.getId());
 
         //then
-        assertThat(모든_컨텐츠).extracting(ContentResponse::getTitle)
-                .containsExactly(TOTORO.TITLE, PONYO.TITLE);
+        assertThat(시청한_컨텐츠를_모두_조회한다()).containsExactly(포뇨);
     }
 
     @Test
-    void 시청할_컨텐츠를_모두_조회한다() throws Exception {
+    void 시청할_수_있는_컨텐츠를_모두_조회할_수_있다() throws Exception {
         //given
-        컨텐츠_등록(TOTORO.URL, TOTORO.TITLE);
-        컨텐츠_등록(PONYO.URL, PONYO.TITLE);
+        var 토토로 = 토토로_컨텐츠();
+        시청한(포뇨_컨텐츠());
 
         //when
-        var 시청할_컨텐츠_목록 = 조회("/api/contents/unwatched").as(ContentResponse[].class);
+        var 시청할_컨텐츠_목록 = 시청할_컨텐츠를_모두_조회한다();
 
         //then
-        assertThat(시청할_컨텐츠_목록).extracting(ContentResponse::getTitle)
-                .containsExactly(TOTORO.TITLE, PONYO.TITLE);
+        assertThat(시청할_컨텐츠_목록).containsExactly(토토로);
     }
 
     @Test
-    void 시청한_컨텐츠를_모두_조회한다() throws Exception {
+    void 이미_시청한_컨텐츠를_모두_조회할_수_있다() throws Exception {
         //given
-        시청(컨텐츠_등록(TOTORO.URL, TOTORO.TITLE).getId());
-        시청(컨텐츠_등록(PONYO.URL, PONYO.TITLE).getId());
+        토토로_컨텐츠();
+        var 포뇨 = 시청한(포뇨_컨텐츠());
 
         //when
-        var 시청한_컨텐츠_목록 = 조회("/api/contents/watched").as(ContentResponse[].class);
+        var 시청한_컨텐츠_목록 = 시청한_컨텐츠를_모두_조회한다();
 
         //then
-        assertThat(시청한_컨텐츠_목록).extracting(ContentResponse::getTitle)
-                .containsExactly(TOTORO.TITLE, PONYO.TITLE);
+        assertThat(시청한_컨텐츠_목록).containsExactly(포뇨);
     }
 
     @Test
-    void 컨텐츠를_시청_처리한다() throws Exception {
+    void 컨텐츠를_모두_조회할_수_있다() throws Exception {
         //given
-        컨텐츠_등록(TOTORO.URL, TOTORO.TITLE);
-
-        var 시청할_컨텐츠 = 컨텐츠_등록(PONYO.URL, PONYO.TITLE);
+        var 시청하지_않은_토토로 = 토토로_컨텐츠();
+        var 시청한_포뇨 = 시청한(포뇨_컨텐츠());
 
         //when
-        변경("/api/contents/{id}/watch", 시청할_컨텐츠.getId()).as(Boolean.class);
+        var 모든_컨텐츠_목록 = 컨텐츠를_모두_조회한다();
 
         //then
-        assertAll(
-                () -> assertThat(시청할_컨텐츠_목록_조회()).extracting(ContentResponse::getTitle)
-                        .contains(TOTORO.TITLE)
-                        .doesNotContain(PONYO.TITLE),
-                () -> assertThat(시청한_컨텐츠_목록_조회()).extracting(ContentResponse::getTitle)
-                        .containsExactly(PONYO.TITLE)
-        );
+        assertThat(모든_컨텐츠_목록).containsExactly(시청하지_않은_토토로, 시청한_포뇨);
     }
 
-    private ContentResponse 컨텐츠_등록(String url, String title) throws Exception {
-        return 등록("/api/contents", asJsonString(new ContentRequest(url, title))).as(ContentResponse.class);
+    private ContentResponse 토토로_컨텐츠() throws Exception {
+        return 컨텐츠를_등록한다(TOTORO.URL, TOTORO.TITLE);
     }
 
-    private ContentResponse[] 시청할_컨텐츠_목록_조회() {
-        return 조회("/api/contents/unwatched").as(ContentResponse[].class);
+    private ContentResponse 포뇨_컨텐츠() throws Exception {
+        return 컨텐츠를_등록한다(PONYO.URL, PONYO.TITLE);
     }
 
-    private ContentResponse[] 시청한_컨텐츠_목록_조회() {
-        return 조회("/api/contents/watched").as(ContentResponse[].class);
+    private ContentResponse 시청한(ContentResponse content) {
+        컨텐츠를_시청_처리_한다(content.getId());
+
+        return content;
     }
 
-    private void 시청(long 컨텐츠_아이디) {
-        변경("/api/contents/{id}/watch", 컨텐츠_아이디).as(Boolean.class);
+    private ContentResponse 컨텐츠를_등록한다(String url, String title) throws Exception {
+        return post("/api/contents", new ContentRequest(url, title)).as(ContentResponse.class);
     }
 
-    protected ExtractableResponse<Response> 조회(String path, Object... pathParams) {
+    private void 컨텐츠를_시청_처리_한다(long id) {
+        patch("/api/contents/{id}/watch", id).as(Boolean.class);
+    }
+
+    private ContentResponse[] 컨텐츠를_모두_조회한다() {
+        return get("/api/contents").as(ContentResponse[].class);
+    }
+
+    private ContentResponse[] 시청할_컨텐츠를_모두_조회한다() {
+        return get("/api/contents/unwatched").as(ContentResponse[].class);
+    }
+
+    private ContentResponse[] 시청한_컨텐츠를_모두_조회한다() {
+        return get("/api/contents/watched").as(ContentResponse[].class);
+    }
+
+
+    protected ExtractableResponse<Response> get(String path, Object... pathParams) {
         //@formatter:off
         return given()
                 .log().all()
@@ -139,12 +147,12 @@ class ContentAcceptanceTest {
         //@formatter:on
     }
 
-    private ExtractableResponse<Response> 등록(String path, String inputJsonForCreate) {
+    private ExtractableResponse<Response> post(String path, Object body) throws Exception {
         //@formatter:off
         return given()
                 .log().all()
                 .contentType(ContentType.JSON)
-                .body(inputJsonForCreate)
+                .body(asJsonString(body))
         .when()
                 .post(path)
         .then()
@@ -153,7 +161,7 @@ class ContentAcceptanceTest {
         //@formatter:on
     }
 
-    protected ExtractableResponse<Response> 변경(String path, Object... pathParams) {
+    protected ExtractableResponse<Response> patch(String path, Object... pathParams) {
         //@formatter:off
         return given()
                 .log().all()
