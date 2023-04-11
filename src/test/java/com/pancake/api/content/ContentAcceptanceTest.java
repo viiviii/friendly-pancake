@@ -20,7 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 class ContentAcceptanceTest {
 
     @Autowired
-    private WebTestClient client;
+    WebTestClient client;
 
     @Test
     void 컨텐츠를_등록할_수_있다() {

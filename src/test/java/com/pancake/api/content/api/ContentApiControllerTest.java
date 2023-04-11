@@ -25,10 +25,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 class ContentApiControllerTest {
 
     @MockBean
-    private ContentService contentService;
+    ContentService contentService;
 
     @Autowired
-    private WebTestClient client;
+    WebTestClient client;
 
     @Test
     void postContentApi() {
