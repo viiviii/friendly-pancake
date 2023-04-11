@@ -3,14 +3,12 @@ package com.pancake.api.content.api;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.domain.Content;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
-import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
@@ -29,14 +27,8 @@ class ContentApiControllerTest {
     @MockBean
     private ContentService contentService;
 
+    @Autowired
     private WebTestClient client;
-
-    @BeforeEach
-    void setUp(WebApplicationContext context) {
-        client = MockMvcWebTestClient
-                .bindToApplicationContext(context)
-                .build();
-    }
 
     @Test
     void postContentApi() {

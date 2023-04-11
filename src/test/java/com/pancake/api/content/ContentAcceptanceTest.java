@@ -2,10 +2,9 @@ package com.pancake.api.content;
 
 import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -20,14 +19,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @SuppressWarnings("NonAsciiCharacters")
 class ContentAcceptanceTest {
 
+    @Autowired
     private WebTestClient client;
-
-    @BeforeEach
-    public void setUp(@LocalServerPort int port) {
-        client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + port)
-                .build();
-    }
 
     @Test
     void 컨텐츠를_등록할_수_있다() {
