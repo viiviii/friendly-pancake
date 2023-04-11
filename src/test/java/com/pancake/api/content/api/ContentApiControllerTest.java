@@ -1,6 +1,5 @@
 package com.pancake.api.content.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.domain.Content;
@@ -8,10 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
 import java.util.List;
 
@@ -22,22 +19,19 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @WebMvcTest(ContentApiController.class)
 class ContentApiControllerTest {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private MockMvc mockMvc;
-
     @MockBean
-    private ContentService contentService;
+    ContentService contentService;
+
+    @Autowired
+    WebTestClient client;
 
     @Test
-    void postContentApi() throws Exception {
+    void postContentApi() {
         //given
         var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
         var content = unwatchedContent(128, request.getUrl(), request.getTitle());
@@ -48,16 +42,16 @@ class ContentApiControllerTest {
         var result = post("/api/contents", request);
 
         //then
-        result.andExpectAll(
-                status().isCreated(),
-                jsonPath("$.id").value(equalTo(128)),
-                jsonPath("$.url").value(equalTo(TOTORO.URL)),
-                jsonPath("$.title").value(equalTo(TOTORO.TITLE))
-        );
+        result
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.id").value(equalTo(128))
+                .jsonPath("$.url").value(equalTo(TOTORO.URL))
+                .jsonPath("$.title").value(equalTo(TOTORO.TITLE));
     }
 
     @Test
-    void getAllContentsApi() throws Exception {
+    void getAllContentsApi() {
         //given
         given(contentService.getAllContents()).willReturn(List.of(
                 unwatchedContent(1001, TOTORO.URL, TOTORO.TITLE),
@@ -68,16 +62,16 @@ class ContentApiControllerTest {
         var result = get("/api/contents");
 
         //then
-        result.andExpectAll(
-                status().isOk(),
-                jsonPath("$..id").value(contains(1001, 1002)),
-                jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
-                jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
-        );
+        result
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$..id").value(contains(1001, 1002))
+                .jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL))
+                .jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE));
     }
 
     @Test
-    void getUnwatchedContentsApi() throws Exception {
+    void getUnwatchedContentsApi() {
         //given
         given(contentService.getUnwatchedContents()).willReturn(List.of(
                 unwatchedContent(1001, TOTORO.URL, TOTORO.TITLE),
@@ -88,16 +82,16 @@ class ContentApiControllerTest {
         var result = get("/api/contents/unwatched");
 
         //then
-        result.andExpectAll(
-                status().isOk(),
-                jsonPath("$..id").value(contains(1001, 1002)),
-                jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
-                jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
-        );
+        result
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$..id").value(contains(1001, 1002))
+                .jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL))
+                .jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE));
     }
 
     @Test
-    void getWatchedContentsApi() throws Exception {
+    void getWatchedContentsApi() {
         //given
         given(contentService.getWatchedContents()).willReturn(List.of(
                 watchedContent(1001, TOTORO.URL, TOTORO.TITLE),
@@ -108,12 +102,12 @@ class ContentApiControllerTest {
         var result = get("/api/contents/watched");
 
         //then
-        result.andExpectAll(
-                status().isOk(),
-                jsonPath("$..id").value(contains(1001, 1002)),
-                jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL)),
-                jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
-        );
+        result
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$..id").value(contains(1001, 1002))
+                .jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL))
+                .jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE));
     }
 
     @Test
@@ -125,10 +119,10 @@ class ContentApiControllerTest {
         var result = patch("/api/contents/{id}/watch", 1234);
 
         //then
-        result.andExpectAll(
-                status().isOk(),
-                content().string(equalTo("true"))
-        );
+        result
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$").value(equalTo(true));
     }
 
     private Content unwatchedContent(long id, String url, String title) {
@@ -143,28 +137,18 @@ class ContentApiControllerTest {
         return new Content(id, url, title, watched);
     }
 
-    private ResultActions get(String path, Object... uriVariables) throws Exception {
-        return mockMvc.perform(
-                MockMvcRequestBuilders.get(path, uriVariables)
-        );
+    private ResponseSpec get(String path, Object... uriVariables) {
+        return client.get().uri(path, uriVariables).exchange();
     }
 
-    private ResultActions post(String path, Object body) throws Exception {
-        return mockMvc.perform(
-                MockMvcRequestBuilders.post(path)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(body))
-        );
+    private ResponseSpec post(String path, Object body) {
+        return client.post().uri(path)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(body)
+                .exchange();
     }
 
-    private ResultActions patch(String urlTemplate, Object... uriVariables) throws Exception {
-        return mockMvc.perform(
-                MockMvcRequestBuilders.patch(urlTemplate, uriVariables)
-        );
+    private ResponseSpec patch(String path, Object... uriVariables) {
+        return client.patch().uri(path, uriVariables).exchange();
     }
-
-    private String asJsonString(Object object) throws Exception {
-        return objectMapper.writeValueAsString(object);
-    }
-
 }
