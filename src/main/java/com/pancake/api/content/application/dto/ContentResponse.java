@@ -13,8 +13,9 @@ public class ContentResponse {
     private Long id;
     private String title;
     private String url;
+    private boolean watched;
 
     public static ContentResponse fromEntity(Content content) {
-        return new ContentResponse(content.id(), content.title(), content.url());
+        return new ContentResponse(content.id(), content.title(), content.url(), content.isWatched());
     }
 }

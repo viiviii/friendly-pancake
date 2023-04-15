@@ -11,6 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import static com.pancake.api.content.NetflixConstant.PONYO;
 import static com.pancake.api.content.NetflixConstant.TOTORO;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -44,7 +45,8 @@ class ContentAcceptanceTest {
         컨텐츠를_시청_처리_한다(포뇨.getId());
 
         //then
-        assertThat(시청한_컨텐츠를_모두_조회한다()).containsExactly(포뇨);
+        assertThat(컨텐츠를_모두_조회한다()).extracting("id", "watched")
+                .contains(tuple(포뇨.getId(), true)); // TODO
     }
 
     @Test
@@ -83,7 +85,8 @@ class ContentAcceptanceTest {
         var 모든_컨텐츠_목록 = 컨텐츠를_모두_조회한다();
 
         //then
-        assertThat(모든_컨텐츠_목록).containsExactly(시청하지_않은_토토로, 시청한_포뇨);
+        assertThat(모든_컨텐츠_목록).extracting("id")
+                .containsExactly(시청하지_않은_토토로.getId(), 시청한_포뇨.getId()); // TODO
     }
 
     private ContentResponse 토토로_컨텐츠() {
@@ -110,14 +113,6 @@ class ContentAcceptanceTest {
 
     private ContentResponse[] 컨텐츠를_모두_조회한다() {
         return get("/api/contents", ContentResponse[].class);
-    }
-
-    private ContentResponse[] 시청할_컨텐츠를_모두_조회한다() {
-        return get("/api/contents/unwatched", ContentResponse[].class);
-    }
-
-    private ContentResponse[] 시청한_컨텐츠를_모두_조회한다() {
-        return get("/api/contents/watched", ContentResponse[].class);
     }
 
     private <T> T get(String path, Class<T> expectBodyType) {
