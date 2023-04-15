@@ -28,7 +28,7 @@ class ContentServiceTest {
     @Test
     void save() {
         //given
-        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
+        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.IMAGE_URL);
 
         //when
         var actual = contentService.save(request);
@@ -86,6 +86,6 @@ class ContentServiceTest {
     }
 
     private Content saveContent(NetflixConstant netflix) {
-        return contentService.save(new ContentRequest(netflix.URL, netflix.TITLE));
+        return contentService.save(new ContentRequest(netflix.URL, netflix.TITLE, netflix.DESCRIPTION, netflix.IMAGE_URL));
     }
 }

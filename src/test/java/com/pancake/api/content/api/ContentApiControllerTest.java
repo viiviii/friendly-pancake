@@ -33,8 +33,8 @@ class ContentApiControllerTest {
     @Test
     void postContentApi() {
         //given
-        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
-        var content = unwatchedContent(128, request.getUrl(), request.getTitle());
+        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.IMAGE_URL);
+        var content = content(128, TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.IMAGE_URL);
 
         given(contentService.save(any())).willReturn(content);
 
@@ -47,15 +47,17 @@ class ContentApiControllerTest {
                 .expectBody()
                 .jsonPath("$.id").value(equalTo(128))
                 .jsonPath("$.url").value(equalTo(TOTORO.URL))
-                .jsonPath("$.title").value(equalTo(TOTORO.TITLE));
+                .jsonPath("$.title").value(equalTo(TOTORO.TITLE))
+                .jsonPath("$.description").value(equalTo(TOTORO.DESCRIPTION))
+                .jsonPath("$.imageUrl").value(equalTo(TOTORO.IMAGE_URL));
     }
 
     @Test
     void getAllContentsApi() {
         //given
         given(contentService.getAllContents()).willReturn(List.of(
-                unwatchedContent(1001, TOTORO.URL, TOTORO.TITLE),
-                unwatchedContent(1002, PONYO.URL, PONYO.TITLE)
+                content(1001, TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.IMAGE_URL),
+                content(1002, PONYO.URL, PONYO.TITLE, PONYO.DESCRIPTION, PONYO.IMAGE_URL)
         ));
 
         //when
@@ -67,7 +69,9 @@ class ContentApiControllerTest {
                 .expectBody()
                 .jsonPath("$..id").value(contains(1001, 1002))
                 .jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL))
-                .jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE));
+                .jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE))
+                .jsonPath("$..description").value(contains(TOTORO.DESCRIPTION, PONYO.DESCRIPTION))
+                .jsonPath("$..imageUrl").value(contains(TOTORO.IMAGE_URL, PONYO.IMAGE_URL));
     }
 
     @Test
@@ -85,16 +89,8 @@ class ContentApiControllerTest {
                 .jsonPath("$").value(equalTo(true));
     }
 
-    private Content unwatchedContent(long id, String url, String title) {
-        return createContent(id, url, title, false);
-    }
-
-    private Content watchedContent(long id, String url, String title) {
-        return createContent(id, url, title, true);
-    }
-
-    private Content createContent(long id, String url, String title, boolean watched) {
-        return new Content(id, url, title, watched);
+    private Content content(long id, String url, String title, String description, String imageUrl) {
+        return new Content(id, url, title, description, imageUrl, false);
     }
 
     private ResponseSpec get(String path, Object... uriVariables) {
