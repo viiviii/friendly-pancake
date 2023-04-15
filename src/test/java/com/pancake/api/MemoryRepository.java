@@ -3,7 +3,6 @@ package com.pancake.api;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 public class MemoryRepository<T> {
     private final Map<Long, T> data;
@@ -31,12 +30,6 @@ public class MemoryRepository<T> {
 
     public List<T> findAll() {
         return new ArrayList<>(data.values());
-    }
-
-    public List<T> findBy(Predicate<? super T> predicate) {
-        return new ArrayList<>(data.values()).stream()
-                .filter(predicate)
-                .toList();
     }
 
     public Optional<T> findById(long id) {

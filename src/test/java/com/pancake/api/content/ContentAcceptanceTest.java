@@ -50,32 +50,6 @@ class ContentAcceptanceTest {
     }
 
     @Test
-    void 시청할_수_있는_컨텐츠를_모두_조회할_수_있다() {
-        //given
-        var 토토로 = 토토로_컨텐츠();
-        시청한(포뇨_컨텐츠());
-
-        //when
-        var 시청할_컨텐츠_목록 = 시청할_컨텐츠를_모두_조회한다();
-
-        //then
-        assertThat(시청할_컨텐츠_목록).containsExactly(토토로);
-    }
-
-    @Test
-    void 이미_시청한_컨텐츠를_모두_조회할_수_있다() {
-        //given
-        토토로_컨텐츠();
-        var 포뇨 = 시청한(포뇨_컨텐츠());
-
-        //when
-        var 시청한_컨텐츠_목록 = 시청한_컨텐츠를_모두_조회한다();
-
-        //then
-        assertThat(시청한_컨텐츠_목록).containsExactly(포뇨);
-    }
-
-    @Test
     void 컨텐츠를_모두_조회할_수_있다() {
         //given
         var 시청하지_않은_토토로 = 토토로_컨텐츠();

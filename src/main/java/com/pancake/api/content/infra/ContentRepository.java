@@ -12,9 +12,5 @@ public interface ContentRepository extends Repository<Content, Long> {
 
     List<Content> findAll();
 
-    List<Content> findByWatchedFalse();
-
-    List<Content> findByWatchedTrue();
-
     Optional<Content> findById(long id);
 }

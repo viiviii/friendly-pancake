@@ -71,46 +71,6 @@ class ContentApiControllerTest {
     }
 
     @Test
-    void getUnwatchedContentsApi() {
-        //given
-        given(contentService.getUnwatchedContents()).willReturn(List.of(
-                unwatchedContent(1001, TOTORO.URL, TOTORO.TITLE),
-                unwatchedContent(1002, PONYO.URL, PONYO.TITLE)
-        ));
-
-        //when
-        var result = get("/api/contents/unwatched");
-
-        //then
-        result
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$..id").value(contains(1001, 1002))
-                .jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL))
-                .jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE));
-    }
-
-    @Test
-    void getWatchedContentsApi() {
-        //given
-        given(contentService.getWatchedContents()).willReturn(List.of(
-                watchedContent(1001, TOTORO.URL, TOTORO.TITLE),
-                watchedContent(1002, PONYO.URL, PONYO.TITLE)
-        ));
-
-        //when
-        var result = get("/api/contents/watched");
-
-        //then
-        result
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$..id").value(contains(1001, 1002))
-                .jsonPath("$..url").value(contains(TOTORO.URL, PONYO.URL))
-                .jsonPath("$..title").value(contains(TOTORO.TITLE, PONYO.TITLE));
-    }
-
-    @Test
     void patchWatchContentApi() throws Exception {
         //given
         given(contentService.watch(anyLong())).willReturn(true);
