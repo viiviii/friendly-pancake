@@ -12,7 +12,7 @@ class ContentTest {
     @Test
     void create() {
         //when
-        var content = new Content(TOTORO.URL, TOTORO.TITLE);
+        var content = new Content(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.URL);
 
         //then
         assertThat(content.isWatched()).isFalse();
@@ -23,7 +23,7 @@ class ContentTest {
     @Test
     void watch() {
         //given
-        var content = new Content(TOTORO.URL, TOTORO.TITLE); // TODO
+        var content = new Content(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.URL); // TODO
 
         //when
         boolean watched = content.watch();
@@ -36,7 +36,7 @@ class ContentTest {
     @Test
     void isWatched() {
         //given
-        var content = new Content(null, TOTORO.URL, TOTORO.TITLE, true); // TODO
+        var content = new Content(1L, TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.URL, true); // TODO
 
         //then
         assertThat(content.isWatched()).isTrue();

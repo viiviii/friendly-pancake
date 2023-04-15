@@ -37,24 +37,6 @@ public class ContentApiController {
                 .toList());
     }
 
-    @GetMapping("/unwatched")
-    public ResponseEntity<List<ContentResponse>> getUnwatchedContents() {
-        final List<Content> contents = contentService.getUnwatchedContents();
-
-        return status(OK).body(contents.stream()
-                .map(ContentResponse::fromEntity)
-                .toList());
-    }
-
-    @GetMapping("/watched")
-    public ResponseEntity<List<ContentResponse>> getWatchedContents() {
-        final List<Content> contents = contentService.getWatchedContents();
-
-        return status(OK).body(contents.stream()
-                .map(ContentResponse::fromEntity)
-                .toList());
-    }
-
     @PatchMapping("{id}/watch")
     public ResponseEntity<Boolean> patchWatchContent(@PathVariable Long id) {
         final boolean watched = contentService.watch(id);

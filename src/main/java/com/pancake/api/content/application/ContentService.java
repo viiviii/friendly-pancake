@@ -23,14 +23,6 @@ public class ContentService {
         return contentRepository.findAll();
     }
 
-    public List<Content> getUnwatchedContents() {
-        return contentRepository.findByWatchedFalse();
-    }
-
-    public List<Content> getWatchedContents() {
-        return contentRepository.findByWatchedTrue();
-    }
-
     @Transactional
     public boolean watch(long id) {
         final var content = contentRepository.findById(id)

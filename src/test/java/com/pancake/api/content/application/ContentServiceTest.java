@@ -28,7 +28,7 @@ class ContentServiceTest {
     @Test
     void save() {
         //given
-        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE);
+        var request = new ContentRequest(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.IMAGE_URL);
 
         //when
         var actual = contentService.save(request);
@@ -77,34 +77,6 @@ class ContentServiceTest {
                 .has(unwatchedContent, atIndex(1));
     }
 
-    @DisplayName("시청하지 않은 컨텐츠를 모두 조회한다")
-    @Test
-    void getUnwatchedContents() {
-        //given
-        existWatchedContent();
-        existUnwatchedContent();
-
-        //when
-        var actual = contentService.getUnwatchedContents();
-
-        //then
-        assertThat(actual).hasSize(1).are(unwatchedContent);
-    }
-
-    @DisplayName("시청한 컨텐츠를 모두 조회한다")
-    @Test
-    void getWatchedContents() {
-        //given
-        existWatchedContent();
-        existUnwatchedContent();
-
-        //when
-        var actual = contentService.getWatchedContents();
-
-        //then
-        assertThat(actual).hasSize(1).are(watchedContent);
-    }
-
     private void existWatchedContent() {
         saveContent(TOTORO).watch();
     }
@@ -114,6 +86,6 @@ class ContentServiceTest {
     }
 
     private Content saveContent(NetflixConstant netflix) {
-        return contentService.save(new ContentRequest(netflix.URL, netflix.TITLE));
+        return contentService.save(new ContentRequest(netflix.URL, netflix.TITLE, netflix.DESCRIPTION, netflix.IMAGE_URL));
     }
 }

@@ -25,10 +25,14 @@ public class Content {
 
     private String title;
 
+    private String description;
+
+    private String imageUrl;
+
     private boolean watched;
 
-    public Content(String url, String title) {
-        this(null, url, title, false);
+    public Content(String url, String title, String description, String imageUrl) {
+        this(null, url, title, description, imageUrl, false);
     }
 
     public Long id() {
@@ -41,6 +45,14 @@ public class Content {
 
     public String title() {
         return this.title;
+    }
+
+    public String description() {
+        return this.description;
+    }
+
+    public String imageUrl() {
+        return this.imageUrl;
     }
 
     public boolean isWatched() {

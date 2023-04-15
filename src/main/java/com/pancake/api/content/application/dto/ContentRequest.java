@@ -12,8 +12,10 @@ public class ContentRequest {
 
     private String url;
     private String title;
+    private String description;
+    private String imageUrl;
 
     public Content toEntity() {
-        return new Content(url, title);
+        return new Content(url, title, description, imageUrl);
     }
 }
