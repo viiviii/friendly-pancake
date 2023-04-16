@@ -8,8 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static com.pancake.api.content.NetflixConstant.PONYO;
-import static com.pancake.api.content.NetflixConstant.TOTORO;
+import static com.pancake.api.content.Fixtures.Netflix.PONYO;
+import static com.pancake.api.content.Fixtures.Netflix.TOTORO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -68,11 +68,11 @@ class ContentAcceptanceTest {
     }
 
     private ContentResponse 토토로_컨텐츠() {
-        return 컨텐츠를_등록한다(new ContentRequest(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.IMAGE_URL));
+        return 컨텐츠를_등록한다(TOTORO.REQUEST);
     }
 
     private ContentResponse 포뇨_컨텐츠() {
-        return 컨텐츠를_등록한다(new ContentRequest(PONYO.URL, PONYO.TITLE, PONYO.DESCRIPTION, PONYO.IMAGE_URL));
+        return 컨텐츠를_등록한다(PONYO.REQUEST);
     }
 
     private ContentResponse 시청한(ContentResponse content) {

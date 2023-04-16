@@ -1,10 +1,11 @@
 package com.pancake.api.content.domain;
 
+import com.pancake.api.content.Fixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.pancake.api.content.NetflixConstant.TOTORO;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ContentTest {
 
@@ -12,34 +13,30 @@ class ContentTest {
     @Test
     void create() {
         //when
-        var content = new Content(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.URL);
+        var content = createContent();
 
         //then
         assertThat(content.isWatched()).isFalse();
     }
 
-
     @DisplayName("컨텐츠를 시청 처리한다")
     @Test
     void watch() {
         //given
-        var content = new Content(TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.URL); // TODO
+        var content = createContent();
 
         //when
         boolean watched = content.watch();
 
         //then
-        assertThat(watched).isTrue();
+        assertAll(
+                () -> assertThat(watched).isTrue(),
+                () -> assertThat(content.isWatched()).isTrue()
+        );
+
     }
 
-    @DisplayName("컨텐츠의 시청 상태를 반환한다")
-    @Test
-    void isWatched() {
-        //given
-        var content = new Content(1L, TOTORO.URL, TOTORO.TITLE, TOTORO.DESCRIPTION, TOTORO.URL, true); // TODO
-
-        //then
-        assertThat(content.isWatched()).isTrue();
+    private Content createContent() {
+        return Fixtures.Netflix.TOTORO.CONTENT;
     }
-
 }
