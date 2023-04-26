@@ -54,12 +54,26 @@ class ContentApiControllerTest {
     }
 
     @Test
-    void patchWatchContentApi() {
+    void getContentApi() {
+        //given
+        given(contentService.getContent(1234)).willReturn(TOTORO.CONTENT);
+
+        //when
+        var response = get("/api/contents/{id}", 1234);
+
+        //then
+        response.expectStatus().isSeeOther()
+                .expectHeader().location(TOTORO.CONTENT.url())
+                .expectBody(Void.class);
+    }
+
+    @Test
+    void patchWatchedContentApi() {
         //given
         given(contentService.watch(1234)).willReturn(true);
 
         //when
-        var response = patch("/api/contents/{id}/watch", 1234);
+        var response = patch("/api/contents/{id}/watched", 1234);
 
         //then
         response.expectStatus().isOk()

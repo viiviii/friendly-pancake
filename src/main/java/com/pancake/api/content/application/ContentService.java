@@ -23,6 +23,11 @@ public class ContentService {
         return contentRepository.findAll();
     }
 
+    public Content getContent(long id) {
+        return contentRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
+    }
+
     @Transactional
     public boolean watch(long id) {
         final var content = contentRepository.findById(id)

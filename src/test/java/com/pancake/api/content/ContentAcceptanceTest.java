@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.net.URI;
+
 import static com.pancake.api.content.Fixtures.Netflix.PONYO;
 import static com.pancake.api.content.Fixtures.Netflix.TOTORO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,19 +43,6 @@ class ContentAcceptanceTest {
     }
 
     @Test
-    void 컨텐츠를_시청_처리_할_수_있다() {
-        //given
-        var 포뇨 = 포뇨_컨텐츠();
-
-        //when
-        컨텐츠를_시청_처리_한다(포뇨.getId());
-
-        //then
-        assertThat(컨텐츠를_모두_조회한다()).extracting("id", "watched")
-                .contains(tuple(포뇨.getId(), true)); // TODO
-    }
-
-    @Test
     void 컨텐츠를_모두_조회할_수_있다() {
         //given
         var 시청하지_않은_토토로 = 토토로_컨텐츠();
@@ -65,6 +54,31 @@ class ContentAcceptanceTest {
         //then
         assertThat(모든_컨텐츠_목록).extracting("id")
                 .containsExactly(시청하지_않은_토토로.getId(), 시청한_포뇨.getId()); // TODO
+    }
+
+    @Test
+    void 컨텐츠를_시청할_수_있다() {
+        //given
+        var 포뇨 = 포뇨_컨텐츠();
+
+        //when
+        var 이동된_위치 = 컨텐츠를_시청한다(포뇨.getId());
+
+        //then
+        assertThat(이동된_위치).hasToString(PONYO.CONTENT.url());
+    }
+
+    @Test
+    void 컨텐츠를_시청_처리_할_수_있다() {
+        //given
+        var 포뇨 = 포뇨_컨텐츠();
+
+        //when
+        컨텐츠를_시청_처리_한다(포뇨.getId());
+
+        //then
+        assertThat(컨텐츠를_모두_조회한다()).extracting("id", "watched")
+                .contains(tuple(포뇨.getId(), true)); // TODO
     }
 
     private ContentResponse 토토로_컨텐츠() {
@@ -86,12 +100,21 @@ class ContentAcceptanceTest {
     }
 
     private void 컨텐츠를_시청_처리_한다(long id) {
-        patch("/api/contents/{id}/watch", id, Boolean.class);
+        patch("/api/contents/{id}/watched", id, Boolean.class);
     }
 
     private ContentResponse[] 컨텐츠를_모두_조회한다() {
         return get("/api/contents", ContentResponse[].class);
     }
+
+    private URI 컨텐츠를_시청한다(long id) {
+        // TODO
+        return client.get().uri("/api/contents/{id}", id)
+                .exchange()
+                .returnResult(Void.class)
+                .getResponseHeaders().getLocation();
+    }
+
 
     private <T> T get(String path, Class<T> expectBodyType) {
         return client.get().uri(path)

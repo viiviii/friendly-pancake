@@ -11,14 +11,13 @@ import lombok.NoArgsConstructor;
 public class ContentResponse {
 
     private Long id;
-    private String url;
     private String title;
     private String description;
     private String imageUrl;
     private boolean watched;
 
     public static ContentResponse fromEntity(Content content) {
-        return new ContentResponse(content.id(), content.url(), content.title(), content.description(),
+        return new ContentResponse(content.id(), content.title(), content.description(),
                 content.imageUrl(), content.isWatched());
     }
 }
