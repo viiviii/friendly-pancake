@@ -43,6 +43,20 @@ class ContentAcceptanceTest {
     }
 
     @Test
+    void 컨텐츠를_모두_조회할_수_있다() {
+        //given
+        var 시청하지_않은_토토로 = 토토로_컨텐츠();
+        var 시청한_포뇨 = 시청한(포뇨_컨텐츠());
+
+        //when
+        var 모든_컨텐츠_목록 = 컨텐츠를_모두_조회한다();
+
+        //then
+        assertThat(모든_컨텐츠_목록).extracting("id")
+                .containsExactly(시청하지_않은_토토로.getId(), 시청한_포뇨.getId()); // TODO
+    }
+
+    @Test
     void 컨텐츠를_시청할_수_있다() {
         //given
         var 포뇨 = 포뇨_컨텐츠();
@@ -65,20 +79,6 @@ class ContentAcceptanceTest {
         //then
         assertThat(컨텐츠를_모두_조회한다()).extracting("id", "watched")
                 .contains(tuple(포뇨.getId(), true)); // TODO
-    }
-
-    @Test
-    void 컨텐츠를_모두_조회할_수_있다() {
-        //given
-        var 시청하지_않은_토토로 = 토토로_컨텐츠();
-        var 시청한_포뇨 = 시청한(포뇨_컨텐츠());
-
-        //when
-        var 모든_컨텐츠_목록 = 컨텐츠를_모두_조회한다();
-
-        //then
-        assertThat(모든_컨텐츠_목록).extracting("id")
-                .containsExactly(시청하지_않은_토토로.getId(), 시청한_포뇨.getId()); // TODO
     }
 
     private ContentResponse 토토로_컨텐츠() {
@@ -108,6 +108,7 @@ class ContentAcceptanceTest {
     }
 
     private URI 컨텐츠를_시청한다(long id) {
+        // TODO
         return client.get().uri("/api/contents/{id}", id)
                 .exchange()
                 .returnResult(Void.class)

@@ -32,26 +32,6 @@ class ContentServiceTest {
         );
     }
 
-    @DisplayName("컨텐츠를 시청 처리한다")
-    @Test
-    void watch() {
-        //given
-        var contentId = existContent().id();
-
-        //when
-        var watched = contentService.watch(contentId);
-
-        //then
-        assertThat(watched).isTrue();
-    }
-
-    @DisplayName("존재하지 않는 컨텐츠를 시청 처리 시 예외가 발생한다")
-    @Test
-    void watchThrownExceptionWhenContentNotExist() {
-        assertThatThrownBy(() -> contentService.watch(NOT_EXISTS_ID))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     @DisplayName("컨텐츠를 모두 조회한다")
     @Test
     void getAllContents() {
@@ -78,6 +58,26 @@ class ContentServiceTest {
 
         //then
         assertThat(actual).isEqualTo(content);
+    }
+
+    @DisplayName("컨텐츠를 시청 처리한다")
+    @Test
+    void watch() {
+        //given
+        var contentId = existContent().id();
+
+        //when
+        var watched = contentService.watch(contentId);
+
+        //then
+        assertThat(watched).isTrue();
+    }
+
+    @DisplayName("존재하지 않는 컨텐츠를 시청 처리 시 예외가 발생한다")
+    @Test
+    void watchThrownExceptionWhenContentNotExist() {
+        assertThatThrownBy(() -> contentService.watch(NOT_EXISTS_ID))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     private Content existContent() {
