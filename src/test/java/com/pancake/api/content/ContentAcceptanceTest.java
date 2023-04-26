@@ -65,7 +65,7 @@ class ContentAcceptanceTest {
         var 이동된_위치 = 컨텐츠를_시청한다(포뇨.getId());
 
         //then
-        assertThat(이동된_위치).hasToString(포뇨.getUrl());
+        assertThat(이동된_위치).hasToString(PONYO.CONTENT.url());
     }
 
     @Test
