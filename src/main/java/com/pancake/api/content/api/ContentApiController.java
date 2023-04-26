@@ -44,8 +44,8 @@ public class ContentApiController {
         return status(SEE_OTHER).location(URI.create(content.url())).build();
     }
 
-    @PatchMapping("{id}/watch")
-    public ResponseEntity<Boolean> patchWatchContent(@PathVariable Long id) {
+    @PatchMapping("{id}/watched")
+    public ResponseEntity<Boolean> patchWatchedContent(@PathVariable Long id) {
         final boolean watched = contentService.watch(id);
 
         return status(OK).body(watched);

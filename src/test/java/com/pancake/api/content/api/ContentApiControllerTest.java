@@ -68,12 +68,12 @@ class ContentApiControllerTest {
     }
 
     @Test
-    void patchWatchContentApi() {
+    void patchWatchedContentApi() {
         //given
         given(contentService.watch(1234)).willReturn(true);
 
         //when
-        var response = patch("/api/contents/{id}/watch", 1234);
+        var response = patch("/api/contents/{id}/watched", 1234);
 
         //then
         response.expectStatus().isOk()

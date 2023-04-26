@@ -100,7 +100,7 @@ class ContentAcceptanceTest {
     }
 
     private void 컨텐츠를_시청_처리_한다(long id) {
-        patch("/api/contents/{id}/watch", id, Boolean.class);
+        patch("/api/contents/{id}/watched", id, Boolean.class);
     }
 
     private ContentResponse[] 컨텐츠를_모두_조회한다() {
