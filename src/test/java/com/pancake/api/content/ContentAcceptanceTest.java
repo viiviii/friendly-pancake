@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.net.URI;
+
 import static com.pancake.api.content.Fixtures.Netflix.PONYO;
 import static com.pancake.api.content.Fixtures.Netflix.TOTORO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +40,18 @@ class ContentAcceptanceTest {
 
         //then
         assertThat(컨텐츠를_모두_조회한다()).containsExactly(등록된_컨텐츠);
+    }
+
+    @Test
+    void 컨텐츠를_시청할_수_있다() {
+        //given
+        var 포뇨 = 포뇨_컨텐츠();
+
+        //when
+        var 이동된_위치 = 컨텐츠를_시청한다(포뇨.getId());
+
+        //then
+        assertThat(이동된_위치).hasToString(포뇨.getUrl());
     }
 
     @Test
@@ -92,6 +106,14 @@ class ContentAcceptanceTest {
     private ContentResponse[] 컨텐츠를_모두_조회한다() {
         return get("/api/contents", ContentResponse[].class);
     }
+
+    private URI 컨텐츠를_시청한다(long id) {
+        return client.get().uri("/api/contents/{id}", id)
+                .exchange()
+                .returnResult(Void.class)
+                .getResponseHeaders().getLocation();
+    }
+
 
     private <T> T get(String path, Class<T> expectBodyType) {
         return client.get().uri(path)

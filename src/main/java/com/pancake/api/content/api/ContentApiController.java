@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
@@ -35,6 +35,13 @@ public class ContentApiController {
         return status(OK).body(contents.stream()
                 .map(ContentResponse::fromEntity)
                 .toList());
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<Void> getContentById(@PathVariable Long id) {
+        final var content = contentService.getContent(id);
+
+        return status(SEE_OTHER).location(URI.create(content.url())).build();
     }
 
     @PatchMapping("{id}/watch")
