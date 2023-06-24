@@ -12,5 +12,12 @@ spring:
       hibernate:
         format_sql: true # SQL 줄바꿈 등 예쁘게 출력
 
+  lifecycle:
+    timeout-per-shutdown-phase: "30s"
+
+
+server:
+  shutdown: "graceful"
+
 logging.level:
   org.hibernate.SQL: debug # SQL logger 통해 출력
