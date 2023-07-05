@@ -10,87 +10,104 @@ HEALTH_CHECK_MAX_RETRIES=5
 HEALTH_CHECK_RETRY_DELAY=5
 VERSION="$1"
 
-# 입력받은 버전 확인
-if [[ -z $VERSION ]]; then
-  echo "❗️ version argument 없음, 예시) sh deploy.sh 1.0.1"
-  exit 1
-fi
-
-# jar 파일 build
-./gradlew clean build
-echo "✅ jar 파일 build"
-
-# 도커 이미지 빌드
-if docker build --tag "$IMAGE_NAME:$VERSION" .; then
-  echo "✅ 도커 이미지 빌드"
-else
-  echo "❌ 도커 이미지 빌드"
-  exit 1
-fi
-
-# 배포할 환경 확인
-current="green"
-target="blue"
-containers=$(docker network inspect $NETWORK_NAME --format '{{range .Containers}}{{.Name}} {{end}}')
-if [[ $containers =~ "blue" ]]; then
-  current="blue"
-  target="green"
-fi
-echo "👉 이번에 배포할 환경은 $target"
-
-# 백업용으로 보관중이던 배포 컨테이너 제거
-if docker rm "$(docker ps -aq --filter status=exited --filter name="^/${target}")"; then
-  echo "✅ 백업용으로 보관중이던 배포 컨테이너 제거"
-else
-  echo "❌ 백업용으로 보관중이던 배포 컨테이너 제거"
-  exit 1
-fi
-
-# 배포 이미지로 새로운 배포 컨테이너 생성 및 실행
-if docker run -d --name $target --network $NETWORK_NAME "$IMAGE_NAME:$VERSION"; then
-  echo "✅ 배포할 도커 컨테이너 생성 및 실행 - $IMAGE_NAME:$VERSION"
-else
-  echo "❌ 배포할 도커 컨테이너 생성 및 실행"
-  exit 1
-fi
-
-# 배포 컨테이너 헬스 체크
-for retries in $(seq $HEALTH_CHECK_MAX_RETRIES); do
-  if docker exec $NGINX_CONTAINER_NAME curl -s $target:$PORT/api/contents >/dev/null; then
-    echo "✅ 배포할 환경인 $target health check"
-    break
-  fi
-
-  if [[ $retries -eq $HEALTH_CHECK_MAX_RETRIES ]]; then
-    echo "❌ 배포할 환경인 $target health check"
+function check_input_version() {
+  if [[ -z $VERSION ]]; then
+    echo "❗❗❗️ 필수 입력 값인 version 누락, 예시) sh deploy.sh 1.0.0 ❗❗❗"
     exit 1
   fi
+}
 
-  echo "...${HEALTH_CHECK_RETRY_DELAY}초 후 health check 재시도"
-  sleep $HEALTH_CHECK_RETRY_DELAY
-done
+function is_blue_running() {
+  local container_names
+  container_names=$(docker network inspect $NETWORK_NAME --format '{{range .Containers}}{{.Name}} {{end}}')
 
-# Nginx 배포 환경을 바라보도록 변경
-if docker exec $NGINX_CONTAINER_NAME sed -i "s/server $current:$PORT;/server $target:$PORT;/g" $UPSTREAM_FILE; then
-  echo "✅ Nginx 설정 변경"
-else
-  echo "❌ Nginx 설정 변경"
-  exit 1
-fi
+  [[ $container_names =~ "blue" ]]
+}
 
-# Nginx 새로운 설정 적용
-if docker exec $NGINX_CONTAINER_NAME nginx -t; then
+function build_jar() {
+  ./gradlew clean build
+  check_success_or_exit $? "jar 빌드"
+}
+
+function build_docker_image() {
+  docker build --tag "$IMAGE_NAME:$VERSION" .
+  check_success_or_exit $? "도커 이미지 빌드"
+}
+
+function remove_container() {
+  docker rm "$(docker ps -aq --filter status=exited --filter name="^/${1}$")"
+  check_success_or_exit $? "백업용으로 보관중이던 컨테이너 제거"
+}
+
+function run_container() {
+  docker run -d --name "$1" --network $NETWORK_NAME "$IMAGE_NAME:$VERSION"
+  check_success_or_exit $? "도커 컨테이너 생성 및 실행"
+}
+
+# TODO: 헬스체크
+function health_check() {
+  for retries in $(seq $HEALTH_CHECK_MAX_RETRIES); do
+    if docker exec $NGINX_CONTAINER_NAME curl -s "$1:$PORT/api/contents" >/dev/null; then
+      echo "✅ 새 버전 health check 성공"
+      return
+    fi
+
+    if [[ $retries -eq $HEALTH_CHECK_MAX_RETRIES ]]; then
+      echo "❌ 새 버전 health check 실패"
+      exit 1
+    fi
+
+    echo "...health check ${HEALTH_CHECK_RETRY_DELAY}초 후 재시도 ($retries)"
+    sleep $HEALTH_CHECK_RETRY_DELAY
+  done
+}
+
+function change_nginx_endpoint() {
+  docker exec $NGINX_CONTAINER_NAME sed -i "s/$1:$PORT/$2:$PORT/" $UPSTREAM_FILE
+  check_success_or_exit $? "Nginx 새 버전을 바라보도록 설정 변경"
+}
+
+function reload_nginx_config() {
   docker exec $NGINX_CONTAINER_NAME nginx -s reload
-  echo "✅ Nginx 설정 적용"
+  check_success_or_exit $? "Nginx 설정 적용"
+}
+
+function stop_container() {
+  docker stop --time $CONTAINER_SHUTDOWN_TIMEOUT "$1" >/dev/null
+  check_success_or_exit $? "기존 버전 종료"
+}
+
+function check_success_or_exit() {
+  if [[ $1 -eq 0 ]]; then
+    echo "✅ $2 성공"
+  else
+    echo "❌ $2 실패"
+    exit 1
+  fi
+}
+
+# 배포 준비
+check_input_version
+
+build_jar
+build_docker_image
+
+if is_blue_running; then
+  current="blue"
+  target="green"
 else
-  echo "❌ Nginx 설정 적용"
-  exit 1
+  current="green"
+  target="blue"
 fi
 
-# 기존 환경 종료
-if docker stop --time $CONTAINER_SHUTDOWN_TIMEOUT $current >/dev/null; then
-  echo "✅ 기존 환경인 $current 종료"
-else
-  echo "❌ 기존 환경인 $current 종료"
-  exit 1
-fi
+# 배포 시작
+echo "🚀🚀🚀 시작, 기존 버전[$current] ➡️ 새 버전[$target]"
+
+remove_container $target
+run_container $target
+health_check $target
+change_nginx_endpoint $current $target
+reload_nginx_config
+stop_container $current
+
+echo "🚀🚀🚀 완료"
