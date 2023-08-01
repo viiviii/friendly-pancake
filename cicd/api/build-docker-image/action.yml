@@ -1,0 +1,58 @@
+name: 📦 Build Docker image
+description: Build and push Docker image
+
+inputs:
+  registry:
+    required: true
+  image-name:
+    required: true
+  build-version:
+    required: true
+  java-version:
+    required: true
+  jar-artifact-name:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: ⬇️ Checkout Dockerfile
+      uses: actions/checkout@v3
+      with:
+        sparse-checkout: /${{ github.action_path }}/Dockerfile
+        sparse-checkout-cone-mode: false
+
+    - name: ⬇️ Download JAR
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.jar-artifact-name }}
+        path: ${{ github.action_path }}
+
+    - name: 🔖 Generate metadata
+      id: meta
+      uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
+      with:
+        images: ${{ inputs.registry }}/${{ inputs.image-name }}
+        tags: |
+          type=semver,pattern={{version}},value=${{ inputs.build-version }},priority=902
+          type=semver,pattern=v{{major}},value=${{ inputs.build-version }},priority=901
+          type=semver,pattern=b{{patch}},value=${{ inputs.build-version }},priority=900
+          type=sha,prefix=,suffix=,priority=100
+
+    - name: 🔑 Login to Container Registry
+      uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+    - name: 📦⬆️ Build and push Docker image
+      uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
+      with:
+        context: ${{ github.action_path }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          JAVA_VERSION=${{ inputs.java-version }}
+          JAR_FILE=*.jar
