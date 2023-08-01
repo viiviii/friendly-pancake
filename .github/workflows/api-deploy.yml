@@ -1,0 +1,44 @@
+# TODO: deploy로 할지 build로 나눌지 고민
+# TODO: 파일명 정하기
+# TODO: 이미지 이름 정하기
+name: 🚀 API Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - api/src/main/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      java-version: 17
+      jar-artifact-name: api-jar
+    steps:
+      - name: 🔢 Generate Version
+        id: version
+        uses: ./cicd/headver
+        with:
+          head: 1 # TODO
+          build: ${{ github.run_number }}
+
+      - name: ☕️ Build and upload JAR file
+        uses: ./cicd/api/build-jar-file
+        with:
+          build-root-directory: api
+          upload-artifact-name: ${{ env.jar-artifact-name }}
+          java-version: ${{ env.java-version }}
+
+      - name: 🐳 Build and push Docker image
+        uses: ./cicd/api/build-docker-image
+        with:
+          registry: ghcr.io
+          image-name: pancake-api
+          build-version: ${{ steps.version.outputs.version }}
+          java-version: ${{ env.java-version }}
+          jar-artifact-name: ${{ env.jar-artifact-name }}
