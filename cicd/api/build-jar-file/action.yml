@@ -1,0 +1,42 @@
+name: 📦 Build JAR file
+description: Build and save as artifact
+
+inputs:
+  build-root-directory:
+    required: true
+  upload-artifact-name:
+    required: true
+  java-version:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: ⬇️ Checkout
+      uses: actions/checkout@v3
+      with:
+        sparse-checkout: /${{ inputs.build-root-directory }}
+        sparse-checkout-cone-mode: false
+
+    - name: 🌱 Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: temurin
+
+    - name: 🕵🏼 Validate Gradle wrapper
+      uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3 # v1.1.0
+
+    - name: 📦 Build with Gradle
+      uses: gradle/gradle-build-action@a4cf152f482c7ca97ef56ead29bf08bcd953284c # v2.7.0
+      with:
+        arguments: build
+        build-root-directory: ${{ inputs.build-root-directory }}
+
+    - name: ⬆️ Upload JAR file
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.upload-artifact-name }}
+        path: ${{ inputs.build-root-directory }}/build/libs/*.jar
+        if-no-files-found: error
+        retention-days: 7
