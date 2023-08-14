@@ -1,8 +1,4 @@
 spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
   lifecycle.timeout-per-shutdown-phase: "30s"
 server:
   shutdown: graceful
@@ -11,10 +7,6 @@ server:
 
 spring:
   config.activate.on-profile: local
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:tcp://localhost/~/pancake}
-    username: ${SPRING_DATASOURCE_USERNAME:sa}
-    password: ${SPRING_DATASOURCE_PASSWORD:sa}
   jpa:
     hibernate.ddl-auto: create
     properties.hibernate.format_sql: true

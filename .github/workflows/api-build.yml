@@ -1,0 +1,120 @@
+name: '📦 Build API'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - api/src/main/**
+
+env:
+  directory: api
+  java-version: 17
+  jar-file: api-0.0.1-SNAPSHOT.jar
+  jar-artifact-name: api-jar
+  image-registry: ghcr.io
+  image-registry-name: ghcr.io/${{ github.repository }}-api
+
+jobs:
+  jar:
+    name: '📦 JAR file'
+    runs-on: ubuntu-latest
+    steps:
+      - name: '⬇️ Checkout directory'
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: /${{ env.directory }}
+          sparse-checkout-cone-mode: false
+
+      - name: '🌱 Set up JDK'
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.java-version }}
+          distribution: temurin
+
+      - name: '🕵🏼 Validate Gradle wrapper'
+        uses: gradle/wrapper-validation-action@v1.1.0
+
+      - name: '📦 Build with Gradle'
+        uses: gradle/gradle-build-action@v2.7.0
+        with:
+          arguments: build
+          build-root-directory: ${{ env.directory }}
+
+      - name: '⬆️ Upload'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.jar-artifact-name }}
+          path: ${{ env.directory }}/build/libs/${{ env.jar-file }}
+          if-no-files-found: error
+          retention-days: 1
+
+  image:
+    name: '📦 Docker Image'
+    needs: jar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: '⬇️ Checkout Dockerfile'
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: /${{ env.directory }}/Dockerfile
+          sparse-checkout-cone-mode: false
+
+      - name: '⬇️ Download JAR file'
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.jar-artifact-name }}
+          path: ${{ env.directory }}
+
+      - name: '💫 Generate Version'
+        id: version
+        uses: viiviii/headver-action@v1
+        with:
+          head: 0 # TODO
+          build: ${{ github.run_number }}
+
+      - name: '🔖 Generate metadata'
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.image-registry-name }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.version.outputs.version }},priority=902
+            type=semver,pattern=v{{major}},value=${{ steps.version.outputs.version }},priority=901
+            type=semver,pattern=b{{patch}},value=${{ steps.version.outputs.version }},priority=900
+            type=sha,prefix=,suffix=,priority=100
+
+      - name: '🌱 Set up QEMU'
+        uses: docker/setup-qemu-action@v2.2.0
+
+      - name: '🌱 Set up Docker Buildx'
+        uses: docker/setup-buildx-action@v2.9.1
+
+      - name: '🔑 Login to Registry'
+        uses: docker/login-action@v2.2.0
+        with:
+          registry: ${{ env.image-registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: '📦⬆️ Build and push'
+        uses: docker/build-push-action@v4.1.1
+        with:
+          context: ${{ env.directory }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            JAVA_VERSION=${{ env.java-version }}
+            JAR_FILE=${{ env.jar-file }}
+
+      - name: '🖨️ Output Summary'
+        run: |
+          echo "### Install from the command line" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.image-registry-name }}:${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
