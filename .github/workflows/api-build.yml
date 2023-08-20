@@ -54,7 +54,7 @@ jobs:
     needs: jar
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - name: '⬇️ Checkout Dockerfile'
@@ -118,3 +118,11 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "docker pull ${{ env.image-registry-name }}:${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: '🗒️ Note image name to commit'
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git fetch origin refs/notes/commits:refs/notes/commits
+          git notes add -m "${{ env.image-registry-name }}:${{ steps.version.outputs.version }}" ${{ github.sha }}
+          git push origin refs/notes/commits
