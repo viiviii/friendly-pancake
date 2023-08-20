@@ -1,0 +1,43 @@
+name: '🔫 trigger-api-deployment'
+
+on:
+  workflow_run:
+    workflows: [ '📦 Build API' ]
+    types: [ completed ]
+    branches: [ main ]
+
+jobs:
+  update-and-push:
+    name: '⬆️ Pushing API image change'
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: write
+    env:
+      file: compose-service-api.yml
+    steps:
+      - name: '⬇️ Checkout'
+        uses: actions/checkout@v3
+        with:
+          ref: infra
+          sparse-checkout: /${{ env.file }}
+          sparse-checkout-cone-mode: false
+          token: ${{ secrets.PAT_FOR_TRIGGER_WORKFLOW }}
+
+      - name: '⬇️ Get image name from commit note'
+        id: image
+        run: |
+          git fetch origin refs/notes/commits:refs/notes/commits
+          note="$(git notes show ${{ github.event.workflow_run.head_sha }})"
+          echo "name=$note" >> $GITHUB_OUTPUT
+
+      - name: '🆙 Update api image'
+        run: |
+          sed -i "s|image: .*|image: ${{ steps.image.outputs.name }}|g" $file
+
+      - name: '⬆️ Push commit'
+        run: |
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git commit -am "🐳 Update image to ${{ steps.image.outputs.name }}"
+          git push origin HEAD
