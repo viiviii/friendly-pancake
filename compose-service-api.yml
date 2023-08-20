@@ -1,0 +1,18 @@
+services:
+  api:
+    image: ghcr.io/viiviii/friendly-pancake-api:latest
+    secrets:
+      - source: spring_datasource_properties
+        target: /application.properties
+    healthcheck:
+      test: curl -f localhost:8080/actuator/health
+      #      interval: 1m
+      interval: 10s
+      timeout: 10s
+      retries: 1
+      start_period: 30s
+#      start_interval: 5s TODO: docker compose 업데이트 아직 안됐음
+
+secrets:
+  spring_datasource_properties:
+    environment: spring_datasource_properties

@@ -1,0 +1,14 @@
+name: pancake
+
+include:
+  - path: compose-service-api.yml
+
+services:
+  nginx:
+    image: nginx:1-alpine-slim
+    volumes:
+      - type: bind
+        source: ./nginx/default.conf
+        target: /etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
