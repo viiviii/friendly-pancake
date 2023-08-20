@@ -1,4 +1,4 @@
-name: '🚀 Deploy API'
+name: 'api-deployment'
 
 concurrency: api-production
 
