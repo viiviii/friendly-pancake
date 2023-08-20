@@ -7,7 +7,7 @@ on:
     branches:
       - infra
     paths:
-      - service-api.yml
+      - compose-service-api.yml
 
 jobs:
   ec2:

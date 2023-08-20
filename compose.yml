@@ -1,7 +1,7 @@
 name: pancake
 
 include:
-  - path: service-api.yml
+  - path: compose-service-api.yml
 
 services:
   nginx:
