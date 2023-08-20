@@ -2,7 +2,7 @@ name: '🔫 trigger-api-deployment'
 
 on:
   workflow_run:
-    workflows: [ '📦 Build API' ]
+    workflows: [ 'api-build' ]
     types: [ completed ]
     branches: [ main ]
 

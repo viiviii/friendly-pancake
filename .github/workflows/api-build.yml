@@ -1,4 +1,4 @@
-name: '📦 Build API'
+name: 'api-build'
 
 on:
   push:
