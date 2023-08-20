@@ -12,8 +12,7 @@ env:
   java-version: 17
   jar-file: api-0.0.1-SNAPSHOT.jar
   jar-artifact-name: api-jar
-  image-registry: ghcr.io
-  image-registry-name: ghcr.io/${{ github.repository }}-api
+  image-name: ${{ vars.CONTAINER_REGISTRY }}/${{ github.repository }}-api
 
 jobs:
   jar:
@@ -80,7 +79,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.image-registry-name }}
+          images: ${{ env.image-name }}
           tags: |
             type=semver,pattern={{version}},value=${{ steps.version.outputs.version }},priority=902
             type=semver,pattern=v{{major}},value=${{ steps.version.outputs.version }},priority=901
@@ -96,7 +95,7 @@ jobs:
       - name: '🔑 Login to Registry'
         uses: docker/login-action@v2.2.0
         with:
-          registry: ${{ env.image-registry }}
+          registry: ${{ vars.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -116,7 +115,7 @@ jobs:
         run: |
           echo "### Install from the command line" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ env.image-registry-name }}:${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.image-name }}:${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: '🗒️ Note image name to commit'
@@ -124,5 +123,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           git fetch origin refs/notes/commits:refs/notes/commits
-          git notes add -m "${{ env.image-registry-name }}:${{ steps.version.outputs.version }}" ${{ github.sha }}
+          git notes add -m "${{ env.image-name }}:${{ steps.version.outputs.version }}" ${{ github.sha }}
           git push origin refs/notes/commits
