@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:pancake_app/api/api.dart' as api;
 import 'package:pancake_app/content_save_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,11 +51,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _onLoad() async {
-    final url = Uri.http('localhost:8080', '/api/contents');
+    final response = await api.get('contents');
+    assert(response.statusCode == 200, '지금은 귀찮아'); // TODO
 
-    final response = await http.get(url);
-    assert(response.statusCode == 200, '지금은 귀찮아');
-
+    // TODO
     final List parsed = jsonDecode(utf8.decode(response.bodyBytes))
         .cast<Map<String, dynamic>>();
 
@@ -70,14 +69,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _watch(int id) async {
-    final url = Uri.http('localhost:8080');
+    final opened = await launchUrl(api.url('contents/$id'));
 
-    final watched = await launchUrl(url.resolve('/api/contents/$id'));
-
-    if (watched) {
-      final response =
-          await http.patch(url.resolve('/api/contents/$id/watched'));
-      assert(response.statusCode == 200, '지금은 귀찮아');
+    if (opened) {
+      final response = await api.patch('contents/$id/watched');
+      assert(response.statusCode == 200, '지금은 귀찮아'); // TODO
     }
 
     _onLoad();
