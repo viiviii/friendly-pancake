@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' as api;
@@ -51,15 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _onLoad() async {
-    final response = await api.get('contents');
-    assert(response.statusCode == 200, '지금은 귀찮아'); // TODO
-
-    // TODO
-    final List parsed = jsonDecode(utf8.decode(response.bodyBytes))
-        .cast<Map<String, dynamic>>();
-
-    final contents =
-        parsed.map<Content>((json) => Content.fromJson(json)).toList();
+    final response = await api.get<List>('contents');
+    final contents = response.map((json) => Content.fromJson(json)).toList();
 
     setState(() {
       // todo: 서버에서 페이징
@@ -71,11 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _watch(int id) async {
     final opened = await launchUrl(api.url('contents/$id'));
 
-    if (opened) {
-      final response = await api.patch('contents/$id/watched');
-      assert(response.statusCode == 200, '지금은 귀찮아'); // TODO
+    if (!opened) {
+      return;
     }
 
+    await api.patch('contents/$id/watched');
     _onLoad();
   }
 

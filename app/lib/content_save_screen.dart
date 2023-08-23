@@ -31,7 +31,7 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
   }
 
   Future<void> _save() async {
-    final response = await api.post(
+    await api.post(
       'contents',
       body: {
         'url': _url,
@@ -40,7 +40,6 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
         'imageUrl': _imageUrl,
       },
     );
-    assert(response.statusCode == 201, '임시');
   }
 
   void _moveToHome() {
