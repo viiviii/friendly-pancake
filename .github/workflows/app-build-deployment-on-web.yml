@@ -1,6 +1,7 @@
 name: 'app-build-deployment-on-web'
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
