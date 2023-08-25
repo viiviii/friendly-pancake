@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:pancake_app/api/api.dart' as api;
 
 class ContentSaveScreen extends StatefulWidget {
   const ContentSaveScreen({super.key});
@@ -33,21 +31,15 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
   }
 
   Future<void> _save() async {
-    final url = Uri.http('localhost:8080', '/api/contents');
-
-    final header = {
-      'Content-Type': 'application/json',
-    };
-
-    final body = jsonEncode({
-      'url': _url,
-      'title': _title,
-      'description': _description,
-      'imageUrl': _imageUrl,
-    });
-
-    final response = await http.post(url, headers: header, body: body);
-    assert(response.statusCode == 201, '임시');
+    await api.post(
+      'contents',
+      body: {
+        'url': _url,
+        'title': _title,
+        'description': _description,
+        'imageUrl': _imageUrl,
+      },
+    );
   }
 
   void _moveToHome() {
