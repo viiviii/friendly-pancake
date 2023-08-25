@@ -1,0 +1,93 @@
+name: 'app-build-on-web'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - app/lib/**
+
+env:
+  directory: app
+  flutter-version: 3.7.12
+  web-artifact-name: web-app-files
+
+jobs:
+  build:
+    name: '📦 Web Application'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: '⬇️ Checkout directory'
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: /${{ env.directory }}
+          sparse-checkout-cone-mode: false
+
+      - name: '💫 Generate Version'
+        id: version
+        uses: viiviii/headver-action@v1
+        with:
+          head: 0 # TODO 🚧🚧🚧🚧🚧
+          build: ${{ github.run_number }}
+
+      - name: '🌱 Set up flutter'
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
+        with:
+          flutter-version: ${{ env.flutter-version }}
+          channel: stable
+
+      - name: '✅ Check tests pass'
+        working-directory: ${{ env.directory }}
+        run: flutter test
+
+      - name: '📦 Build web'
+        working-directory: ${{ env.directory }}
+        run: |
+          flutter build web \
+            --base-href "/${{ github.event.repository.name }}/" \
+            --build-number ${{ github.run_number }} \
+            --build-name ${{ steps.version.outputs.version }} \
+            --dart-define "API_HOST=${{ vars.API_HOST }}"
+
+      - name: '⬆️ Upload'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.web-artifact-name }}
+          path: ${{ env.directory }}/build/web
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: '🖨️ Output Summary'
+        run: |
+          echo "### Build version" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+
+  push:
+    name: '⬆️ To gh-pages'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: '⬇️ Checkout'
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+
+      - name: '⬇️ Download build files'
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.web-artifact-name }}
+
+      - name: '⬆️ Push web app'
+        run: |
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git add .
+          git commit -m "🦋 Update web app to ${{ needs.build.outputs.version }}"
+          git push origin HEAD
