@@ -1,0 +1,51 @@
+name: 'infra-update'
+
+concurrency: api-production
+
+on:
+  push:
+    branches:
+      - infra
+    paths:
+      - compose.yml
+      - nginx/**
+
+jobs:
+  ec2:
+    name: '🚀 AWS EC2'
+    runs-on: [ self-hosted, production ]
+    environment: api-production
+    permissions:
+      contents: read
+    steps:
+      - name: '⬇️ Checkout infra branch'
+        uses: actions/checkout@v3
+        with:
+          ref: infra
+
+      - name: '🔄 Apply compose'
+        env:
+          spring_datasource_properties: ${{ secrets.SPRING_DATASOURCE_PROPERTIES }}
+        run: docker compose up --wait --build --detach --remove-orphans --no-recreate
+
+      - name: '🔄 Reload nginx'
+        run: docker compose exec nginx nginx -s reload
+
+      - name: '🖨️ Output Summary'
+        if: ${{ always() }}
+        run: |
+          PIPE='|' LINE='---'
+          table=$(docker ps -a --format "table {{.ID}}$PIPE{{.Names}}$PIPE{{.Image}}$PIPE{{.Ports}}$PIPE{{.Status}}")
+          
+          # Create table header line
+          header_line=$LINE
+          pipe_count=$(echo "$table" | head -n 1 | tr -cd $PIPE | wc -c)
+          for _ in $(seq "$pipe_count"); do
+            header_line+="|$LINE"
+          done
+          
+          # Add a header line to second line
+          table=$(echo "$table" | sed "2 s/^/$header_line\n/")
+
+          echo "### Container Runs" >> $GITHUB_STEP_SUMMARY
+          echo "$table" >> $GITHUB_STEP_SUMMARY
