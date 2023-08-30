@@ -6,9 +6,27 @@ include:
 services:
   nginx:
     image: nginx:1-alpine-slim
+    depends_on:
+      ssl:
+        condition: service_completed_successfully
     volumes:
-      - type: bind
-        source: ./nginx/default.conf
-        target: /etc/nginx/conf.d/default.conf
+      - ./nginx:/etc/nginx/conf.d
+      - ssl_certificates:/etc/nginx/ssl:ro
     ports:
-      - 80:80
+      - 8080:80
+      - 8443:443
+
+  ssl:
+    image: certbot/certbot:latest
+    volumes:
+      - ssl_certificates:/etc/letsencrypt/live/pancake.viiviii.xyz
+    # 👀 --standalone uses 80 port when obtain certificates
+    command: >
+      certonly
+        --standalone
+        --keep-until-expiring
+        --email viiiix.viiviii@gmail.com --agree-tos --no-eff-email
+        --domain pancake.viiviii.xyz
+
+volumes:
+  ssl_certificates:
