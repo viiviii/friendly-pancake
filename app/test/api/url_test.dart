@@ -1,7 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/api/api.dart';
 
 void main() {
+  test('Domain defaultValue', () {
+    final domain = Domain();
+    expect(domain.fromEnvironment(), 'http://localhost:8080');
+  });
+
   test('url()', () {
     expect('${api.url('contents')}', 'http://localhost:8080/api/contents');
     expect('${api.url('users')}', 'http://localhost:8080/api/users');
