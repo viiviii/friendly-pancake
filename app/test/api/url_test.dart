@@ -1,17 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pancake_app/api/api.dart' as api;
 import 'package:pancake_app/api/api.dart';
-
-class Url {
-  final Uri _url;
-
-  Url(Domain domain)
-      : _url = Uri.parse(domain.fromEnvironment()).resolve('api/');
-
-  Uri call() => _url;
-
-  Uri path(String path) => _url.resolve(path);
-}
 
 class StubDomain implements Domain {
   final String _domain;
@@ -57,11 +45,6 @@ void main() {
     //then
     expect('${url.path('posts')}', 'http://localhost:8080/api/posts');
     expect('${url.path('users')}', 'http://localhost:8080/api/users');
-  });
-
-  test('url(String path) ', () {
-    expect('${api.url('contents')}', 'http://localhost:8080/api/contents');
-    expect('${api.url('users')}', 'http://localhost:8080/api/users');
   });
 
   test('url() with http', () {
