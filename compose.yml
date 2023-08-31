@@ -25,7 +25,7 @@ services:
       - 443:443
     command: >
       certonly
-        --standalone --staging
+        --standalone
         --domain pancake.viiviii.xyz
         --disable-hook-validation --deploy-hook 
           'cd /etc/letsencrypt && ln -s live/$$RENEWED_DOMAINS/fullchain.pem cert.pem && ln -s live/$$RENEWED_DOMAINS/privkey.pem key.pem'
