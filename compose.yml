@@ -19,14 +19,18 @@ services:
   ssl:
     image: certbot/certbot:latest
     volumes:
-      - ssl_certificates:/etc/letsencrypt/live/pancake.viiviii.xyz
-    # 👀 --standalone uses 80 port when obtain certificates
+      - ssl_certificates:/etc/letsencrypt
+    ports:
+      - 80:80
+      - 443:443
     command: >
       certonly
-        --standalone
-        --keep-until-expiring
-        --email viiiix.viiviii@gmail.com --agree-tos --no-eff-email
+        --standalone --staging
         --domain pancake.viiviii.xyz
+        --disable-hook-validation --deploy-hook 
+          "cd $$RENEWED_LINEAGE && ln -s fullchain.pem ../../cert.pem && ln -s privkey.pem ../../key.pem"
+        --email viiiix.viiviii@gmail.com --agree-tos --no-eff-email
+        --keep-until-expiring
 
 volumes:
   ssl_certificates:
