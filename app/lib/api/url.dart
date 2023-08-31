@@ -5,7 +5,7 @@ final _url = Url(Domain());
 Uri url(String path) => _url.path(path);
 
 class Domain {
-  static const dartDefineKey = 'API_HOST'; // --dart-define=<foo=bar>
+  static const dartDefineKey = 'API_URL'; // --dart-define=<foo=bar>
 
   final String _defaultValue = 'http://localhost:8080';
 

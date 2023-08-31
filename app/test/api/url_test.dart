@@ -8,7 +8,7 @@ void main() {
 
   group('Domain', () {
     test('dartDefineKey', () {
-      expect(Domain.dartDefineKey, 'API_HOST');
+      expect(Domain.dartDefineKey, 'API_URL');
     });
 
     test('defaultValue', () {
