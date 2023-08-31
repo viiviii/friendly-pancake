@@ -28,7 +28,7 @@ services:
         --standalone --staging
         --domain pancake.viiviii.xyz
         --disable-hook-validation --deploy-hook 
-          "cd $$RENEWED_LINEAGE && ln -s fullchain.pem ../../cert.pem && ln -s privkey.pem ../../key.pem"
+          'cd /etc/letsencrypt && ln -s live/$$RENEWED_DOMAINS/fullchain.pem cert.pem && ln -s live/$$RENEWED_DOMAINS/privkey.pem key.pem'
         --email viiiix.viiviii@gmail.com --agree-tos --no-eff-email
         --keep-until-expiring
 
