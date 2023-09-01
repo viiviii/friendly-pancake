@@ -52,7 +52,7 @@ jobs:
             --base-href "/${{ github.event.repository.name }}/" \
             --build-number ${{ github.run_number }} \
             --build-name ${{ steps.version.outputs.version }} \
-            --dart-define "API_HOST=${{ vars.API_HOST }}"
+            --dart-define "API_URL=${{ vars.API_URL }}"
 
       - name: '⬆️ Upload'
         uses: actions/upload-pages-artifact@v2
