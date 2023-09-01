@@ -7,10 +7,12 @@ Uri url(String path) => _url.path(path);
 class Domain {
   static const dartDefineKey = 'API_URL'; // --dart-define=<foo=bar>
 
-  final String _defaultValue = 'http://localhost:8080';
+  static const String _default = 'http://localhost:8080';
 
   String fromEnvironment() {
-    return String.fromEnvironment(dartDefineKey, defaultValue: _defaultValue);
+    // ⚠️ web 환경에서 에러 주의
+    // - Uncaught Unsupported operation: fromEnvironment can only be used as a const constructor
+    return const String.fromEnvironment(dartDefineKey, defaultValue: _default);
   }
 }
 
