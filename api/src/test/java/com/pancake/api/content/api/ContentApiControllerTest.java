@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
 import java.util.List;
 
@@ -31,12 +30,16 @@ class ContentApiControllerTest {
         given(contentService.save(TOTORO.REQUEST)).willReturn(TOTORO.CONTENT);
 
         //when
-        var response = post("/api/contents", TOTORO.REQUEST);
+        var response = client.post().uri("/api/contents")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(TOTORO.REQUEST)
+                .exchange();
 
         //then
-        response.expectStatus().isCreated()
-                .expectBody(ContentResponse.class)
-                .isEqualTo(TOTORO.RESPONSE);
+        response.expectAll(
+                spec -> spec.expectStatus().isCreated(),
+                spec -> spec.expectBody(ContentResponse.class).isEqualTo(TOTORO.RESPONSE)
+        );
     }
 
     @Test
@@ -45,12 +48,13 @@ class ContentApiControllerTest {
         given(contentService.getAllContents()).willReturn(List.of(TOTORO.CONTENT, PONYO.CONTENT));
 
         //when
-        var response = get("/api/contents");
+        var response = client.get().uri("/api/contents").exchange();
 
         //then
-        response.expectStatus().isOk()
-                .expectBodyList(ContentResponse.class)
-                .isEqualTo(List.of(TOTORO.RESPONSE, PONYO.RESPONSE));
+        response.expectAll(
+                spec -> spec.expectStatus().isOk(),
+                spec -> spec.expectBodyList(ContentResponse.class).isEqualTo(List.of(TOTORO.RESPONSE, PONYO.RESPONSE))
+        );
     }
 
     @Test
@@ -59,12 +63,14 @@ class ContentApiControllerTest {
         given(contentService.getContent(1234)).willReturn(TOTORO.CONTENT);
 
         //when
-        var response = get("/api/contents/{id}", 1234);
+        var response = client.get().uri("/api/contents/{id}", 1234).exchange();
 
         //then
-        response.expectStatus().isSeeOther()
-                .expectHeader().location(TOTORO.CONTENT.url())
-                .expectBody(Void.class);
+        response.expectAll(
+                spec -> spec.expectStatus().isSeeOther(),
+                spec -> spec.expectHeader().location(TOTORO.CONTENT.url()),
+                spec -> spec.expectBody(Void.class)
+        );
     }
 
     @Test
@@ -73,26 +79,12 @@ class ContentApiControllerTest {
         given(contentService.watch(1234)).willReturn(true);
 
         //when
-        var response = patch("/api/contents/{id}/watched", 1234);
+        var response = client.patch().uri("/api/contents/{id}/watched", 1234).exchange();
 
         //then
-        response.expectStatus().isOk()
-                .expectBody(Boolean.class)
-                .isEqualTo(true);
-    }
-
-    private ResponseSpec get(String path, Object... uriVariables) {
-        return client.get().uri(path, uriVariables).exchange();
-    }
-
-    private ResponseSpec post(String path, Object body) {
-        return client.post().uri(path)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(body)
-                .exchange();
-    }
-
-    private ResponseSpec patch(String path, Object... uriVariables) {
-        return client.patch().uri(path, uriVariables).exchange();
+        response.expectAll(
+                spec -> spec.expectStatus().isOk(),
+                spec -> spec.expectBody(Boolean.class).isEqualTo(true)
+        );
     }
 }
