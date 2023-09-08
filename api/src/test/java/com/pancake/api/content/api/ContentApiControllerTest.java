@@ -1,18 +1,17 @@
 package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.ContentService;
+import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
+import com.pancake.api.content.helper.ContentRequests;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 
 import java.util.List;
 
-import static com.pancake.api.content.Fixtures.Netflix.PONYO;
-import static com.pancake.api.content.Fixtures.Netflix.TOTORO;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -28,43 +27,53 @@ class ContentApiControllerTest {
     @Test
     void postContentApi() {
         //given
-        given(contentService.save(TOTORO.REQUEST)).willReturn(TOTORO.CONTENT);
+        var request = ContentRequests.DUMMY;
+        var res = responseOf(ContentRequests.DUMMY); // TODO
+        given(contentService.save(request)).willReturn(res);
 
         //when
-        var response = post("/api/contents", TOTORO.REQUEST);
+        var response = client.post().uri("/api/contents")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(ContentRequests.DUMMY)
+                .exchange();
 
         //then
-        response.expectStatus().isCreated()
-                .expectBody(ContentResponse.class)
-                .isEqualTo(TOTORO.RESPONSE);
+        response.expectAll(
+                spec -> spec.expectStatus().isCreated(),
+                spec -> spec.expectBody(ContentResponse.class).isEqualTo(res)
+        );
     }
 
     @Test
     void getAllContentsApi() {
         //given
-        given(contentService.getAllContents()).willReturn(List.of(TOTORO.CONTENT, PONYO.CONTENT));
+        var res = List.of(responseOf(ContentRequests.THOR), responseOf(ContentRequests.IRON_MAN));
+        given(contentService.getAllContents()).willReturn(res);
 
         //when
-        var response = get("/api/contents");
+        var response = client.get().uri("/api/contents").exchange();
 
         //then
-        response.expectStatus().isOk()
-                .expectBodyList(ContentResponse.class)
-                .isEqualTo(List.of(TOTORO.RESPONSE, PONYO.RESPONSE));
+        response.expectAll(
+                spec -> spec.expectStatus().isOk(),
+                spec -> spec.expectBodyList(ContentResponse.class).isEqualTo(res)
+        );
     }
 
     @Test
     void getContentApi() {
         //given
-        given(contentService.getContent(1234)).willReturn(TOTORO.CONTENT);
+        given(contentService.getContent(1234)).willReturn(responseOf(ContentRequests.THOR));
 
         //when
-        var response = get("/api/contents/{id}", 1234);
+        var response = client.get().uri("/api/contents/{id}", 1234).exchange();
 
         //then
-        response.expectStatus().isSeeOther()
-                .expectHeader().location(TOTORO.CONTENT.url())
-                .expectBody(Void.class);
+        response.expectAll(
+                spec -> spec.expectStatus().isSeeOther(),
+                spec -> spec.expectHeader().location(ContentRequests.THOR.getUrl()),
+                spec -> spec.expectBody(Void.class)
+        );
     }
 
     @Test
@@ -73,26 +82,19 @@ class ContentApiControllerTest {
         given(contentService.watch(1234)).willReturn(true);
 
         //when
-        var response = patch("/api/contents/{id}/watched", 1234);
+        var response = client.patch().uri("/api/contents/{id}/watched", 1234).exchange();
 
         //then
-        response.expectStatus().isOk()
-                .expectBody(Boolean.class)
-                .isEqualTo(true);
+        response.expectAll(
+                spec -> spec.expectStatus().isOk(),
+                spec -> spec.expectBody(Boolean.class).isEqualTo(true)
+        );
     }
 
-    private ResponseSpec get(String path, Object... uriVariables) {
-        return client.get().uri(path, uriVariables).exchange();
-    }
-
-    private ResponseSpec post(String path, Object body) {
-        return client.post().uri(path)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(body)
-                .exchange();
-    }
-
-    private ResponseSpec patch(String path, Object... uriVariables) {
-        return client.patch().uri(path, uriVariables).exchange();
+    private ContentResponse responseOf(ContentRequest request) {
+        return new ContentResponse(
+                999L, request.getTitle(), request.getDescription(), request.getUrl(), request.getImageUrl(),
+                false
+        );
     }
 }
