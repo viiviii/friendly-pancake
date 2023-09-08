@@ -2,13 +2,11 @@ package com.pancake.api.content;
 
 import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.net.URI;
@@ -19,12 +17,18 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@Sql("/database_cleanup.sql")
+@TestPropertySource(properties = "spring.flyway.clean-disabled=false")
 @SuppressWarnings("NonAsciiCharacters")
 class ContentAcceptanceTest {
 
     @Autowired
     WebTestClient client;
+
+    @AfterEach
+    void cleanUp(@Autowired Flyway flyway) {
+        flyway.clean();
+        flyway.migrate();
+    }
 
     @DisplayName("등록된 컨텐츠가 있다")
     @Nested
