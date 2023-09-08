@@ -1,6 +1,5 @@
 package com.pancake.api.content.domain;
 
-import com.pancake.api.content.Fixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +36,7 @@ class ContentTest {
     }
 
     private Content createContent() {
-        return Fixtures.Netflix.TOTORO.CONTENT;
+        return new Content("https://www.netflix.com/watch/0", "테스트용 제목",
+                "테스트용 설명", "https://occ.nflxso.net/api/0");
     }
 }
