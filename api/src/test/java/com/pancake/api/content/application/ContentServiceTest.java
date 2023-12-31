@@ -1,12 +1,13 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
-import com.pancake.api.content.helper.ContentRequests;
+import com.pancake.api.content.helper.ContentRequestBuilders;
+import com.pancake.api.content.helper.ContentRequestBuilders.ContentRequestBuilder;
 import com.pancake.api.content.infra.MemoryContentRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.pancake.api.content.helper.ContentRequestBuilders.aRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -20,7 +21,7 @@ class ContentServiceTest {
     @Test
     void save() {
         //given
-        var request = ContentRequests.builder()
+        var request = ContentRequestBuilders.builder()
                 .title("이웃집 토토로")
                 .description("일본의 한 시골 마을에서 여름을 보내게 된다")
                 .url("https://www.netflix.com/watch/999")
@@ -43,8 +44,8 @@ class ContentServiceTest {
     @Test
     void getAllContents() {
         //given
-        var ironMan = save(ContentRequests.IRON_MAN);
-        var thor = save(ContentRequests.THOR);
+        var ironMan = save(aRequest().title("아이언맨"));
+        var thor = save(aRequest().title("토르"));
 
         //when
         var actual = contentService.getAllContents();
@@ -57,7 +58,7 @@ class ContentServiceTest {
     @Test
     void getContent() {
         //given
-        var content = saveContent();
+        var content = save(aRequest());
 
         //when
         var actual = contentService.getContent(content.getId());
@@ -70,7 +71,7 @@ class ContentServiceTest {
     @Test
     void watch() {
         //given
-        var contentId = saveContent().getId();
+        var contentId = save(aRequest()).getId();
 
         //when
         var watched = contentService.watch(contentId);
@@ -86,11 +87,7 @@ class ContentServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    private ContentResponse saveContent() {
-        return save(ContentRequests.DUMMY);
-    }
-
-    private ContentResponse save(ContentRequest request) {
-        return contentService.save(request);
+    private ContentResponse save(ContentRequestBuilder request) {
+        return contentService.save(request.build());
     }
 }
