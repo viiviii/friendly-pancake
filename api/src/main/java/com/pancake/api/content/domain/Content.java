@@ -31,8 +31,8 @@ public class Content {
 
     private boolean watched;
 
-    public Content(String url, String title, String description, String imageUrl) {
-        this(null, url, title, description, imageUrl, false);
+    public Content(String title, String description, String imageUrl) {
+        this(null, "", title, description, imageUrl, false);
     }
 
     public Long id() {

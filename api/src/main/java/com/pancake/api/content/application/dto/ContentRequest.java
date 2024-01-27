@@ -10,12 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ContentRequest {
 
-    private String url;
     private String title;
     private String description;
     private String imageUrl;
 
     public Content toEntity() {
-        return new Content(url, title, description, imageUrl);
+        return new Content(title, description, imageUrl);
     }
 }

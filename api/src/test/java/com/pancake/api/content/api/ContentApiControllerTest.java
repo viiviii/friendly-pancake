@@ -66,7 +66,8 @@ class ContentApiControllerTest {
     @Test
     void getContentApi() {
         //given
-        given(contentService.getContent(1234)).willReturn(responseOf(aRequest().url("www.netflix.com/watch/1").build()));
+        // TODO
+        given(contentService.getContent(1234)).willReturn(responseOf(aRequest().build()));
 
         //when
         var response = client.get().uri("/api/contents/{id}", 1234).exchange();

@@ -24,7 +24,6 @@ class ContentServiceTest {
         var request = ContentRequestBuilders.builder()
                 .title("이웃집 토토로")
                 .description("일본의 한 시골 마을에서 여름을 보내게 된다")
-                .url("https://www.netflix.com/watch/999")
                 .imageUrl("https://occ.nflxso.net/api/999")
                 .build();
 
@@ -35,7 +34,6 @@ class ContentServiceTest {
         assertAll(
                 () -> assertThat(actual.getTitle()).isEqualTo("이웃집 토토로"),
                 () -> assertThat(actual.getDescription()).isEqualTo("일본의 한 시골 마을에서 여름을 보내게 된다"),
-                () -> assertThat(actual.getUrl()).isEqualTo("https://www.netflix.com/watch/999"),
                 () -> assertThat(actual.getImageUrl()).isEqualTo("https://occ.nflxso.net/api/999")
         );
     }

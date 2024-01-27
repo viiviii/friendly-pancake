@@ -36,7 +36,6 @@ class ContentTest {
     }
 
     private Content createContent() {
-        return new Content("https://www.netflix.com/watch/0", "테스트용 제목",
-                "테스트용 설명", "https://occ.nflxso.net/api/0");
+        return new Content("테스트용 제목", "테스트용 설명", "https://occ.nflxso.net/api/0");
     }
 }
