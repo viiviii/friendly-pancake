@@ -34,7 +34,9 @@ class ContentAcceptanceTest {
     @Test
     void 사용자가_컨텐츠를_시청한다() {
         //준비
-        등록된_컨텐츠가_있다("https://www.netflix.com/watch/70106454");
+        등록된_컨텐츠가_있다();
+        컨텐츠에_시청주소를_추가한다("https://www.netflix.com/watch/70106454");
+
         var 원하는_컨텐츠 = 첫번째_컨텐츠(조회된_컨텐츠_목록이_있다());
 
         //목표
@@ -58,14 +60,18 @@ class ContentAcceptanceTest {
         return client.get().uri("/api/contents/{id}", id).exchange();
     }
 
-    private void 등록된_컨텐츠가_있다(String url) {
-        var request = aRequest().url(url).build();
+    private void 등록된_컨텐츠가_있다() {
+        var request = aRequest().build();
         client.post().uri("/api/contents")
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(Void.class);
+    }
+
+    private void 컨텐츠에_시청주소를_추가한다(String url) {
+        // TODO
     }
 
     private List<ContentResponse> 조회된_컨텐츠_목록이_있다() {
