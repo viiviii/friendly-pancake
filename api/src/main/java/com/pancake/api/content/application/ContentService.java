@@ -43,4 +43,9 @@ public class ContentService {
 
         return content.watch();
     }
+
+    public boolean addUrl(long contentId, String url) {
+
+        return true;
+    }
 }

@@ -52,6 +52,19 @@ class ContentServiceTest {
         assertThat(actual).containsExactly(ironMan, thor);
     }
 
+    @Test
+    void 컨텐츠에_시청_주소를_추가한다() {
+        //given
+        var contentId = save(aRequest()).getId();
+
+        //when
+        var actual = contentService.addUrl(contentId, "https://www.netflix.com/watch/999");
+
+        //then
+        assertThat(actual).isTrue();
+    }
+
+
     @DisplayName("컨텐츠를 아이디로 조회한다")
     @Test
     void getContent() {
