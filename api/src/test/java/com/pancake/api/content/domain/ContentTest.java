@@ -32,7 +32,19 @@ class ContentTest {
                 () -> assertThat(watched).isTrue(),
                 () -> assertThat(content.isWatched()).isTrue()
         );
+    }
 
+    @DisplayName("컨텐츠에 url 추가한다")
+    @Test
+    void addUrl() {
+        //given
+        var content = createContent();
+
+        //when
+        content.addUrl("https://www.netflix.com/watch/999");
+
+        //then
+        assertThat(content.url()).isEqualTo("https://www.netflix.com/watch/999");
     }
 
     private Content createContent() {

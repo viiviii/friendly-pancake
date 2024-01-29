@@ -31,7 +31,7 @@ public class ContentService {
 
     public ContentResponse getContent(long id) {
         final var content = contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(IllegalArgumentException::new); // TODO
 
         return ContentResponse.fromEntity(content);
     }
@@ -39,13 +39,17 @@ public class ContentService {
     @Transactional
     public boolean watch(long id) {
         final var content = contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(IllegalArgumentException::new); // TODO
 
         return content.watch();
     }
 
     public boolean addUrl(long contentId, String url) {
+        final var content = contentRepository.findById(contentId)
+                .orElseThrow(IllegalArgumentException::new); // TODO
+        
+        content.addUrl(url);
 
-        return true;
+        return true; // TODO
     }
 }

@@ -32,7 +32,7 @@ public class Content {
     private boolean watched;
 
     public Content(String title, String description, String imageUrl) {
-        this(null, "", title, description, imageUrl, false);
+        this(null, null, title, description, imageUrl, false);
     }
 
     public Long id() {
@@ -63,5 +63,9 @@ public class Content {
         watched = true;
 
         return true;
+    }
+
+    public void addUrl(String url) {
+        this.url = url;
     }
 }
