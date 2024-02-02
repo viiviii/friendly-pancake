@@ -1,4 +1,4 @@
-package com.pancake.api.content.application.dto;
+package com.pancake.api.content.api;
 
 import com.pancake.api.content.domain.Content;
 import lombok.AllArgsConstructor;

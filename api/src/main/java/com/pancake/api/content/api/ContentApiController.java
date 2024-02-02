@@ -3,7 +3,6 @@ package com.pancake.api.content.api;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.application.dto.ContentRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

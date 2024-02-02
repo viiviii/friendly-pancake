@@ -1,7 +1,7 @@
 package com.pancake.api.content;
 
+import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,6 @@ package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
 import com.pancake.api.content.domain.Content;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
