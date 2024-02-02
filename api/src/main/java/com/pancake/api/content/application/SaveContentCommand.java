@@ -1,4 +1,4 @@
-package com.pancake.api.content.application.dto;
+package com.pancake.api.content.application;
 
 import com.pancake.api.content.domain.Content;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContentRequest {
+public class SaveContentCommand {
 
     private String title;
     private String description;

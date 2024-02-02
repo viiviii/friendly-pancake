@@ -1,7 +1,5 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.infra.ContentRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +14,8 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public Content save(ContentRequest request) {
-        return contentRepository.save(request.toEntity());
+    public Content save(SaveContentCommand command) {
+        return contentRepository.save(command.toEntity());
     }
 
     public List<Content> getAllContents() {
@@ -26,22 +24,18 @@ public class ContentService {
 
     public Content getContent(long id) {
         return contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new); // TODO
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     @Transactional
     public void watch(long id) {
-        final var content = contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new); // TODO
-
+        final var content = getContent(id);
         content.watch();
     }
 
     @Transactional
-    public void addWatch(long id, AddWatchRequest request) {
-        final var content = contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new); // TODO
-
-        content.addUrl(request.getUrl());
+    public void addWatch(long id, AddWatchCommand command) {
+        final var content = getContent(id);
+        content.addUrl(command.getUrl());
     }
 }

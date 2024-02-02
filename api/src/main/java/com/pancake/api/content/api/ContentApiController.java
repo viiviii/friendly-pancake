@@ -1,8 +1,8 @@
 package com.pancake.api.content.api;
 
+import com.pancake.api.content.application.AddWatchCommand;
 import com.pancake.api.content.application.ContentService;
-import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentRequest;
+import com.pancake.api.content.application.SaveContentCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +21,8 @@ public class ContentApiController {
     private final ContentService contentService;
 
     @PostMapping
-    public ResponseEntity<ContentResponse> save(@RequestBody ContentRequest request) {
-        final var content = contentService.save(request);
+    public ResponseEntity<ContentResponse> save(@RequestBody SaveContentCommand command) {
+        final var content = contentService.save(command);
         final var response = ContentResponse.fromEntity(content);
 
         return status(CREATED).body(response);
@@ -44,8 +44,8 @@ public class ContentApiController {
     }
 
     @PostMapping("{id}/watch")
-    public ResponseEntity<Void> addWatch(@PathVariable Long id, @RequestBody AddWatchRequest request) {
-        contentService.addWatch(id, request);
+    public ResponseEntity<Void> addWatch(@PathVariable Long id, @RequestBody AddWatchCommand command) {
+        contentService.addWatch(id, command);
 
         return status(NO_CONTENT).build();
     }

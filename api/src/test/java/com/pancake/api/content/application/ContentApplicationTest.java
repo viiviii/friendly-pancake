@@ -1,8 +1,7 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.application.dto.AddWatchRequest;
+import com.pancake.api.content.application.SaveContentCommandBuilders.SaveContentCommandBuilder;
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.helper.ContentRequestBuilders.ContentRequestBuilder;
 import com.pancake.api.content.infra.ContentRepository;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Condition;
@@ -14,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import static com.pancake.api.content.helper.ContentRequestBuilders.aRequest;
+import static com.pancake.api.content.application.SaveContentCommandBuilders.aSaveContentCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
@@ -38,7 +37,7 @@ class ContentApplicationTest {
     @Test
     void getById() {
         //given
-        var expected = save(aRequest());
+        var expected = save(aSaveContentCommand());
 
         //when
         var actual = contentService.getContent(expected.getId());
@@ -51,8 +50,8 @@ class ContentApplicationTest {
     @Test
     void getAll() {
         //given
-        save(aRequest().title("토르"));
-        save(aRequest().title("아이언맨"));
+        save(aSaveContentCommand().title("토르"));
+        save(aSaveContentCommand().title("아이언맨"));
 
         //when
         var actual = contentService.getAllContents();
@@ -65,14 +64,14 @@ class ContentApplicationTest {
     @Test
     void save() {
         //given
-        var request = aRequest()
+        var command = aSaveContentCommand()
                 .title("토토로")
                 .description("설명")
                 .imageUrl("http://some.image")
                 .build();
 
         //when
-        var content = contentService.save(request);
+        var content = contentService.save(command);
 
         //then
         assertThatActualBy(content.getId())
@@ -85,11 +84,11 @@ class ContentApplicationTest {
     @Test
     void addWatchToContent() {
         //given
-        var contentId = save(aRequest()).getId();
-        var request = new AddWatchRequest("https://www.netflix.com/watch/0");
+        var contentId = save(aSaveContentCommand()).getId();
+        var command = new AddWatchCommand("https://www.netflix.com/watch/0");
 
         //when
-        contentService.addWatch(contentId, request);
+        contentService.addWatch(contentId, command);
 
         //then
         assertThatActualBy(contentId).has(url("https://www.netflix.com/watch/0"));
@@ -99,7 +98,7 @@ class ContentApplicationTest {
     @Test
     void watch() {
         //given
-        var contentId = save(aRequest()).getId();
+        var contentId = save(aSaveContentCommand()).getId();
 
         //when
         contentService.watch(contentId);
@@ -108,8 +107,8 @@ class ContentApplicationTest {
         assertThatActualBy(contentId).is(watched());
     }
 
-    private Content save(ContentRequestBuilder request) {
-        return contentService.save(request.build());
+    private Content save(SaveContentCommandBuilder builder) {
+        return contentService.save(builder.build());
     }
 
     private AbstractObjectAssert<?, Content> assertThatActualBy(long contentId) {

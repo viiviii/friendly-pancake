@@ -1,6 +1,5 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.infra.ContentRepository;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +37,7 @@ class ContentServiceTest {
         given(contentRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
-        ThrowingCallable actual = () -> contentService.addWatch(anyLong(), watchRequest());
+        ThrowingCallable actual = () -> contentService.addWatch(anyLong(), command());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
@@ -57,7 +56,7 @@ class ContentServiceTest {
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    private AddWatchRequest watchRequest() {
-        return new AddWatchRequest("url");
+    private AddWatchCommand command() {
+        return new AddWatchCommand("url");
     }
 }

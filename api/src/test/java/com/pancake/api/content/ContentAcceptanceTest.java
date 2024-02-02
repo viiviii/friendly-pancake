@@ -1,7 +1,7 @@
 package com.pancake.api.content;
 
 import com.pancake.api.content.api.ContentResponse;
-import com.pancake.api.content.application.dto.AddWatchRequest;
+import com.pancake.api.content.application.AddWatchCommand;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.R
 
 import java.util.List;
 
-import static com.pancake.api.content.helper.ContentRequestBuilders.aRequest;
+import static com.pancake.api.content.application.SaveContentCommandBuilders.aSaveContentCommand;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -56,7 +56,7 @@ class ContentAcceptanceTest {
     }
 
     private ContentResponse 등록된_컨텐츠가_있다() {
-        var request = aRequest().build();
+        var request = aSaveContentCommand().build();
 
         return client.post().uri("/api/contents")
                 .contentType(APPLICATION_JSON)
@@ -68,7 +68,7 @@ class ContentAcceptanceTest {
     }
 
     private void 컨텐츠에_시청주소를_추가한다(long contentId, String url) {
-        var request = new AddWatchRequest(url);
+        var request = new AddWatchCommand(url);
         client.post().uri("/api/contents/{id}/watch", contentId)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
