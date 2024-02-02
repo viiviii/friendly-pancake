@@ -1,5 +1,6 @@
 package com.pancake.api.content;
 
+import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
@@ -34,10 +35,8 @@ class ContentAcceptanceTest {
     @Test
     void 사용자가_컨텐츠를_시청한다() {
         //준비
-        등록된_컨텐츠가_있다();
-        컨텐츠에_시청주소를_추가한다("https://www.netflix.com/watch/70106454");
-
-        var 원하는_컨텐츠 = 첫번째_컨텐츠(조회된_컨텐츠_목록이_있다());
+        var 원하는_컨텐츠 = 등록된_컨텐츠가_있다().getId();
+        컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.netflix.com/watch/70106454");
 
         //목표
         var 결과 = 컨텐츠를_시청한다(원하는_컨텐츠);
@@ -52,17 +51,25 @@ class ContentAcceptanceTest {
         return spec -> spec.expectHeader().location(url);
     }
 
-    private Long 첫번째_컨텐츠(List<ContentResponse> contents) {
-        return contents.get(0).getId();
-    }
-
     private ResponseSpec 컨텐츠를_시청한다(long id) {
         return client.get().uri("/api/contents/{id}", id).exchange();
     }
 
-    private void 등록된_컨텐츠가_있다() {
+    private ContentResponse 등록된_컨텐츠가_있다() {
         var request = aRequest().build();
-        client.post().uri("/api/contents")
+
+        return client.post().uri("/api/contents")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(ContentResponse.class)
+                .returnResult().getResponseBody();
+    }
+
+    private void 컨텐츠에_시청주소를_추가한다(long contentId, String url) {
+        var request = new AddWatchRequest(url);
+        client.post().uri("/api/contents/{id}/watch", contentId)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
@@ -70,10 +77,7 @@ class ContentAcceptanceTest {
                 .expectBody(Void.class);
     }
 
-    private void 컨텐츠에_시청주소를_추가한다(String url) {
-        // TODO
-    }
-
+    // TODO: 지금 쓸데 없죠
     private List<ContentResponse> 조회된_컨텐츠_목록이_있다() {
         return client.get().uri("/api/contents")
                 .exchange()

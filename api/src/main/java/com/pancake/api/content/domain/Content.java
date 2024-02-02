@@ -32,7 +32,7 @@ public class Content {
     private boolean watched;
 
     public Content(String title, String description, String imageUrl) {
-        this(null, null, title, description, imageUrl, false);
+        this(null, "", title, description, imageUrl, false); // TODO: url=""
     }
 
     public Long id() {
