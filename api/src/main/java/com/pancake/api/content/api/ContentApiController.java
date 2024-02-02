@@ -46,13 +46,13 @@ public class ContentApiController {
     public ResponseEntity<Void> addWatch(@PathVariable Long id, @RequestBody AddWatchRequest request) {
         contentService.addWatch(id, request);
 
-        return status(CREATED).build();
+        return status(NO_CONTENT).build();
     }
 
     @PatchMapping("{id}/watched")
-    public ResponseEntity<Boolean> patchWatchedContent(@PathVariable Long id) {
-        final boolean watched = contentService.watch(id);
+    public ResponseEntity<Void> changeContentToWatch(@PathVariable Long id) {
+        contentService.watch(id);
 
-        return status(OK).body(watched);
+        return status(NO_CONTENT).build();
     }
 }

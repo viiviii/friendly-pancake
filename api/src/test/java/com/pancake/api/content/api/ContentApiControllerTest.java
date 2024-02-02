@@ -95,29 +95,27 @@ class ContentApiControllerTest {
 
         //then
         response.expectAll(
-                spec -> spec.expectStatus().isCreated(),
-                spec -> spec.expectBody(Void.class) // TODO: 응답값 추가
+                spec -> spec.expectStatus().isNoContent(),
+                spec -> spec.expectBody(Void.class)
         );
     }
 
     @Test
     void patchWatchedContentApi() {
-        //given
-        given(contentService.watch(1234)).willReturn(true);
-
         //when
         var response = client.patch().uri("/api/contents/{id}/watched", 1234).exchange();
 
         //then
         response.expectAll(
-                spec -> spec.expectStatus().isOk(),
-                spec -> spec.expectBody(Boolean.class).isEqualTo(true)
+                spec -> spec.expectStatus().isNoContent(),
+                spec -> spec.expectBody(Void.class)
         );
     }
 
     private ContentResponse responseOf(ContentRequest request) {
         var response = ContentResponse.fromEntity(request.toEntity());
         response.setId(999L);
+
         return response;
     }
 }
