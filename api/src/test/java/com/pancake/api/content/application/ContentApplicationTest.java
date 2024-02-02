@@ -36,6 +36,50 @@ class ContentApplicationTest {
         flyway.migrate();
     }
 
+    @DisplayName("컨텐츠를 아이디로 조회한다")
+    @Test
+    void getById() {
+        //given
+        var content = save(aRequest());
+
+        //when
+        var actual = contentService.getContent(content.getId());
+
+        //then
+        assertThat(actual).isEqualTo(content);
+    }
+
+    @DisplayName("모든 컨텐츠를 조회한다")
+    @Test
+    void getAll() {
+        //given
+        save(aRequest().title("토르"));
+        save(aRequest().title("아이언맨"));
+
+        //when
+        var actual = contentService.getAllContents();
+
+        //then
+        assertThat(actual)
+                .hasSize(2)
+                .are(notNullId())
+                .extracting(ContentResponse::getTitle)
+                .containsExactly("토르", "아이언맨"); // TODO
+    }
+
+    @DisplayName("컨텐츠를 저장한다")
+    @Test
+    void save() {
+        //given
+        var request = aRequest().build();
+
+        //when
+        var content = contentService.save(request);
+
+        //then
+        assertThat(actualBy(content.getId())).isPresent();
+    }
+
     @DisplayName("컨텐츠에 시청 주소를 추가한다")
     @Test
     void addWatchToContent() {
@@ -47,8 +91,20 @@ class ContentApplicationTest {
         contentService.addWatch(contentId, request);
 
         //then
-        assertThat(actualBy(contentId)).get()
-                .has(url("https://www.netflix.com/watch/0"));
+        assertThat(actualBy(contentId)).get().has(url("https://www.netflix.com/watch/0"));
+    }
+
+    @DisplayName("컨텐츠를 시청 처리한다")
+    @Test
+    void watch() {
+        //given
+        var contentId = save(aRequest()).getId();
+
+        //when
+        contentService.watch(contentId);
+
+        //then
+        assertThat(actualBy(contentId)).get().is(watched());
     }
 
     private ContentResponse save(ContentRequestBuilder request) {
@@ -59,7 +115,15 @@ class ContentApplicationTest {
         return contentRepository.findById(id);
     }
 
+    private Condition<ContentResponse> notNullId() {
+        return new Condition<>(e -> e.getId() != null, "id is not null");
+    }
+
     private Condition<Content> url(String expected) {
         return new Condition<>(e -> e.url().equals(expected), "url equals %s", expected);
+    }
+
+    private Condition<Content> watched() {
+        return new Condition<>(Content::isWatched, "isWatched is true");
     }
 }
