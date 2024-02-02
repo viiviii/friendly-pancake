@@ -46,6 +46,7 @@ public class ContentService {
         return content.watch();
     }
 
+    @Transactional
     public Content addWatch(long id, AddWatchRequest request) {
         final var content = contentRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new); // TODO
