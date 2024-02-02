@@ -2,7 +2,7 @@ package com.pancake.api.content.application;
 
 import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.application.dto.ContentRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
+import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.infra.ContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,25 +16,17 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public ContentResponse save(ContentRequest request) {
-        final var saved = contentRepository.save(request.toEntity());
-
-        return ContentResponse.fromEntity(saved);
+    public Content save(ContentRequest request) {
+        return contentRepository.save(request.toEntity());
     }
 
-    public List<ContentResponse> getAllContents() {
-        final var contents = contentRepository.findAll();
-
-        return contents.stream()
-                .map(ContentResponse::fromEntity)
-                .toList();
+    public List<Content> getAllContents() {
+        return contentRepository.findAll();
     }
 
-    public ContentResponse getContent(long id) {
-        final var content = contentRepository.findById(id)
+    public Content getContent(long id) {
+        return contentRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new); // TODO
-
-        return ContentResponse.fromEntity(content);
     }
 
     @Transactional

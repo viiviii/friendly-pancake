@@ -1,10 +1,10 @@
 package com.pancake.api.content.application;
 
 import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.helper.ContentRequestBuilders.ContentRequestBuilder;
 import com.pancake.api.content.infra.ContentRepository;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Condition;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-
-import java.util.Optional;
 
 import static com.pancake.api.content.helper.ContentRequestBuilders.aRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,13 +38,13 @@ class ContentApplicationTest {
     @Test
     void getById() {
         //given
-        var content = save(aRequest());
+        var expected = save(aRequest());
 
         //when
-        var actual = contentService.getContent(content.getId());
+        var actual = contentService.getContent(expected.getId());
 
         //then
-        assertThat(actual).isEqualTo(content);
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @DisplayName("모든 컨텐츠를 조회한다")
@@ -60,24 +58,27 @@ class ContentApplicationTest {
         var actual = contentService.getAllContents();
 
         //then
-        assertThat(actual)
-                .hasSize(2)
-                .are(notNullId())
-                .extracting(ContentResponse::getTitle)
-                .containsExactly("토르", "아이언맨"); // TODO
+        assertThat(actual).hasSize(2);
     }
 
     @DisplayName("컨텐츠를 저장한다")
     @Test
     void save() {
         //given
-        var request = aRequest().build();
+        var request = aRequest()
+                .title("토토로")
+                .description("설명")
+                .imageUrl("http://some.image")
+                .build();
 
         //when
         var content = contentService.save(request);
 
         //then
-        assertThat(actualBy(content.getId())).isPresent();
+        assertThatActualBy(content.getId())
+                .has(title("토토로"))
+                .has(description("설명"))
+                .has(imageUrl("http://some.image"));
     }
 
     @DisplayName("컨텐츠에 시청 주소를 추가한다")
@@ -91,7 +92,7 @@ class ContentApplicationTest {
         contentService.addWatch(contentId, request);
 
         //then
-        assertThat(actualBy(contentId)).get().has(url("https://www.netflix.com/watch/0"));
+        assertThatActualBy(contentId).has(url("https://www.netflix.com/watch/0"));
     }
 
     @DisplayName("컨텐츠를 시청 처리한다")
@@ -104,23 +105,33 @@ class ContentApplicationTest {
         contentService.watch(contentId);
 
         //then
-        assertThat(actualBy(contentId)).get().is(watched());
+        assertThatActualBy(contentId).is(watched());
     }
 
-    private ContentResponse save(ContentRequestBuilder request) {
+    private Content save(ContentRequestBuilder request) {
         return contentService.save(request.build());
     }
 
-    private Optional<Content> actualBy(Long id) {
-        return contentRepository.findById(id);
+    private AbstractObjectAssert<?, Content> assertThatActualBy(long contentId) {
+        var actual = contentRepository.findById(contentId);
+
+        return assertThat(actual).get();
     }
 
-    private Condition<ContentResponse> notNullId() {
-        return new Condition<>(e -> e.getId() != null, "id is not null");
+    private Condition<Content> title(String expected) {
+        return new Condition<>(e -> e.getTitle().equals(expected), "title equals %s", expected);
+    }
+
+    private Condition<Content> description(String expected) {
+        return new Condition<>(e -> e.getDescription().equals(expected), "description equals %s", expected);
+    }
+
+    private Condition<Content> imageUrl(String expected) {
+        return new Condition<>(e -> e.getImageUrl().equals(expected), "image url equals %s", expected);
     }
 
     private Condition<Content> url(String expected) {
-        return new Condition<>(e -> e.url().equals(expected), "url equals %s", expected);
+        return new Condition<>(e -> e.getUrl().equals(expected), "url equals %s", expected);
     }
 
     private Condition<Content> watched() {

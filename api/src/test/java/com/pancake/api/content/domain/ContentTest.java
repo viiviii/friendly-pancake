@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ContentTest {
 
@@ -25,13 +24,10 @@ class ContentTest {
         var content = createContent();
 
         //when
-        boolean watched = content.watch();
+        content.watch();
 
         //then
-        assertAll(
-                () -> assertThat(watched).isTrue(),
-                () -> assertThat(content.isWatched()).isTrue()
-        );
+        assertThat(content.isWatched()).isTrue();
     }
 
     @DisplayName("컨텐츠에 url 추가한다")
@@ -44,7 +40,7 @@ class ContentTest {
         content.addUrl("https://www.netflix.com/watch/999");
 
         //then
-        assertThat(content.url()).isEqualTo("https://www.netflix.com/watch/999");
+        assertThat(content.getUrl()).isEqualTo("https://www.netflix.com/watch/999");
     }
 
     private Content createContent() {

@@ -18,7 +18,7 @@ public class ContentResponse {
     private boolean watched;
 
     public static ContentResponse fromEntity(Content content) {
-        return new ContentResponse(content.id(), content.title(), content.description(),
-                content.url(), content.imageUrl(), content.isWatched());
+        return new ContentResponse(content.getId(), content.getTitle(), content.getDescription(),
+                content.getUrl(), content.getImageUrl(), content.isWatched());
     }
 }

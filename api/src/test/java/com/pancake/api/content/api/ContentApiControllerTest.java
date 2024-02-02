@@ -2,8 +2,8 @@ package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
+import com.pancake.api.content.domain.Content;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,8 +29,9 @@ class ContentApiControllerTest {
     void postContentApi() {
         //given
         var request = aRequest().build();
-        var expectedBody = responseOf(request);
-        given(contentService.save(request)).willReturn(expectedBody);
+        var content = request.toEntity();
+
+        given(contentService.save(request)).willReturn(content);
 
         //when
         var response = client.post().uri("/api/contents")
@@ -41,18 +42,17 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isCreated(),
-                spec -> spec.expectBody(ContentResponse.class).isEqualTo(expectedBody)
+                spec -> spec.expectBody(ContentResponse.class).isEqualTo(ContentResponse.fromEntity(content))
         );
     }
 
     @Test
     void getAllContentsApi() {
         //given
-        var expectedBodyList = List.of(
-                responseOf(aRequest().title("토르").build()),
-                responseOf(aRequest().title("아이언맨").build())
-        );
-        given(contentService.getAllContents()).willReturn(expectedBodyList);
+        var content1 = content();
+        var content2 = content();
+
+        given(contentService.getAllContents()).willReturn(List.of(content1, content2));
 
         //when
         var response = client.get().uri("/api/contents").exchange();
@@ -60,7 +60,9 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isOk(),
-                spec -> spec.expectBodyList(ContentResponse.class).isEqualTo(expectedBodyList)
+                spec -> spec.expectBodyList(ContentResponse.class).isEqualTo(
+                        List.of(toResponse(content1), toResponse(content2))
+                )
         );
     }
 
@@ -68,8 +70,9 @@ class ContentApiControllerTest {
     @Test
     void getContentApi() {
         //given
-        given(contentService.getContent(1234))
-                .willReturn(new ContentResponse(0L, "", "", "www.netflix.com/watch/1", "", false));
+        var content = content();
+
+        given(contentService.getContent(1234)).willReturn(content);
 
         //when
         var response = client.get().uri("/api/contents/{id}", 1234).exchange();
@@ -77,7 +80,7 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isSeeOther(),
-                spec -> spec.expectHeader().location("www.netflix.com/watch/1"),
+                spec -> spec.expectHeader().location(content.getUrl()),
                 spec -> spec.expectBody(Void.class)
         );
     }
@@ -112,10 +115,11 @@ class ContentApiControllerTest {
         );
     }
 
-    private ContentResponse responseOf(ContentRequest request) {
-        var response = ContentResponse.fromEntity(request.toEntity());
-        response.setId(999L);
+    private Content content() {
+        return new Content("title", "description", "imageUrl");
+    }
 
-        return response;
+    private ContentResponse toResponse(Content content) {
+        return ContentResponse.fromEntity(content);
     }
 }

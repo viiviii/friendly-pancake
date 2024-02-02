@@ -22,21 +22,23 @@ public class ContentApiController {
     private final ContentService contentService;
 
     @PostMapping
-    public ResponseEntity<ContentResponse> saveContent(@RequestBody ContentRequest request) {
+    public ResponseEntity<ContentResponse> save(@RequestBody ContentRequest request) {
         final var content = contentService.save(request);
+        final var response = ContentResponse.fromEntity(content);
 
-        return status(CREATED).body(content);
+        return status(CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<ContentResponse>> getAllContents() {
+    public ResponseEntity<List<ContentResponse>> getAll() {
         final var contents = contentService.getAllContents();
+        final var response = contents.stream().map(ContentResponse::fromEntity).toList();
 
-        return status(OK).body(contents);
+        return status(OK).body(response);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Void> getContentById(@PathVariable Long id) {
+    public ResponseEntity<Void> getById(@PathVariable Long id) {
         final var content = contentService.getContent(id);
 
         return status(SEE_OTHER).location(URI.create(content.getUrl())).build();
