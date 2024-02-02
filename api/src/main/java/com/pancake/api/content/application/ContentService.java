@@ -1,7 +1,9 @@
 package com.pancake.api.content.application;
 
+import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
+import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.infra.ContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,12 +46,11 @@ public class ContentService {
         return content.watch();
     }
 
-    public boolean addUrl(long contentId, String url) {
-        final var content = contentRepository.findById(contentId)
+    public Content addWatch(long id, AddWatchRequest request) {
+        final var content = contentRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new); // TODO
-        
-        content.addUrl(url);
+        content.addUrl(request.getUrl());
 
-        return true; // TODO
+        return content;
     }
 }

@@ -1,6 +1,7 @@
 package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.ContentService;
+import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
 import org.junit.jupiter.api.Test;
@@ -78,6 +79,24 @@ class ContentApiControllerTest {
                 spec -> spec.expectStatus().isSeeOther(),
                 spec -> spec.expectHeader().location("www.netflix.com/watch/1"),
                 spec -> spec.expectBody(Void.class)
+        );
+    }
+
+    @Test
+    void addWatch() {
+        //given
+        var request = new AddWatchRequest("www.netflix.com/watch/1");
+
+        //when
+        var response = client.post().uri("/api/contents/{id}/watch", 1L)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange();
+
+        //then
+        response.expectAll(
+                spec -> spec.expectStatus().isCreated(),
+                spec -> spec.expectBody(Void.class) // TODO: 응답값 추가
         );
     }
 

@@ -1,5 +1,6 @@
 package com.pancake.api.content.application;
 
+import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
 import com.pancake.api.content.helper.ContentRequestBuilders;
 import com.pancake.api.content.helper.ContentRequestBuilders.ContentRequestBuilder;
@@ -56,12 +57,13 @@ class ContentServiceTest {
     void 컨텐츠에_시청_주소를_추가한다() {
         //given
         var contentId = save(aRequest()).getId();
+        var request = new AddWatchRequest("https://www.netflix.com/watch/999");
 
         //when
-        var actual = contentService.addUrl(contentId, "https://www.netflix.com/watch/999");
+        var actual = contentService.addWatch(contentId, request);
 
         //then
-        assertThat(actual).isTrue();
+        assertThat(actual.url()).isEqualTo("https://www.netflix.com/watch/999");
     }
 
 
