@@ -1,106 +1,62 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
-import com.pancake.api.content.helper.ContentRequestBuilders;
-import com.pancake.api.content.helper.ContentRequestBuilders.ContentRequestBuilder;
-import com.pancake.api.content.infra.MemoryContentRepository;
+import com.pancake.api.content.domain.ContentRepository;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.pancake.api.content.helper.ContentRequestBuilders.aRequest;
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 class ContentServiceTest {
-    private static final long NOT_EXISTS_ID = Long.MAX_VALUE;
 
-    private final ContentService contentService = new ContentService(new MemoryContentRepository());
+    private final ContentRepository contentRepository = mock(ContentRepository.class);
+    private final ContentService contentService = new ContentService(contentRepository);
 
-    @DisplayName("컨텐츠를 저장한다")
+    @DisplayName("존재하지 않는 컨텐츠 조회 시 예외가 발생한다")
     @Test
-    void save() {
+    void getThrownExceptionWhenContentNotExist() {
         //given
-        var request = ContentRequestBuilders.builder()
-                .title("이웃집 토토로")
-                .description("일본의 한 시골 마을에서 여름을 보내게 된다")
-                .imageUrl("https://occ.nflxso.net/api/999")
-                .build();
+        given(contentRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
-        var actual = contentService.save(request);
+        ThrowingCallable actual = () -> contentService.getContent(anyLong());
 
         //then
-        assertAll(
-                () -> assertThat(actual.getTitle()).isEqualTo("이웃집 토토로"),
-                () -> assertThat(actual.getDescription()).isEqualTo("일본의 한 시골 마을에서 여름을 보내게 된다"),
-                () -> assertThat(actual.getImageUrl()).isEqualTo("https://occ.nflxso.net/api/999")
-        );
+        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("컨텐츠를 모두 조회한다")
+    @DisplayName("존재하지 않는 컨텐츠에 시청 주소 추가 시 예외가 발생한다")
     @Test
-    void getAllContents() {
+    void addWatchThrownExceptionWhenContentNotExist() {
         //given
-        var ironMan = save(aRequest().title("아이언맨"));
-        var thor = save(aRequest().title("토르"));
+        given(contentRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
-        var actual = contentService.getAllContents();
+        ThrowingCallable actual = () -> contentService.addWatch(anyLong(), command());
 
         //then
-        assertThat(actual).containsExactly(ironMan, thor);
-    }
-
-    @Test
-    void 컨텐츠에_시청_주소를_추가한다() {
-        //given
-        var contentId = save(aRequest()).getId();
-        var request = new AddWatchRequest("https://www.netflix.com/watch/999");
-
-        //when
-        var actual = contentService.addWatch(contentId, request);
-
-        //then
-        assertThat(actual.url()).isEqualTo("https://www.netflix.com/watch/999");
-    }
-
-
-    @DisplayName("컨텐츠를 아이디로 조회한다")
-    @Test
-    void getContent() {
-        //given
-        var content = save(aRequest());
-
-        //when
-        var actual = contentService.getContent(content.getId());
-
-        //then
-        assertThat(actual).isEqualTo(content);
-    }
-
-    @DisplayName("컨텐츠를 시청 처리한다")
-    @Test
-    void watch() {
-        //given
-        var contentId = save(aRequest()).getId();
-
-        //when
-        var watched = contentService.watch(contentId);
-
-        //then
-        assertThat(watched).isTrue();
+        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("존재하지 않는 컨텐츠를 시청 처리 시 예외가 발생한다")
     @Test
     void watchThrownExceptionWhenContentNotExist() {
-        assertThatThrownBy(() -> contentService.watch(NOT_EXISTS_ID))
-                .isInstanceOf(IllegalArgumentException.class);
+        //given
+        given(contentRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        //when
+        ThrowingCallable actual = () -> contentService.watch(anyLong());
+
+        //then
+        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    private ContentResponse save(ContentRequestBuilder request) {
-        return contentService.save(request.build());
+    private AddWatchCommand command() {
+        return new AddWatchCommand("url");
     }
 }

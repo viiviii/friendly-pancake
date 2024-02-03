@@ -35,23 +35,23 @@ public class Content {
         this(null, "", title, description, imageUrl, false); // TODO: url=""
     }
 
-    public Long id() {
+    public Long getId() {
         return this.id;
     }
 
-    public String url() {
+    public String getUrl() {
         return this.url;
     }
 
-    public String title() {
+    public String getTitle() {
         return this.title;
     }
 
-    public String description() {
+    public String getDescription() {
         return this.description;
     }
 
-    public String imageUrl() {
+    public String getImageUrl() {
         return this.imageUrl;
     }
 
@@ -59,10 +59,8 @@ public class Content {
         return this.watched;
     }
 
-    public boolean watch() {
+    public void watch() {
         watched = true;
-
-        return true;
     }
 
     public void addUrl(String url) {

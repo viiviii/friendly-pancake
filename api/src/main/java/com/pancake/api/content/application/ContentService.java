@@ -1,10 +1,7 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.infra.ContentRepository;
+import com.pancake.api.content.domain.ContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,41 +14,28 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public ContentResponse save(ContentRequest request) {
-        final var saved = contentRepository.save(request.toEntity());
-
-        return ContentResponse.fromEntity(saved);
+    public Content save(SaveContentCommand command) {
+        return contentRepository.save(command.toEntity());
     }
 
-    public List<ContentResponse> getAllContents() {
-        final var contents = contentRepository.findAll();
-
-        return contents.stream()
-                .map(ContentResponse::fromEntity)
-                .toList();
+    public List<Content> getAllContents() {
+        return contentRepository.findAll();
     }
 
-    public ContentResponse getContent(long id) {
-        final var content = contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new); // TODO
-
-        return ContentResponse.fromEntity(content);
+    public Content getContent(long id) {
+        return contentRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
     }
 
     @Transactional
-    public boolean watch(long id) {
-        final var content = contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new); // TODO
-
-        return content.watch();
+    public void watch(long id) {
+        final var content = getContent(id);
+        content.watch();
     }
 
     @Transactional
-    public Content addWatch(long id, AddWatchRequest request) {
-        final var content = contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new); // TODO
-        content.addUrl(request.getUrl());
-
-        return content;
+    public void addWatch(long id, AddWatchCommand command) {
+        final var content = getContent(id);
+        content.addUrl(command.getUrl());
     }
 }

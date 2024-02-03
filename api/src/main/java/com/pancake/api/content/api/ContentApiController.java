@@ -1,9 +1,8 @@
 package com.pancake.api.content.api;
 
+import com.pancake.api.content.application.AddWatchCommand;
 import com.pancake.api.content.application.ContentService;
-import com.pancake.api.content.application.dto.AddWatchRequest;
-import com.pancake.api.content.application.dto.ContentRequest;
-import com.pancake.api.content.application.dto.ContentResponse;
+import com.pancake.api.content.application.SaveContentCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,37 +21,39 @@ public class ContentApiController {
     private final ContentService contentService;
 
     @PostMapping
-    public ResponseEntity<ContentResponse> saveContent(@RequestBody ContentRequest request) {
-        final var content = contentService.save(request);
+    public ResponseEntity<ContentResponse> save(@RequestBody SaveContentCommand command) {
+        final var content = contentService.save(command);
+        final var response = ContentResponse.fromEntity(content);
 
-        return status(CREATED).body(content);
+        return status(CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<ContentResponse>> getAllContents() {
+    public ResponseEntity<List<ContentResponse>> getAll() {
         final var contents = contentService.getAllContents();
+        final var response = contents.stream().map(ContentResponse::fromEntity).toList();
 
-        return status(OK).body(contents);
+        return status(OK).body(response);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Void> getContentById(@PathVariable Long id) {
+    public ResponseEntity<Void> getById(@PathVariable Long id) {
         final var content = contentService.getContent(id);
 
         return status(SEE_OTHER).location(URI.create(content.getUrl())).build();
     }
 
     @PostMapping("{id}/watch")
-    public ResponseEntity<Void> addWatch(@PathVariable Long id, @RequestBody AddWatchRequest request) {
-        contentService.addWatch(id, request);
+    public ResponseEntity<Void> addWatch(@PathVariable Long id, @RequestBody AddWatchCommand command) {
+        contentService.addWatch(id, command);
 
-        return status(CREATED).build();
+        return status(NO_CONTENT).build();
     }
 
     @PatchMapping("{id}/watched")
-    public ResponseEntity<Boolean> patchWatchedContent(@PathVariable Long id) {
-        final boolean watched = contentService.watch(id);
+    public ResponseEntity<Void> changeContentToWatch(@PathVariable Long id) {
+        contentService.watch(id);
 
-        return status(OK).body(watched);
+        return status(NO_CONTENT).build();
     }
 }
