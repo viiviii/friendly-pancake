@@ -1,6 +1,7 @@
 package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.ContentService;
+import com.pancake.api.content.application.dto.AddWatchRequest;
 import com.pancake.api.content.application.dto.ContentRequest;
 import com.pancake.api.content.application.dto.ContentResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,13 @@ public class ContentApiController {
         final var content = contentService.getContent(id);
 
         return status(SEE_OTHER).location(URI.create(content.getUrl())).build();
+    }
+
+    @PostMapping("{id}/watch")
+    public ResponseEntity<Void> addWatch(@PathVariable Long id, @RequestBody AddWatchRequest request) {
+        contentService.addWatch(id, request);
+
+        return status(CREATED).build();
     }
 
     @PatchMapping("{id}/watched")
