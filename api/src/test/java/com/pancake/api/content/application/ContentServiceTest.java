@@ -1,6 +1,6 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.infra.ContentRepository;
+import com.pancake.api.content.domain.ContentRepository;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

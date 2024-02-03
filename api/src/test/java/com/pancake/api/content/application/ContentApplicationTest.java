@@ -2,7 +2,7 @@ package com.pancake.api.content.application;
 
 import com.pancake.api.content.application.SaveContentCommandBuilders.SaveContentCommandBuilder;
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.infra.ContentRepository;
+import com.pancake.api.content.domain.ContentRepository;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Condition;
 import org.flywaydb.core.Flyway;
