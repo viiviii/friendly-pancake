@@ -37,7 +37,7 @@ class ContentApplicationTest {
     @Test
     void getById() {
         //given
-        var expected = save(aSaveContentCommand());
+        var expected = savedContent(aSaveContentCommand());
 
         //when
         var actual = contentService.getContent(expected.getId());
@@ -46,18 +46,20 @@ class ContentApplicationTest {
         assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 
-    @DisplayName("모든 컨텐츠를 조회한다")
+    @DisplayName("시청 가능한 모든 컨텐츠를 조회한다")
     @Test
     void getAll() {
         //given
-        save(aSaveContentCommand().title("토르"));
-        save(aSaveContentCommand().title("아이언맨"));
+        watchableContent(aSaveContentCommand().title("토르"));
+        
+        savedContent(aSaveContentCommand().title("스파이더맨"));
+        savedContent(aSaveContentCommand().title("아이언맨"));
 
         //when
         var actual = contentService.getAllContents();
 
         //then
-        assertThat(actual).hasSize(2);
+        assertThat(actual).singleElement().is(watchable());
     }
 
     @DisplayName("컨텐츠를 저장한다")
@@ -84,7 +86,7 @@ class ContentApplicationTest {
     @Test
     void addWatchToContent() {
         //given
-        var contentId = save(aSaveContentCommand()).getId();
+        var contentId = savedContent(aSaveContentCommand()).getId();
         var command = new AddWatchCommand("https://www.netflix.com/watch/0");
 
         //when
@@ -98,7 +100,7 @@ class ContentApplicationTest {
     @Test
     void watch() {
         //given
-        var contentId = save(aSaveContentCommand()).getId();
+        var contentId = savedContent(aSaveContentCommand()).getId();
 
         //when
         contentService.watch(contentId);
@@ -107,7 +109,12 @@ class ContentApplicationTest {
         assertThatActualBy(contentId).is(watched());
     }
 
-    private Content save(SaveContentCommandBuilder builder) {
+    private void watchableContent(SaveContentCommandBuilder builder) {
+        var content = contentService.save(builder.build());
+        contentService.addWatch(content.getId(), new AddWatchCommand("https://www.netflix.com/watch/1"));
+    }
+
+    private Content savedContent(SaveContentCommandBuilder builder) {
         return contentService.save(builder.build());
     }
 
@@ -131,6 +138,10 @@ class ContentApplicationTest {
 
     private Condition<Content> url(String expected) {
         return new Condition<>(e -> e.getUrl().equals(expected), "url equals %s", expected);
+    }
+
+    private Condition<Content> watchable() {
+        return new Condition<>(Content::canWatch, "must watchable");
     }
 
     private Condition<Content> watched() {
