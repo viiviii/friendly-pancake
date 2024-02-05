@@ -19,7 +19,9 @@ public class ContentService {
     }
 
     public List<Content> getAllContents() {
-        return contentRepository.findAll();
+        return contentRepository.findAll().stream()
+                .filter(Content::canWatch)
+                .toList();
     }
 
     public Content getContent(long id) {

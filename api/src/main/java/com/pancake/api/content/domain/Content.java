@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static org.springframework.util.StringUtils.hasText;
 
 
 @Entity
@@ -65,5 +66,9 @@ public class Content {
 
     public void addUrl(String url) {
         this.url = url;
+    }
+
+    public boolean canWatch() {
+        return hasText(getUrl());
     }
 }
