@@ -29,9 +29,9 @@ public class ContentApiController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ContentResponse>> getAll() {
+    public ResponseEntity<List<WatchableContentResponse>> getAll() {
         final var contents = contentService.getAllContents();
-        final var response = contents.stream().map(ContentResponse::fromEntity).toList();
+        final var response = contents.stream().map(WatchableContentResponse::fromEntity).toList();
 
         return status(OK).body(response);
     }

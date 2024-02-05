@@ -59,7 +59,7 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isOk(),
-                spec -> spec.expectBodyList(ContentResponse.class).isEqualTo(
+                spec -> spec.expectBodyList(WatchableContentResponse.class).isEqualTo(
                         List.of(toResponse(content1), toResponse(content2))
                 )
         );
@@ -118,7 +118,7 @@ class ContentApiControllerTest {
         return new Content("title", "description", "imageUrl");
     }
 
-    private ContentResponse toResponse(Content content) {
-        return ContentResponse.fromEntity(content);
+    private WatchableContentResponse toResponse(Content content) {
+        return WatchableContentResponse.fromEntity(content);
     }
 }
