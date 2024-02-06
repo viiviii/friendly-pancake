@@ -1,15 +1,11 @@
 package com.pancake.api.content.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-import static org.springframework.util.StringUtils.hasText;
 
 
 @Entity
@@ -32,8 +28,11 @@ public class Content {
 
     private boolean watched;
 
+    @Transient
+    private Watch watch;
+
     public Content(String title, String description, String imageUrl) {
-        this(null, "", title, description, imageUrl, false); // TODO: url=""
+        this(null, "", title, description, imageUrl, false, null); // TODO: url="", watch
     }
 
     public Long getId() {
@@ -56,6 +55,10 @@ public class Content {
         return this.imageUrl;
     }
 
+    public PlaybackUrl getPlaybackUrl() {
+        return this.watch.getPlaybackUrl();
+    }
+
     public boolean isWatched() {
         return this.watched;
     }
@@ -64,11 +67,11 @@ public class Content {
         watched = true;
     }
 
-    public void addUrl(String url) {
-        this.url = url;
+    public void addWatch(Watch watch) {
+        this.watch = watch;
     }
 
     public boolean canWatch() {
-        return hasText(getUrl());
+        return this.watch != null && getPlaybackUrl() != null;
     }
 }
