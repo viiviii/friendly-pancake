@@ -1,6 +1,5 @@
 package com.pancake.api.content.api;
 
-import com.pancake.api.content.application.AddWatchCommand;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
-import static com.pancake.api.content.application.SaveContentCommandBuilders.aSaveContentCommand;
+import static com.pancake.api.content.application.Builders.aContentToSave;
+import static com.pancake.api.content.application.Builders.aWatchToAdd;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -27,7 +27,7 @@ class ContentApiControllerTest {
     @Test
     void postContentApi() {
         //given
-        var request = aSaveContentCommand().build();
+        var request = aContentToSave().build();
         var content = request.toEntity();
 
         given(contentService.save(request)).willReturn(content);
@@ -87,7 +87,7 @@ class ContentApiControllerTest {
     @Test
     void addWatch() {
         //given
-        var request = new AddWatchCommand("www.netflix.com/watch/1");
+        var request = aWatchToAdd().build();
 
         //when
         var response = client.post().uri("/api/contents/{id}/watch", 1L)

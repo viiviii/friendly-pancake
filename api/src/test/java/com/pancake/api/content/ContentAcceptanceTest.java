@@ -14,7 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.R
 
 import java.util.List;
 
-import static com.pancake.api.content.application.SaveContentCommandBuilders.aSaveContentCommand;
+import static com.pancake.api.content.application.Builders.aContentToSave;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -56,7 +56,7 @@ class ContentAcceptanceTest {
     }
 
     private ContentResponse 등록된_컨텐츠가_있다() {
-        var request = aSaveContentCommand().build();
+        var request = aContentToSave().build();
 
         return client.post().uri("/api/contents")
                 .contentType(APPLICATION_JSON)
