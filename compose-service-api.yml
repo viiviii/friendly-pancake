@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/viiviii/friendly-pancake-api:0.2406.4
+    image: ghcr.io/viiviii/friendly-pancake-api:0.2406.5
     secrets:
       - source: spring_datasource_properties
         target: /application.properties
