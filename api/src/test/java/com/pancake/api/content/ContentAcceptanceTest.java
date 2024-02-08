@@ -1,7 +1,7 @@
 package com.pancake.api.content;
 
 import com.pancake.api.content.api.ContentResponse;
-import com.pancake.api.content.application.AddWatchCommand;
+import com.pancake.api.content.api.WatchableContentResponse;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.R
 import java.util.List;
 
 import static com.pancake.api.content.application.Builders.aContentToSave;
+import static com.pancake.api.content.application.Builders.aWatchToAdd;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -37,14 +38,27 @@ class ContentAcceptanceTest {
         //준비
         var 원하는_컨텐츠 = 등록된_컨텐츠가_있다().getId();
         컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.netflix.com/watch/70106454");
+        컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.disneyplus.com/ko-kr/video/6e386dd6");
+        var 시청_아이디 = 시청할_컨텐츠의_플랫폼을_선택한다(조회된_컨텐츠_목록이_있다(), 원하는_컨텐츠, "넷플릭스");
 
         //목표
-        var 결과 = 컨텐츠를_시청한다(원하는_컨텐츠);
+        var 결과 = 컨텐츠를_시청한다(시청_아이디);
 
         //결과
         결과.expectAll(
                 컨텐츠를_시청할_수_있는_주소로_이동된다("https://www.netflix.com/watch/70106454")
         );
+    }
+
+    private long 시청할_컨텐츠의_플랫폼을_선택한다(List<WatchableContentResponse> contents, long contentId, String platformName) {
+        var watch = contents.stream()
+                .filter(e -> e.getId().equals(contentId))
+                .flatMap(e -> e.getWatches().stream())
+                .filter(e -> e.getPlatformName().equals(platformName))
+                .findAny()
+                .orElseThrow();
+
+        return watch.getId();
     }
 
     private ResponseSpecConsumer 컨텐츠를_시청할_수_있는_주소로_이동된다(String url) {
@@ -68,7 +82,7 @@ class ContentAcceptanceTest {
     }
 
     private void 컨텐츠에_시청주소를_추가한다(long contentId, String url) {
-        var request = new AddWatchCommand(url);
+        var request = aWatchToAdd().url(url).build();
         client.post().uri("/api/contents/{id}/watch", contentId)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
@@ -77,12 +91,11 @@ class ContentAcceptanceTest {
                 .expectBody(Void.class);
     }
 
-    // TODO: 지금 쓸데 없죠
-    private List<ContentResponse> 조회된_컨텐츠_목록이_있다() {
+    private List<WatchableContentResponse> 조회된_컨텐츠_목록이_있다() {
         return client.get().uri("/api/contents")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(ContentResponse.class)
+                .expectBodyList(WatchableContentResponse.class)
                 .returnResult()
                 .getResponseBody();
     }
