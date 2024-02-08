@@ -79,7 +79,7 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isSeeOther(),
-                spec -> spec.expectHeader().location(content.getUrl()),
+                spec -> spec.expectHeader().location(content.getPlaybackUrl().asString()),
                 spec -> spec.expectBody(Void.class)
         );
     }

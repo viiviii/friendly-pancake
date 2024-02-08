@@ -146,7 +146,7 @@ class ContentApplicationTest {
     }
 
     private Condition<Content> url(String expected) {
-        return new Condition<>(e -> e.getUrl().equals(expected), "url equals %s", expected);
+        return new Condition<>(e -> e.getPlaybackUrl().asString().equals(expected), "url equals %s", expected);
     }
 
     private Condition<Content> watchable() {

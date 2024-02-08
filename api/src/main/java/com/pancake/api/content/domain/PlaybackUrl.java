@@ -1,16 +1,20 @@
 package com.pancake.api.content.domain;
 
-import lombok.Getter;
+import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static lombok.AccessLevel.PRIVATE;
 
-@Getter
+
+@Embeddable
+@NoArgsConstructor(access = PRIVATE)
 public final class PlaybackUrl {
-    private final URL url;
+    private URL url;
 
     public PlaybackUrl(String value) {
         if (value == null) {
@@ -25,5 +29,9 @@ public final class PlaybackUrl {
         } catch (MalformedURLException | URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    public String asString() {
+        return this.url.toString();
     }
 }

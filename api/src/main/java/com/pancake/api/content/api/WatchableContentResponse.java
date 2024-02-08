@@ -19,6 +19,6 @@ public class WatchableContentResponse {
 
     public static WatchableContentResponse fromEntity(Content content) {
         return new WatchableContentResponse(content.getId(), content.getTitle(), content.getDescription(),
-                content.getUrl(), content.getImageUrl(), content.isWatched());
+                content.getPlaybackUrl().asString(), content.getImageUrl(), content.isWatched());
     }
 }

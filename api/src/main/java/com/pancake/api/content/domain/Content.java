@@ -18,8 +18,6 @@ public class Content {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private String url;
-
     private String title;
 
     private String description;
@@ -28,19 +26,15 @@ public class Content {
 
     private boolean watched;
 
-    @Transient
+    @Column(name = "url")
     private Watch watch;
 
     public Content(String title, String description, String imageUrl) {
-        this(null, "", title, description, imageUrl, false, null); // TODO: url="", watch
+        this(null, title, description, imageUrl, false, new Watch(new PlaybackUrl("https://www.netflix.com/"))); // TODO: watch=null
     }
 
     public Long getId() {
         return this.id;
-    }
-
-    public String getUrl() {
-        return this.url;
     }
 
     public String getTitle() {
@@ -72,6 +66,6 @@ public class Content {
     }
 
     public boolean canWatch() {
-        return this.watch != null && getPlaybackUrl() != null;
+        return !getPlaybackUrl().asString().equals("https://www.netflix.com/"); // TODO
     }
 }

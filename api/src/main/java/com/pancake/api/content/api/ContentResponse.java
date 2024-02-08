@@ -19,6 +19,6 @@ public class ContentResponse {
 
     public static ContentResponse fromEntity(Content content) {
         return new ContentResponse(content.getId(), content.getTitle(), content.getDescription(),
-                content.getUrl(), content.getImageUrl(), content.isWatched());
+                content.getPlaybackUrl().asString(), content.getImageUrl(), content.isWatched());
     }
 }

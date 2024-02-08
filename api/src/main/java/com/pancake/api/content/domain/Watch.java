@@ -1,11 +1,17 @@
 package com.pancake.api.content.domain;
 
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
+import static lombok.AccessLevel.PRIVATE;
+
+@Embeddable
 @Getter
-@RequiredArgsConstructor
-public class Watch {
+@AllArgsConstructor
+@NoArgsConstructor(access = PRIVATE)
+public final class Watch {
 
-    private final PlaybackUrl playbackUrl;
+    private PlaybackUrl playbackUrl;
 }

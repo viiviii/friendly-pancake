@@ -40,7 +40,7 @@ public class ContentApiController {
     public ResponseEntity<Void> getById(@PathVariable Long id) {
         final var content = contentService.getContent(id);
 
-        return status(SEE_OTHER).location(URI.create(content.getUrl())).build();
+        return status(SEE_OTHER).location(URI.create(content.getPlaybackUrl().asString())).build();
     }
 
     @PostMapping("{id}/watch")
