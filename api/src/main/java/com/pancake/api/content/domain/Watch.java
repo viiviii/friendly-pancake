@@ -1,15 +1,11 @@
 package com.pancake.api.content.domain;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.net.URL;
-
+@Getter
 @RequiredArgsConstructor
 public class Watch {
 
-    private final URL playbackUrl;
-
-    public String getUrl() {
-        return this.playbackUrl.toString();
-    }
+    private final PlaybackUrl playbackUrl;
 }
