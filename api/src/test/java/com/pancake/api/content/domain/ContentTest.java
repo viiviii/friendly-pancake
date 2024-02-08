@@ -2,9 +2,6 @@ package com.pancake.api.content.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,12 +35,13 @@ class ContentTest {
     void addUrl() {
         //given
         var content = createContent();
+        var watch = createWatch();
 
         //when
-        content.addUrl("https://www.netflix.com/watch/999");
+        content.addWatch(watch);
 
         //then
-        assertThat(content.getUrl()).isEqualTo("https://www.netflix.com/watch/999");
+        assertThat(content.getPlaybackUrl()).isEqualTo(watch.getPlaybackUrl());
     }
 
     @DisplayName("시청 주소가 있는 컨텐츠는 시청 가능하다")
@@ -51,7 +49,7 @@ class ContentTest {
     void canWatchIsTrue() {
         //given
         var content = createContent();
-        content.addUrl("https://www.netflix.com/watch/999");
+        content.addWatch(createWatch());
 
         //when
         var actual = content.canWatch();
@@ -60,21 +58,22 @@ class ContentTest {
     }
 
     @DisplayName("시청 주소가 없는 컨텐츠는 시청 불가하다")
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = " ")
-    void canWatchIsFalse(String url) {
+    @Test
+    void canWatchIsFalse() {
         //given
         var content = createContent();
-        content.addUrl(url);
 
-        //when
-        var actual = content.canWatch();
         //then
-        assertThat(actual).isFalse();
+        assertThat(content.canWatch()).isFalse();
     }
 
     private Content createContent() {
         return new Content("테스트용 제목", "테스트용 설명", "https://occ.nflxso.net/api/0");
+    }
+
+    private Watch createWatch() {
+        var playbackUrl = new PlaybackUrl("https://www.netflix.com/watch/999");
+
+        return new Watch(playbackUrl);
     }
 }

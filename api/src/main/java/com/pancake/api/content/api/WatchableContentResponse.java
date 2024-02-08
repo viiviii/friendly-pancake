@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContentResponse {
+public class WatchableContentResponse {
 
     private Long id;
     private String title;
@@ -17,8 +17,8 @@ public class ContentResponse {
     private String imageUrl;
     private boolean watched;
 
-    public static ContentResponse fromEntity(Content content) {
-        return new ContentResponse(content.getId(), content.getTitle(), content.getDescription(),
+    public static WatchableContentResponse fromEntity(Content content) {
+        return new WatchableContentResponse(content.getId(), content.getTitle(), content.getDescription(),
                 content.getPlaybackUrl().asString(), content.getImageUrl(), content.isWatched());
     }
 }

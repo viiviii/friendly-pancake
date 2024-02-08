@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
+import static com.pancake.api.content.application.Builders.aWatchToAdd;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -55,7 +56,7 @@ class ContentServiceTest {
         given(contentRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when
-        ThrowingCallable actual = () -> contentService.addWatch(anyLong(), command());
+        ThrowingCallable actual = () -> contentService.addWatch(anyLong(), aWatchToAdd().build());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
@@ -72,9 +73,5 @@ class ContentServiceTest {
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    private AddWatchCommand command() {
-        return new AddWatchCommand("url");
     }
 }

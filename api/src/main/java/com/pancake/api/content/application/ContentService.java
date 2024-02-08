@@ -38,6 +38,6 @@ public class ContentService {
     @Transactional
     public void addWatch(long id, AddWatchCommand command) {
         final var content = getContent(id);
-        content.addUrl(command.getUrl());
+        content.addWatch(command.toEntity());
     }
 }

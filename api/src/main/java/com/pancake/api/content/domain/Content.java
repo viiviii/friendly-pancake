@@ -1,15 +1,11 @@
 package com.pancake.api.content.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-import static org.springframework.util.StringUtils.hasText;
 
 
 @Entity
@@ -22,8 +18,6 @@ public class Content {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private String url;
-
     private String title;
 
     private String description;
@@ -32,16 +26,15 @@ public class Content {
 
     private boolean watched;
 
+    @Column(name = "url")
+    private Watch watch;
+
     public Content(String title, String description, String imageUrl) {
-        this(null, "", title, description, imageUrl, false); // TODO: url=""
+        this(null, title, description, imageUrl, false, new Watch(new PlaybackUrl("https://www.netflix.com/"))); // TODO: watch=null
     }
 
     public Long getId() {
         return this.id;
-    }
-
-    public String getUrl() {
-        return this.url;
     }
 
     public String getTitle() {
@@ -56,6 +49,10 @@ public class Content {
         return this.imageUrl;
     }
 
+    public PlaybackUrl getPlaybackUrl() {
+        return this.watch.getPlaybackUrl();
+    }
+
     public boolean isWatched() {
         return this.watched;
     }
@@ -64,11 +61,11 @@ public class Content {
         watched = true;
     }
 
-    public void addUrl(String url) {
-        this.url = url;
+    public void addWatch(Watch watch) {
+        this.watch = watch;
     }
 
     public boolean canWatch() {
-        return hasText(getUrl());
+        return !getPlaybackUrl().asString().equals("https://www.netflix.com/"); // TODO
     }
 }
