@@ -13,11 +13,11 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Embeddable
 @NoArgsConstructor(access = PRIVATE)
-public final class PlaybackUrl {
+public final class Url {
 
     private URL url;
 
-    public PlaybackUrl(String value) {
+    public Url(String value) {
         if (value == null) {
             throw new IllegalArgumentException();
         }
@@ -30,9 +30,5 @@ public final class PlaybackUrl {
         } catch (MalformedURLException | URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    public String asString() {
-        return this.url.toString();
     }
 }

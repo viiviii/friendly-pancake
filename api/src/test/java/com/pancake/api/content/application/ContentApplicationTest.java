@@ -3,6 +3,7 @@ package com.pancake.api.content.application;
 import com.pancake.api.content.application.Builders.SaveContentCommandBuilder;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.ContentRepository;
+import com.pancake.api.content.domain.Platform;
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.ObjectAssert;
 import org.flywaydb.core.Flyway;
@@ -40,7 +41,9 @@ class ContentApplicationTest {
         //given
         savedContent(aContentToSave().title("스파이더맨"));
         savedContent(aContentToSave().title("아이언맨"));
-        watchableContent(aContentToSave().title("토르"), aPlaybackToAdd());
+        watchableContent(
+                aContentToSave().title("토르"),
+                aPlaybackToAdd().url("https://www.netflix.com/watch/100000001"));
 
         //when
         var actual = contentService.getAllContents();
@@ -48,7 +51,8 @@ class ContentApplicationTest {
         //then
         assertThat(actual).singleElement()
                 .is(title("토르"))
-                .is(watchable());
+                .is(watchable())
+                .has(platform(Platform.NETFLIX));
     }
 
     @DisplayName("컨텐츠를 저장한다")
@@ -84,7 +88,7 @@ class ContentApplicationTest {
         );
         contentService.addPlayback(
                 contentId,
-                aPlaybackToAdd().url("https://www.disneyplus.com/ko-kr/video/1").build()
+                aPlaybackToAdd().url("https://www.disneyplus.com/video/1").build()
         );
 
         //then
@@ -143,5 +147,10 @@ class ContentApplicationTest {
 
     private Condition<Content> watched() {
         return new Condition<>(Content::isWatched, "isWatched is true");
+    }
+
+    private Condition<Content> platform(Platform expected) {
+        return new Condition<>(e -> e.getPlaybacks().stream().anyMatch(p -> p.getPlatform().equals(expected)),
+                "has expected platform");
     }
 }
