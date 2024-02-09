@@ -66,7 +66,7 @@ class ContentAcceptanceTest {
     }
 
     private ResponseSpec 컨텐츠를_시청한다(long id) {
-        return client.get().uri("/api/contents/{id}", id).exchange();
+        return client.get().uri("/api/watch/{id}", id).exchange();
     }
 
     private ContentResponse 등록된_컨텐츠가_있다() {
