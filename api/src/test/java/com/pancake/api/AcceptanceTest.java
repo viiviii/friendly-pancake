@@ -1,4 +1,4 @@
-package com.pancake.api.content;
+package com.pancake.api;
 
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.api.WatchableContentResponse;
@@ -22,7 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = "spring.flyway.clean-disabled=false")
 @SuppressWarnings("NonAsciiCharacters")
-class ContentAcceptanceTest {
+class AcceptanceTest {
 
     @Autowired
     WebTestClient client;
