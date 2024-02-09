@@ -36,19 +36,6 @@ class ContentServiceTest {
         assertThat(actual).hasSize(2);
     }
 
-    @DisplayName("존재하지 않는 컨텐츠 조회 시 예외가 발생한다")
-    @Test
-    void getThrownExceptionWhenContentNotExist() {
-        //given
-        given(contentRepository.findById(anyLong())).willReturn(Optional.empty());
-
-        //when
-        ThrowingCallable actual = () -> contentService.getContent(anyLong());
-
-        //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
-    }
-
     @DisplayName("존재하지 않는 컨텐츠에 시청 주소 추가 시 예외가 발생한다")
     @Test
     void addWatchThrownExceptionWhenContentNotExist() {

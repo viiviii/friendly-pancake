@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
@@ -34,14 +33,6 @@ public class ContentApiController {
         final var response = contents.stream().map(WatchableContentResponse::fromEntity).toList();
 
         return status(OK).body(response);
-    }
-
-    // TODO
-    @GetMapping("{id}")
-    public ResponseEntity<Void> getById(@PathVariable Long id) {
-        final var content = contentService.getContent(id);
-
-        return status(SEE_OTHER).location(URI.create("")).build();
     }
 
     @PostMapping("{id}/playbacks")

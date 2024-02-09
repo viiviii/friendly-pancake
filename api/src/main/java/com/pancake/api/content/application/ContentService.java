@@ -24,20 +24,20 @@ public class ContentService {
                 .toList();
     }
 
-    public Content getContent(long id) {
-        return contentRepository.findById(id)
-                .orElseThrow(IllegalArgumentException::new);
-    }
-
     @Transactional
     public void watch(long id) {
-        final var content = getContent(id);
+        final var content = loadContentBy(id);
         content.watch();
     }
 
     @Transactional
     public void addPlayback(long id, AddPlaybackCommand command) {
-        final var content = getContent(id);
+        final var content = loadContentBy(id);
         content.add(command.toEntity());
+    }
+
+    private Content loadContentBy(long id) {
+        return contentRepository.findById(id)
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

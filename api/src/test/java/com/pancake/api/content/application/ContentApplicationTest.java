@@ -2,6 +2,7 @@ package com.pancake.api.content.application;
 
 import com.pancake.api.content.application.Builders.SaveContentCommandBuilder;
 import com.pancake.api.content.domain.Content;
+import com.pancake.api.content.domain.ContentRepository;
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.ObjectAssert;
 import org.flywaydb.core.Flyway;
@@ -22,25 +23,15 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 class ContentApplicationTest {
 
     @Autowired
+    ContentRepository contentRepository;
+
+    @Autowired
     ContentService contentService;
 
     @AfterEach
     void cleanUp(@Autowired Flyway flyway) {
         flyway.clean();
         flyway.migrate();
-    }
-
-    @DisplayName("컨텐츠를 아이디로 조회한다")
-    @Test
-    void getById() {
-        //given
-        var expected = savedContent();
-
-        //when
-        var actual = contentService.getContent(expected.getId());
-
-        //then
-        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 
     @DisplayName("시청 가능한 모든 컨텐츠를 조회한다")
@@ -129,7 +120,9 @@ class ContentApplicationTest {
     }
 
     private ObjectAssert<Content> assertThatActualBy(long contentId) {
-        return assertThat(contentService.getContent(contentId));
+        final var actual = contentRepository.findById(contentId).orElseThrow();
+
+        return assertThat(actual);
     }
 
     private Condition<Content> title(String expected) {

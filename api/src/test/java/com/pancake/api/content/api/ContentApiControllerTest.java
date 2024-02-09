@@ -65,25 +65,6 @@ class ContentApiControllerTest {
         );
     }
 
-    // TODO: 이상하죠
-    @Test
-    void getContent() {
-        //given
-        var content = content();
-
-        given(contentService.getContent(1234)).willReturn(content);
-
-        //when
-        var response = client.get().uri("/api/contents/{id}", 1234).exchange();
-
-        //then
-        response.expectAll(
-                spec -> spec.expectStatus().isSeeOther(),
-                spec -> spec.expectHeader().location(""), // TODO
-                spec -> spec.expectBody(Void.class)
-        );
-    }
-
     @Test
     void addPlayback() {
         //given
