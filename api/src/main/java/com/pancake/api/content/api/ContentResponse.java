@@ -13,12 +13,11 @@ public class ContentResponse {
     private Long id;
     private String title;
     private String description;
-    private String url;
     private String imageUrl;
     private boolean watched;
 
     public static ContentResponse fromEntity(Content content) {
         return new ContentResponse(content.getId(), content.getTitle(), content.getDescription(),
-                content.getPlaybackUrl().asString(), content.getImageUrl(), content.isWatched());
+                content.getImageUrl(), content.isWatched());
     }
 }

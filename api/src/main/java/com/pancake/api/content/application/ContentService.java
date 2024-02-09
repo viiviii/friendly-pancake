@@ -36,8 +36,8 @@ public class ContentService {
     }
 
     @Transactional
-    public void addWatch(long id, AddWatchCommand command) {
+    public void addPlayback(long id, AddPlaybackCommand command) {
         final var content = getContent(id);
-        content.addWatch(command.toEntity());
+        content.add(command.toEntity());
     }
 }

@@ -1,6 +1,7 @@
 package com.pancake.api.content.api;
 
 import com.pancake.api.content.domain.Content;
+import com.pancake.api.content.domain.Playback;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,24 +16,27 @@ public class WatchableContentResponse {
     private Long id;
     private String title;
     private String description;
-    private String url;
     private String imageUrl;
     private boolean watched;
 
-    private List<WatchResponse> watches;
+    private List<PlaybackResponse> playbacks;
 
     public static WatchableContentResponse fromEntity(Content content) {
-        final var watchlist = List.of(new WatchResponse(999L, "넷플릭스"));
-        return new WatchableContentResponse(content.getId(), content.getTitle(), content.getDescription(),
-                content.getPlaybackUrl().asString(), content.getImageUrl(), content.isWatched(),
-                watchlist);
+        final var playbackList = content.getPlaybacks().stream().map(PlaybackResponse::fromEntity).toList();
+        return new WatchableContentResponse(content.getId(), content.getTitle(),
+                content.getDescription(), content.getImageUrl(), content.isWatched(),
+                playbackList);
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class WatchResponse {
+    public static class PlaybackResponse {
         private Long id;
         private String platformName;
+
+        public static PlaybackResponse fromEntity(Playback playback) {
+            return new PlaybackResponse(playback.getId(), "넷플릭스"); // TODO
+        }
     }
 }

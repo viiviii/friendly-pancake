@@ -14,6 +14,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Embeddable
 @NoArgsConstructor(access = PRIVATE)
 public final class PlaybackUrl {
+
     private URL url;
 
     public PlaybackUrl(String value) {

@@ -1,7 +1,7 @@
 package com.pancake.api.content.application;
 
+import com.pancake.api.content.domain.Playback;
 import com.pancake.api.content.domain.PlaybackUrl;
-import com.pancake.api.content.domain.Watch;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddWatchCommand {
+public class AddPlaybackCommand {
 
     private String url;
 
-    public Watch toEntity() {
+    public Playback toEntity() {
         final var playbackUrl = new PlaybackUrl(getUrl());
-        return new Watch(playbackUrl);
+        return new Playback(playbackUrl);
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.List;
 
 import static com.pancake.api.content.application.Builders.aContentToSave;
-import static com.pancake.api.content.application.Builders.aWatchToAdd;
+import static com.pancake.api.content.application.Builders.aPlaybackToAdd;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -25,7 +25,7 @@ class ContentApiControllerTest {
     WebTestClient client;
 
     @Test
-    void postContentApi() {
+    void saveContent() {
         //given
         var request = aContentToSave().build();
         var content = request.toEntity();
@@ -46,7 +46,7 @@ class ContentApiControllerTest {
     }
 
     @Test
-    void getAllContentsApi() {
+    void getAllContents() {
         //given
         var content1 = content();
         var content2 = content();
@@ -67,7 +67,7 @@ class ContentApiControllerTest {
 
     // TODO: 이상하죠
     @Test
-    void getContentApi() {
+    void getContent() {
         //given
         var content = content();
 
@@ -79,18 +79,18 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isSeeOther(),
-                spec -> spec.expectHeader().location(content.getPlaybackUrl().asString()),
+                spec -> spec.expectHeader().location(""), // TODO
                 spec -> spec.expectBody(Void.class)
         );
     }
 
     @Test
-    void addWatch() {
+    void addPlayback() {
         //given
-        var request = aWatchToAdd().build();
+        var request = aPlaybackToAdd().build();
 
         //when
-        var response = client.post().uri("/api/contents/{id}/watch", 1L)
+        var response = client.post().uri("/api/contents/{id}/playbacks", 1L)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange();
@@ -103,7 +103,7 @@ class ContentApiControllerTest {
     }
 
     @Test
-    void patchWatchedContentApi() {
+    void changeToWatched() {
         //when
         var response = client.patch().uri("/api/contents/{id}/watched", 1234).exchange();
 

@@ -15,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.R
 import java.util.List;
 
 import static com.pancake.api.content.application.Builders.aContentToSave;
-import static com.pancake.api.content.application.Builders.aWatchToAdd;
+import static com.pancake.api.content.application.Builders.aPlaybackToAdd;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -51,14 +51,14 @@ class ContentAcceptanceTest {
     }
 
     private long 시청할_컨텐츠의_플랫폼을_선택한다(List<WatchableContentResponse> contents, long contentId, String platformName) {
-        var watch = contents.stream()
+        var playback = contents.stream()
                 .filter(e -> e.getId().equals(contentId))
-                .flatMap(e -> e.getWatches().stream())
+                .flatMap(e -> e.getPlaybacks().stream())
                 .filter(e -> e.getPlatformName().equals(platformName))
                 .findAny()
                 .orElseThrow();
 
-        return watch.getId();
+        return playback.getId();
     }
 
     private ResponseSpecConsumer 컨텐츠를_시청할_수_있는_주소로_이동된다(String url) {
@@ -82,8 +82,8 @@ class ContentAcceptanceTest {
     }
 
     private void 컨텐츠에_시청주소를_추가한다(long contentId, String url) {
-        var request = aWatchToAdd().url(url).build();
-        client.post().uri("/api/contents/{id}/watch", contentId)
+        var request = aPlaybackToAdd().url(url).build();
+        client.post().uri("/api/contents/{id}/playbacks", contentId)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()

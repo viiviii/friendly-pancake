@@ -1,11 +1,9 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.application.Builders.AddWatchCommandBuilder;
 import com.pancake.api.content.application.Builders.SaveContentCommandBuilder;
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.domain.ContentRepository;
-import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Condition;
+import org.assertj.core.api.ObjectAssert;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,16 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import static com.pancake.api.content.application.Builders.aContentToSave;
-import static com.pancake.api.content.application.Builders.aWatchToAdd;
+import static com.pancake.api.content.application.Builders.aPlaybackToAdd;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 @SpringBootTest(webEnvironment = NONE)
 @TestPropertySource(properties = "spring.flyway.clean-disabled=false")
 class ContentApplicationTest {
-
-    @Autowired
-    ContentRepository contentRepository;
 
     @Autowired
     ContentService contentService;
@@ -54,7 +49,7 @@ class ContentApplicationTest {
         //given
         savedContent(aContentToSave().title("스파이더맨"));
         savedContent(aContentToSave().title("아이언맨"));
-        watchableContent(aContentToSave().title("토르"), aWatchToAdd());
+        watchableContent(aContentToSave().title("토르"), aPlaybackToAdd());
 
         //when
         var actual = contentService.getAllContents();
@@ -90,15 +85,21 @@ class ContentApplicationTest {
     void addWatchToContent() {
         //given
         var contentId = savedContent().getId();
-        var command = aWatchToAdd()
-                .url("https://www.netflix.com/watch/0")
-                .build();
 
         //when
-        contentService.addWatch(contentId, command);
+        contentService.addPlayback(
+                contentId,
+                aPlaybackToAdd().url("https://www.netflix.com/watch/0").build()
+        );
+        contentService.addPlayback(
+                contentId,
+                aPlaybackToAdd().url("https://www.disneyplus.com/ko-kr/video/1").build()
+        );
 
         //then
-        assertThatActualBy(contentId).has(url("https://www.netflix.com/watch/0"));
+        assertThatActualBy(contentId)
+                .extracting(Content::getPlaybacks).asList()
+                .hasSize(2);
     }
 
     @DisplayName("컨텐츠를 시청 처리한다")
@@ -114,9 +115,9 @@ class ContentApplicationTest {
         assertThatActualBy(contentId).is(watched());
     }
 
-    private void watchableContent(SaveContentCommandBuilder contentToSave, AddWatchCommandBuilder watchToAdd) {
-        var content = savedContent(contentToSave);
-        contentService.addWatch(content.getId(), watchToAdd.build());
+    private void watchableContent(SaveContentCommandBuilder content, Builders.AddPlaybackCommandBuilder playback) {
+        var contentId = savedContent(content).getId();
+        contentService.addPlayback(contentId, playback.build());
     }
 
     private Content savedContent() {
@@ -127,10 +128,8 @@ class ContentApplicationTest {
         return contentService.save(contentToSave.build());
     }
 
-    private AbstractObjectAssert<?, Content> assertThatActualBy(long contentId) {
-        var actual = contentRepository.findById(contentId);
-
-        return assertThat(actual).get();
+    private ObjectAssert<Content> assertThatActualBy(long contentId) {
+        return assertThat(contentService.getContent(contentId));
     }
 
     private Condition<Content> title(String expected) {
@@ -143,10 +142,6 @@ class ContentApplicationTest {
 
     private Condition<Content> imageUrl(String expected) {
         return new Condition<>(e -> e.getImageUrl().equals(expected), "image url equals %s", expected);
-    }
-
-    private Condition<Content> url(String expected) {
-        return new Condition<>(e -> e.getPlaybackUrl().asString().equals(expected), "url equals %s", expected);
     }
 
     private Condition<Content> watchable() {
