@@ -1,13 +1,12 @@
 package com.pancake.api.content.api;
 
-import com.pancake.api.content.application.AddWatchCommand;
+import com.pancake.api.content.application.AddPlaybackCommand;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.SaveContentCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
@@ -36,16 +35,9 @@ public class ContentApiController {
         return status(OK).body(response);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Void> getById(@PathVariable Long id) {
-        final var content = contentService.getContent(id);
-
-        return status(SEE_OTHER).location(URI.create(content.getPlaybackUrl().asString())).build();
-    }
-
-    @PostMapping("{id}/watch")
-    public ResponseEntity<Void> addWatch(@PathVariable Long id, @RequestBody AddWatchCommand command) {
-        contentService.addWatch(id, command);
+    @PostMapping("{id}/playbacks")
+    public ResponseEntity<Void> addPlayback(@PathVariable Long id, @RequestBody AddPlaybackCommand command) {
+        contentService.addPlayback(id, command);
 
         return status(NO_CONTENT).build();
     }

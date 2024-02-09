@@ -30,26 +30,28 @@ class ContentTest {
         assertThat(content.isWatched()).isTrue();
     }
 
-    @DisplayName("컨텐츠에 url 추가한다")
+    @DisplayName("컨텐츠에 재생 정보를 추가한다")
     @Test
     void addUrl() {
         //given
         var content = createContent();
-        var watch = createWatch();
+        var playback = createPlayback();
 
         //when
-        content.addWatch(watch);
+        content.add(playback);
 
         //then
-        assertThat(content.getPlaybackUrl()).isEqualTo(watch.getPlaybackUrl());
+        assertThat(content.getPlaybacks())
+                .singleElement()
+                .isEqualTo(playback);
     }
 
-    @DisplayName("시청 주소가 있는 컨텐츠는 시청 가능하다")
+    @DisplayName("재생 주소가 있는 컨텐츠는 시청 가능하다")
     @Test
     void canWatchIsTrue() {
         //given
         var content = createContent();
-        content.addWatch(createWatch());
+        content.add(createPlayback());
 
         //when
         var actual = content.canWatch();
@@ -57,7 +59,7 @@ class ContentTest {
         assertThat(actual).isTrue();
     }
 
-    @DisplayName("시청 주소가 없는 컨텐츠는 시청 불가하다")
+    @DisplayName("재생 주소가 없는 컨텐츠는 시청 불가하다")
     @Test
     void canWatchIsFalse() {
         //given
@@ -71,9 +73,9 @@ class ContentTest {
         return new Content("테스트용 제목", "테스트용 설명", "https://occ.nflxso.net/api/0");
     }
 
-    private Watch createWatch() {
+    private Playback createPlayback() {
         var playbackUrl = new PlaybackUrl("https://www.netflix.com/watch/999");
 
-        return new Watch(playbackUrl);
+        return new Playback(playbackUrl);
     }
 }

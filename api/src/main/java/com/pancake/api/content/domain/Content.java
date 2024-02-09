@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -26,11 +29,13 @@ public class Content {
 
     private boolean watched;
 
-    @Column(name = "url")
-    private Watch watch;
+    // TODO
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "content_id")
+    private final List<Playback> playbacks = new ArrayList<>();
 
     public Content(String title, String description, String imageUrl) {
-        this(null, title, description, imageUrl, false, new Watch(new PlaybackUrl("https://www.netflix.com/"))); // TODO: watch=null
+        this(null, title, description, imageUrl, false);
     }
 
     public Long getId() {
@@ -49,8 +54,8 @@ public class Content {
         return this.imageUrl;
     }
 
-    public PlaybackUrl getPlaybackUrl() {
-        return this.watch.getPlaybackUrl();
+    public List<Playback> getPlaybacks() {
+        return this.playbacks;
     }
 
     public boolean isWatched() {
@@ -61,11 +66,13 @@ public class Content {
         watched = true;
     }
 
-    public void addWatch(Watch watch) {
-        this.watch = watch;
+    // TODO
+    public void add(Playback playback) {
+        this.playbacks.add(playback);
+        playback.setContent(this.id);
     }
 
     public boolean canWatch() {
-        return !getPlaybackUrl().asString().equals("https://www.netflix.com/"); // TODO
+        return !getPlaybacks().isEmpty();
     }
 }

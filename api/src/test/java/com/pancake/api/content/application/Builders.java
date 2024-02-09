@@ -11,8 +11,8 @@ public abstract class Builders {
                 .imageUrl("테스트용 이미지 주소");
     }
 
-    public static AddWatchCommandBuilder aWatchToAdd() {
-        return addWatchCommandBuilder()
+    public static AddPlaybackCommandBuilder aPlaybackToAdd() {
+        return addPlaybackCommandBuilder()
                 .url("https://www.netflix.com/watch/100000001");
     }
 
@@ -21,8 +21,8 @@ public abstract class Builders {
         return new SaveContentCommand(title, description, imageUrl);
     }
 
-    @Builder(builderMethodName = "addWatchCommandBuilder")
-    private static AddWatchCommand create(String url) {
-        return new AddWatchCommand(url);
+    @Builder(builderMethodName = "addPlaybackCommandBuilder")
+    private static AddPlaybackCommand create(String url) {
+        return new AddPlaybackCommand(url);
     }
 }
