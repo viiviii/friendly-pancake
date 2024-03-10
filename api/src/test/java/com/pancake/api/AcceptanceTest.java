@@ -36,9 +36,10 @@ class AcceptanceTest {
     @Test
     void 사용자가_컨텐츠를_시청한다() {
         //준비
+        //준비
         var 원하는_컨텐츠 = 등록된_컨텐츠가_있다().getId();
+        컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.disneyplus.com/video/6e386dd6");
         컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.netflix.com/watch/70106454");
-        컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.disneyplus.com/ko-kr/video/6e386dd6");
         var 시청_아이디 = 시청할_컨텐츠의_플랫폼을_선택한다(조회된_컨텐츠_목록이_있다(), 원하는_컨텐츠, "넷플릭스");
 
         //목표
@@ -54,7 +55,7 @@ class AcceptanceTest {
         var playback = contents.stream()
                 .filter(e -> e.getId().equals(contentId))
                 .flatMap(e -> e.getPlaybacks().stream())
-                .filter(e -> e.getPlatformName().equals(platformName))
+                .filter(e -> e.getPlatformLabel().equals(platformName))
                 .findAny()
                 .orElseThrow();
 

@@ -1,5 +1,6 @@
 package com.pancake.api.content.api;
 
+import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ class ContentApiControllerTest {
     @MockBean
     ContentService contentService;
 
+    @MockBean
+    AddPlayback addPlayback;
+
     @Autowired
     WebTestClient client;
 
@@ -41,7 +45,7 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isCreated(),
-                spec -> spec.expectBody(ContentResponse.class).isEqualTo(ContentResponse.fromEntity(content))
+                spec -> spec.expectBody(ContentResponse.class).isEqualTo(new ContentResponse(content))
         );
     }
 
@@ -100,6 +104,6 @@ class ContentApiControllerTest {
     }
 
     private WatchableContentResponse toResponse(Content content) {
-        return WatchableContentResponse.fromEntity(content);
+        return new WatchableContentResponse(content);
     }
 }

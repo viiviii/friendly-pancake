@@ -21,6 +21,6 @@ public class GetWatchApi {
     public ResponseEntity<Void> redirectToPUrl(@PathVariable Long id) {
         final var playback = loadPlayback.query(id);
 
-        return status(SEE_OTHER).location(URI.create(playback.getUrl().asString())).build();
+        return status(SEE_OTHER).location(URI.create(playback.getUrl())).build();
     }
 }

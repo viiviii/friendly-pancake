@@ -26,17 +26,11 @@ public class ContentService {
 
     @Transactional
     public void watch(long id) {
-        final var content = loadContentBy(id);
+        final var content = getBy(id);
         content.watch();
     }
 
-    @Transactional
-    public void addPlayback(long id, AddPlaybackCommand command) {
-        final var content = loadContentBy(id);
-        content.add(command.toEntity());
-    }
-
-    private Content loadContentBy(long id) {
+    public Content getBy(long id) {
         return contentRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
     }

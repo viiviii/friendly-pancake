@@ -1,48 +1,49 @@
 package com.pancake.api.content.domain;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static com.pancake.api.content.domain.Platform.DISNEY_PLUS;
+import static com.pancake.api.content.domain.Platform.NETFLIX;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PlaybackUrlTest {
 
-    @DisplayName("주소가 비어있는 경우 예외를 던진다")
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = " ")
-    void createThrownExceptionWhenEmptyString(String url) {
-        //then
-        assertThatThrownBy(() -> create(url))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @DisplayName("주소에 공백이 포함된 경우 예외를 던진다")
     @Test
-    void createThrowExceptionWhenHasSpace() {
+    void isSatisfiedBy() {
         //given
-        var url = "https://www.netflix.com/watch/ 0000000";
+        var url = create("https://www.netflix.com/watch/1");
 
         //then
-        assertThatThrownBy(() -> create(url))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertAll(
+                () -> assertThat(url.isSatisfiedBy(NETFLIX)).isTrue(),
+                () -> assertThat(url.isSatisfiedBy(DISNEY_PLUS)).isFalse()
+        );
     }
 
-    @DisplayName("상대 주소인 경우 예외를 던진다")
     @Test
-    void createThrowExceptionWhenRelativeUrl() {
+    void equality() {
         //given
-        var url = "/watch/0000000";
+        var url = create("https://www.disneyplus.com/video/1");
+        var same = create("https://www.disneyplus.com/video/1");
+        var different = create("https://www.disneyplus.com/video/2");
 
         //then
-        assertThatThrownBy(() -> create(url))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(url)
+                .isEqualTo(same).hasSameHashCodeAs(same)
+                .isNotEqualTo(different).doesNotHaveSameHashCodeAs(different);
     }
 
-    private PlaybackUrl create(String value) {
-        return new PlaybackUrl(value);
+    @Test
+    void hasToString() {
+        //given
+        var url = create("https://www.disneyplus.com/video/1");
+
+        //then
+        assertThat(url).hasToString("https://www.disneyplus.com/video/1");
+    }
+
+    private PlaybackUrl create(String url) {
+        return new PlaybackUrl(url);
     }
 }

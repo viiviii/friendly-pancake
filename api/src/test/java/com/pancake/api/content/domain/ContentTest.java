@@ -3,6 +3,7 @@ package com.pancake.api.content.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.pancake.api.content.application.Builders.aPlayback;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ContentTest {
@@ -35,7 +36,7 @@ class ContentTest {
     void addUrl() {
         //given
         var content = createContent();
-        var playback = createPlayback();
+        var playback = aPlayback().build();
 
         //when
         content.add(playback);
@@ -51,7 +52,7 @@ class ContentTest {
     void canWatchIsTrue() {
         //given
         var content = createContent();
-        content.add(createPlayback());
+        content.add(aPlayback().build());
 
         //when
         var actual = content.canWatch();
@@ -71,11 +72,5 @@ class ContentTest {
 
     private Content createContent() {
         return new Content("테스트용 제목", "테스트용 설명", "https://occ.nflxso.net/api/0");
-    }
-
-    private Playback createPlayback() {
-        var playbackUrl = new PlaybackUrl("https://www.netflix.com/watch/999");
-
-        return new Playback(playbackUrl);
     }
 }
