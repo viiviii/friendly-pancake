@@ -21,23 +21,23 @@ public class Playback {
     @Enumerated(EnumType.STRING)
     private Platform platform;
 
-    private PlaybackUrl playbackUrl;
+    private PlaybackUrl url;
 
-    public Playback(String playbackUrl, Platform platform) {
-        this(null, null, platform, new PlaybackUrl(playbackUrl));
+    public Playback(String url, Platform platform) {
+        this(null, null, platform, new PlaybackUrl(url));
     }
 
-    private Playback(Long id, Long contentId, Platform platform, PlaybackUrl playbackUrl) {
-        mustMatch(playbackUrl, platform);
+    private Playback(Long id, Long contentId, Platform platform, PlaybackUrl url) {
+        mustMatch(url, platform);
 
         this.id = id;
         this.contentId = contentId;
         this.platform = platform;
-        this.playbackUrl = playbackUrl;
+        this.url = url;
     }
 
-    private void mustMatch(PlaybackUrl playbackUrl, Platform platform) {
-        if (!playbackUrl.toString().startsWith(platform.baseUrl())) {
+    private void mustMatch(PlaybackUrl url, Platform platform) {
+        if (!url.isSatisfiedBy(platform)) {
             throw new IllegalArgumentException();
         }
     }
@@ -47,7 +47,7 @@ public class Playback {
     }
 
     public String getUrl() {
-        return this.playbackUrl.toString();
+        return this.url.toString();
     }
 
     public Platform getPlatform() {
