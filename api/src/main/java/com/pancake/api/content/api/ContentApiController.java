@@ -25,7 +25,7 @@ public class ContentApiController {
     @PostMapping
     public ResponseEntity<ContentResponse> save(@RequestBody SaveContentCommand command) {
         final var content = contentService.save(command);
-        final var response = ContentResponse.fromEntity(content);
+        final var response = new ContentResponse(content);
 
         return status(CREATED).body(response);
     }
@@ -33,7 +33,7 @@ public class ContentApiController {
     @GetMapping
     public ResponseEntity<List<WatchableContentResponse>> getAll() {
         final var contents = contentService.getAllContents();
-        final var response = contents.stream().map(WatchableContentResponse::fromEntity).toList();
+        final var response = contents.stream().map(WatchableContentResponse::new).toList();
 
         return status(OK).body(response);
     }

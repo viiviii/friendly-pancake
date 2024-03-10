@@ -55,7 +55,7 @@ class AcceptanceTest {
         var playback = contents.stream()
                 .filter(e -> e.getId().equals(contentId))
                 .flatMap(e -> e.getPlaybacks().stream())
-                .filter(e -> e.getPlatformName().equals(platformName))
+                .filter(e -> e.getPlatformLabel().equals(platformName))
                 .findAny()
                 .orElseThrow();
 

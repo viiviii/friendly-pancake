@@ -1,12 +1,10 @@
 package com.pancake.api.content.api;
 
 import com.pancake.api.content.domain.Content;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ContentResponse {
 
@@ -16,8 +14,11 @@ public class ContentResponse {
     private String imageUrl;
     private boolean watched;
 
-    public static ContentResponse fromEntity(Content content) {
-        return new ContentResponse(content.getId(), content.getTitle(), content.getDescription(),
-                content.getImageUrl(), content.isWatched());
+    public ContentResponse(Content content) {
+        this.id = content.getId();
+        this.title = content.getTitle();
+        this.description = content.getDescription();
+        this.imageUrl = content.getImageUrl();
+        this.watched = content.isWatched();
     }
 }

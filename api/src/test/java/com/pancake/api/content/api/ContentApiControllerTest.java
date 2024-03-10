@@ -45,7 +45,7 @@ class ContentApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isCreated(),
-                spec -> spec.expectBody(ContentResponse.class).isEqualTo(ContentResponse.fromEntity(content))
+                spec -> spec.expectBody(ContentResponse.class).isEqualTo(new ContentResponse(content))
         );
     }
 
@@ -104,6 +104,6 @@ class ContentApiControllerTest {
     }
 
     private WatchableContentResponse toResponse(Content content) {
-        return WatchableContentResponse.fromEntity(content);
+        return new WatchableContentResponse(content);
     }
 }
