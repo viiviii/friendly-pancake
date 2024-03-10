@@ -1,6 +1,10 @@
 package com.pancake.api.content.application;
 
+import com.pancake.api.content.domain.Platform;
+import com.pancake.api.content.domain.Playback;
 import lombok.Builder;
+
+import static com.pancake.api.content.domain.Platform.NETFLIX;
 
 public abstract class Builders {
 
@@ -16,6 +20,12 @@ public abstract class Builders {
                 .url("https://www.netflix.com/watch/100000001");
     }
 
+    public static PlaybackBuilder aPlayback() {
+        return playbackBuilder()
+                .url("https://www.netflix.com/watch/100000001")
+                .platform(NETFLIX);
+    }
+
     @Builder(builderMethodName = "saveContentCommandBuilder")
     private static SaveContentCommand create(String title, String description, String imageUrl) {
         return new SaveContentCommand(title, description, imageUrl);
@@ -24,5 +34,10 @@ public abstract class Builders {
     @Builder(builderMethodName = "addPlaybackCommandBuilder")
     private static AddPlaybackCommand create(String url) {
         return new AddPlaybackCommand(url);
+    }
+
+    @Builder(builderMethodName = "playbackBuilder")
+    private static Playback create(String url, Platform platform) {
+        return new Playback(url, platform);
     }
 }

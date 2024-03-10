@@ -1,14 +1,12 @@
 package com.pancake.api.watch;
 
-import com.pancake.api.content.domain.Platform;
-import com.pancake.api.content.domain.Playback;
-import com.pancake.api.content.domain.PlaybackUrl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static com.pancake.api.content.application.Builders.aPlayback;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
@@ -24,7 +22,7 @@ class GetWatchApiTest {
     @Test
     void redirectToPlaybackUrl() {
         //given
-        var playback = playback();
+        var playback = aPlayback().build();
         given(loadPlayback.query(anyLong())).willReturn(playback);
 
         //when
@@ -36,11 +34,5 @@ class GetWatchApiTest {
                 spec -> spec.expectHeader().location(playback.getUrl()),
                 spec -> spec.expectBody(Void.class)
         );
-    }
-
-    private Playback playback() {
-        final var playbackUrl = new PlaybackUrl("https://www.netflix.com/watch/123");
-
-        return new Playback(playbackUrl, Platform.NETFLIX);
     }
 }

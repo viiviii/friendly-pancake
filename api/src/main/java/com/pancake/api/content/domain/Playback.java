@@ -25,8 +25,8 @@ public class Playback {
 
     private PlaybackUrl playbackUrl;
 
-    public Playback(PlaybackUrl playbackUrl, Platform platform) {
-        this(null, null, platform, playbackUrl);
+    public Playback(String playbackUrl, Platform platform) {
+        this(null, null, platform, new PlaybackUrl(playbackUrl));
     }
 
     public Long getId() {

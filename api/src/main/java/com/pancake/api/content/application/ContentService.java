@@ -1,6 +1,9 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.domain.*;
+import com.pancake.api.content.domain.Content;
+import com.pancake.api.content.domain.ContentRepository;
+import com.pancake.api.content.domain.Platform;
+import com.pancake.api.content.domain.Playback;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +42,7 @@ public class ContentService {
 
     private Playback toPlayback(AddPlaybackCommand command) {
         final var platform = mapPlatformWith(command);
-        return new Playback(new PlaybackUrl(command.getUrl()), platform);
+        return new Playback(command.getUrl(), platform);
     }
 
     private Platform mapPlatformWith(AddPlaybackCommand command) {
