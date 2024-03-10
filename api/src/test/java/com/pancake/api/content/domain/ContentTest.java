@@ -76,6 +76,6 @@ class ContentTest {
     private Playback createPlayback() {
         var playbackUrl = new PlaybackUrl("https://www.netflix.com/watch/999");
 
-        return new Playback(playbackUrl);
+        return new Playback(playbackUrl, Platform.NETFLIX);
     }
 }

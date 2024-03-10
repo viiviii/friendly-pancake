@@ -20,18 +20,25 @@ public class Playback {
     @Column(name = "content_id")
     private Long contentId;
 
+    @Enumerated(EnumType.STRING)
+    private Platform platform;
+
     private PlaybackUrl playbackUrl;
 
-    public Playback(PlaybackUrl playbackUrl) {
-        this(null, null, playbackUrl);
+    public Playback(PlaybackUrl playbackUrl, Platform platform) {
+        this(null, null, platform, playbackUrl);
     }
 
     public Long getId() {
         return this.id;
     }
 
-    public PlaybackUrl getUrl() {
-        return this.playbackUrl;
+    public String getUrl() {
+        return this.playbackUrl.toString();
+    }
+
+    public Platform getPlatform() {
+        return this.platform;
     }
 
     void setContent(Long contentId) {

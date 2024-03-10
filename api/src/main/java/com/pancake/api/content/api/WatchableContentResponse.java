@@ -33,10 +33,10 @@ public class WatchableContentResponse {
     @NoArgsConstructor
     public static class PlaybackResponse {
         private Long id;
-        private String platformName;
+        private String platformName; // TODO: label로 바꿔라
 
         public static PlaybackResponse fromEntity(Playback playback) {
-            return new PlaybackResponse(playback.getId(), "넷플릭스"); // TODO
+            return new PlaybackResponse(playback.getId(), playback.getPlatform().label());
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.pancake.api.watch;
 
+import com.pancake.api.content.domain.Platform;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.content.domain.PlaybackUrl;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,8 @@ class GetWatchApiTest {
     @Test
     void redirectToPlaybackUrl() {
         //given
-        given(loadPlayback.query(anyLong())).willReturn(playback("https://www.netflix.com/watch/123"));
+        var playback = playback();
+        given(loadPlayback.query(anyLong())).willReturn(playback);
 
         //when
         var response = client.get().uri("/api/watch/{id}", anyLong()).exchange();
@@ -31,14 +33,14 @@ class GetWatchApiTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isSeeOther(),
-                spec -> spec.expectHeader().location("https://www.netflix.com/watch/123"),
+                spec -> spec.expectHeader().location(playback.getUrl()),
                 spec -> spec.expectBody(Void.class)
         );
     }
 
-    private Playback playback(String url) {
-        final var playbackUrl = new PlaybackUrl(url);
+    private Playback playback() {
+        final var playbackUrl = new PlaybackUrl("https://www.netflix.com/watch/123");
 
-        return new Playback(playbackUrl);
+        return new Playback(playbackUrl, Platform.NETFLIX);
     }
 }

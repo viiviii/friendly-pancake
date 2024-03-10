@@ -1,11 +1,11 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.domain.ContentRepository;
+import com.pancake.api.content.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -33,7 +33,19 @@ public class ContentService {
     @Transactional
     public void addPlayback(long id, AddPlaybackCommand command) {
         final var content = loadContentBy(id);
-        content.add(command.toEntity());
+        final var playback = toPlayback(command);
+        content.add(playback);
+    }
+
+    private Playback toPlayback(AddPlaybackCommand command) {
+        final var platform = mapPlatformWith(command);
+        return new Playback(new PlaybackUrl(command.getUrl()), platform);
+    }
+
+    private Platform mapPlatformWith(AddPlaybackCommand command) {
+        return Arrays.stream(Platform.values())
+                .filter(e -> command.getUrl().startsWith(e.baseUrl()))
+                .findAny().orElseThrow(IllegalArgumentException::new);
     }
 
     private Content loadContentBy(long id) {

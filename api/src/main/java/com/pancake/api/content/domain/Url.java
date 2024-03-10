@@ -1,6 +1,8 @@
 package com.pancake.api.content.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.net.MalformedURLException;
@@ -13,27 +15,29 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Embeddable
 @NoArgsConstructor(access = PRIVATE)
-public final class PlaybackUrl {
+@EqualsAndHashCode
+final class Url {
 
-    private URL url;
+    @Column(name = "url")
+    private URL value;
 
-    public PlaybackUrl(String value) {
-        if (value == null) {
+    public Url(String url) {
+        if (url == null) {
             throw new IllegalArgumentException();
         }
-        this.url = parse(value);
+        this.value = parse(url);
     }
 
-    private URL parse(String url) {
+    private URL parse(String value) {
         try {
-            return new URI(url).toURL();
+            return new URI(value).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException();
         }
     }
 
     @Override
     public String toString() {
-        return this.url.toString();
+        return this.value.toString();
     }
 }
