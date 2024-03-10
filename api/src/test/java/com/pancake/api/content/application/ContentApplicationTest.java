@@ -29,6 +29,10 @@ class ContentApplicationTest {
     @Autowired
     ContentService contentService;
 
+    @Autowired
+    AddPlayback addPlayback;
+
+
     @AfterEach
     void cleanUp(@Autowired Flyway flyway) {
         flyway.clean();
@@ -82,11 +86,11 @@ class ContentApplicationTest {
         var contentId = savedContent().getId();
 
         //when
-        contentService.addPlayback(
+        addPlayback.with(
                 contentId,
                 aPlaybackToAdd().url("https://www.netflix.com/watch/0").build()
         );
-        contentService.addPlayback(
+        addPlayback.with(
                 contentId,
                 aPlaybackToAdd().url("https://www.disneyplus.com/video/1").build()
         );
@@ -112,7 +116,7 @@ class ContentApplicationTest {
 
     private void watchableContent(SaveContentCommandBuilder content, Builders.AddPlaybackCommandBuilder playback) {
         var contentId = savedContent(content).getId();
-        contentService.addPlayback(contentId, playback.build());
+        addPlayback.with(contentId, playback.build());
     }
 
     private Content savedContent() {

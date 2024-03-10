@@ -1,5 +1,6 @@
 package com.pancake.api.content.api;
 
+import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.AddPlaybackCommand;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.SaveContentCommand;
@@ -19,6 +20,8 @@ public class ContentApiController {
 
     private final ContentService contentService;
 
+    private final AddPlayback addPlayback;
+
     @PostMapping
     public ResponseEntity<ContentResponse> save(@RequestBody SaveContentCommand command) {
         final var content = contentService.save(command);
@@ -37,7 +40,7 @@ public class ContentApiController {
 
     @PostMapping("{id}/playbacks")
     public ResponseEntity<Void> addPlayback(@PathVariable Long id, @RequestBody AddPlaybackCommand command) {
-        contentService.addPlayback(id, command);
+        addPlayback.with(id, command);
 
         return status(NO_CONTENT).build();
     }
