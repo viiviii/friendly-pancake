@@ -1,16 +1,15 @@
 package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.AddPlayback;
-import com.pancake.api.content.application.AddPlaybackCommand;
+import com.pancake.api.content.application.ContentMetadata;
 import com.pancake.api.content.application.ContentService;
-import com.pancake.api.content.application.SaveContentCommand;
+import com.pancake.api.content.application.ContentStreaming;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
@@ -23,24 +22,16 @@ public class ContentApiController {
     private final AddPlayback addPlayback;
 
     @PostMapping
-    public ResponseEntity<ContentResponse> save(@RequestBody SaveContentCommand command) {
-        final var content = contentService.save(command);
+    public ResponseEntity<ContentResponse> save(@RequestBody ContentMetadata metadata) {
+        final var content = contentService.save(metadata);
         final var response = new ContentResponse(content);
 
         return status(CREATED).body(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<WatchableContentResponse>> getAll() {
-        final var contents = contentService.getAllContents();
-        final var response = contents.stream().map(WatchableContentResponse::new).toList();
-
-        return status(OK).body(response);
-    }
-
     @PostMapping("{id}/playbacks")
-    public ResponseEntity<Void> addPlayback(@PathVariable Long id, @RequestBody AddPlaybackCommand command) {
-        addPlayback.with(id, command);
+    public ResponseEntity<Void> addPlayback(@PathVariable Long id, @RequestBody ContentStreaming streaming) {
+        addPlayback.command(id, streaming);
 
         return status(NO_CONTENT).build();
     }

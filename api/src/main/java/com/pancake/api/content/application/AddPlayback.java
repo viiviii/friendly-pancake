@@ -14,16 +14,16 @@ public class AddPlayback {
     private final PlatformMapper platformMapper;
 
     @Transactional
-    public void with(long contentId, AddPlaybackCommand command) {
-        final var content = contentService.getBy(contentId);
-        final var watchOption = toWatchOption(command);
+    public void command(long contentId, ContentStreaming streaming) {
+        final var content = contentService.get(contentId);
+        final var playback = toPlayback(streaming);
 
-        content.add(watchOption);
+        content.add(playback);
     }
 
-    private Playback toWatchOption(AddPlaybackCommand command) {
-        final var platform = platformMapper.mapFrom(command);
+    private Playback toPlayback(ContentStreaming streaming) {
+        final var platform = platformMapper.mapFrom(streaming);
 
-        return new Playback(command.getUrl(), platform);
+        return new Playback(streaming.getUrl(), platform);
     }
 }

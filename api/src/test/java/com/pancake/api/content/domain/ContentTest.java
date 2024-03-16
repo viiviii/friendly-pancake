@@ -3,7 +3,7 @@ package com.pancake.api.content.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.pancake.api.content.application.Builders.aPlayback;
+import static com.pancake.api.content.Builders.aPlayback;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ContentTest {
@@ -45,29 +45,6 @@ class ContentTest {
         assertThat(content.getPlaybacks())
                 .singleElement()
                 .isEqualTo(playback);
-    }
-
-    @DisplayName("재생 주소가 있는 컨텐츠는 시청 가능하다")
-    @Test
-    void canWatchIsTrue() {
-        //given
-        var content = createContent();
-        content.add(aPlayback().build());
-
-        //when
-        var actual = content.canWatch();
-        //then
-        assertThat(actual).isTrue();
-    }
-
-    @DisplayName("재생 주소가 없는 컨텐츠는 시청 불가하다")
-    @Test
-    void canWatchIsFalse() {
-        //given
-        var content = createContent();
-
-        //then
-        assertThat(content.canWatch()).isFalse();
     }
 
     private Content createContent() {

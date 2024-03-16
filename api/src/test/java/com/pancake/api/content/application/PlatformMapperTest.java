@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static com.pancake.api.content.application.Builders.aPlaybackToAdd;
+import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.DISNEY_PLUS;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +52,7 @@ class PlatformMapperTest {
         );
     }
 
-    private static AddPlaybackCommand create(String url) {
-        return aPlaybackToAdd().url(url).build();
+    private static ContentStreaming create(String url) {
+        return aStreaming().url(url).build();
     }
 }

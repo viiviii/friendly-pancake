@@ -1,6 +1,6 @@
 package com.pancake.api.watch.api;
 
-import com.pancake.api.watch.application.LoadPlayback;
+import com.pancake.api.watch.application.GetWatchUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +16,12 @@ import static org.springframework.http.ResponseEntity.status;
 @RequiredArgsConstructor
 public class WatchRedirectController {
 
-    private final LoadPlayback loadPlayback;
+    private final GetWatchUrl getWatchUrl;
 
     @GetMapping("/api/watch/{id}")
     public ResponseEntity<Void> redirectToUrl(@PathVariable Long id) {
-        final var playback = loadPlayback.query(id);
+        final var url = getWatchUrl.query(id);
 
-        return status(SEE_OTHER).location(URI.create(playback.getUrl())).build();
+        return status(SEE_OTHER).location(URI.create(url)).build();
     }
 }
