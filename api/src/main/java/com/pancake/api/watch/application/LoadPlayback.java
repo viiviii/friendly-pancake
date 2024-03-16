@@ -1,4 +1,4 @@
-package com.pancake.api.watch;
+package com.pancake.api.watch.application;
 
 import com.pancake.api.content.domain.Playback;
 import jakarta.persistence.EntityManager;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-class LoadPlayback {
+public class LoadPlayback {
 
     @PersistenceContext
     private final EntityManager em;

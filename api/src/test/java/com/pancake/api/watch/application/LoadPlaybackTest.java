@@ -1,4 +1,4 @@
-package com.pancake.api.watch;
+package com.pancake.api.watch.application;
 
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;

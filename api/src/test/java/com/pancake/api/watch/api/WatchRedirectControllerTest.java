@@ -1,5 +1,6 @@
-package com.pancake.api.watch;
+package com.pancake.api.watch.api;
 
+import com.pancake.api.watch.application.LoadPlayback;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -10,8 +11,8 @@ import static com.pancake.api.content.application.Builders.aPlayback;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-@WebMvcTest(GetWatchApi.class)
-class GetWatchApiTest {
+@WebMvcTest(WatchRedirectController.class)
+class WatchRedirectControllerTest {
 
     @MockBean
     LoadPlayback loadPlayback;
@@ -20,7 +21,7 @@ class GetWatchApiTest {
     WebTestClient client;
 
     @Test
-    void redirectToPlaybackUrl() {
+    void redirectToUrl() {
         //given
         var playback = aPlayback().build();
         given(loadPlayback.query(anyLong())).willReturn(playback);
