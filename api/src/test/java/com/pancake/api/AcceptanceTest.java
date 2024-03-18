@@ -13,6 +13,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.ResponseSpecConsumer;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
@@ -36,14 +37,12 @@ class AcceptanceTest {
     @Test
     void 사용자가_컨텐츠를_시청한다() {
         //준비
-        //준비
-        var 원하는_컨텐츠 = 등록된_컨텐츠가_있다().getId();
-        컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.disneyplus.com/video/6e386dd6");
-        컨텐츠에_시청주소를_추가한다(원하는_컨텐츠, "https://www.netflix.com/watch/70106454");
-        var 시청_아이디 = 시청할_컨텐츠의_플랫폼을_선택한다(시청할_컨텐츠_목록이_있다(), 원하는_컨텐츠, "넷플릭스");
+        var 컨텐츠_아이디 = 컨텐츠를_등록한다().getId();
+        컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.disneyplus.com/video/6e386dd6");
+        컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.netflix.com/watch/70106454");
 
         //목표
-        var 결과 = 컨텐츠를_시청한다(시청_아이디);
+        var 결과 = 시청할_컨텐츠의("넷플릭스", this::컨텐츠를_시청한다);
 
         //결과
         결과.expectAll(
@@ -51,26 +50,25 @@ class AcceptanceTest {
         );
     }
 
-    private long 시청할_컨텐츠의_플랫폼을_선택한다(List<GetContentsToWatchResult> contents, long contentId, String platformLabel) {
-        var playback = contents.stream()
-                .filter(e -> e.getId().equals(contentId))
-                .flatMap(e -> e.getOptions().stream())
+    private ResponseSpec 시청할_컨텐츠의(String platformLabel, BiFunction<Long, String, ResponseSpec> 컨텐츠_시청) {
+        var 시청할_컨텐츠 = 시청할_컨텐츠들을_조회한다().stream()
+                .findAny().orElseThrow();
+        var 시청옵션 = 시청할_컨텐츠.getOptions().stream()
                 .filter(e -> e.getPlatformLabel().equals(platformLabel))
-                .findAny()
-                .orElseThrow();
+                .findAny().orElseThrow();
 
-        return playback.getId();
+        return 컨텐츠_시청.apply(시청할_컨텐츠.getId(), 시청옵션.getPlatformName());
+    }
+
+    private ResponseSpec 컨텐츠를_시청한다(Long id, String platformName) {
+        return client.get().uri("/api/watch/{id}/{platformName}", id, platformName).exchange();
     }
 
     private ResponseSpecConsumer 컨텐츠를_시청할_수_있는_주소로_이동된다(String url) {
         return spec -> spec.expectHeader().location(url);
     }
 
-    private ResponseSpec 컨텐츠를_시청한다(long id) {
-        return client.get().uri("/api/watch/{id}", id).exchange();
-    }
-
-    private ContentResponse 등록된_컨텐츠가_있다() {
+    private ContentResponse 컨텐츠를_등록한다() {
         var request = aMetadata().build();
 
         return client.post().uri("/api/contents")
@@ -84,6 +82,7 @@ class AcceptanceTest {
 
     private void 컨텐츠에_시청주소를_추가한다(long contentId, String url) {
         var request = aStreaming().url(url).build();
+
         client.post().uri("/api/contents/{id}/playbacks", contentId)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
@@ -92,12 +91,11 @@ class AcceptanceTest {
                 .expectBody(Void.class);
     }
 
-    private List<GetContentsToWatchResult> 시청할_컨텐츠_목록이_있다() {
+    private List<GetContentsToWatchResult> 시청할_컨텐츠들을_조회한다() {
         return client.get().uri("/api/watches")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBodyList(GetContentsToWatchResult.class)
-                .returnResult()
-                .getResponseBody();
+                .returnResult().getResponseBody();
     }
 }

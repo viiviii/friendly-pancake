@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static org.mockito.ArgumentMatchers.anyLong;
+import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.mockito.BDDMockito.given;
 
 @WebMvcTest(WatchRedirectController.class)
@@ -20,12 +20,12 @@ class WatchRedirectControllerTest {
     WebTestClient client;
 
     @Test
-    void redirectToUrl() {
+    void redirect() {
         //given
-        given(getWatchUrl.query(anyLong())).willReturn("https://www.netflix.com/watch/1");
+        given(getWatchUrl.query(1L, NETFLIX)).willReturn("https://www.netflix.com/watch/1");
 
         //when
-        var response = client.get().uri("/api/watch/{id}", anyLong()).exchange(); // TODO : {id}
+        var response = client.get().uri("/api/watch/{id}/{platform}", 1L, NETFLIX).exchange();
 
         //then
         response.expectAll(

@@ -19,6 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
+import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
@@ -101,7 +102,7 @@ class ApplicationTest {
         add(contentId, aStreaming().url("https://www.netflix.com/watch/100000001"));
 
         //when
-        var actual = getWatchUrl.query(contentId);
+        var actual = getWatchUrl.query(contentId, NETFLIX);
 
         //then
         assertThat(actual).isEqualTo("https://www.netflix.com/watch/100000001");

@@ -1,5 +1,6 @@
 package com.pancake.api.watch.api;
 
+import com.pancake.api.content.domain.Platform;
 import com.pancake.api.watch.application.GetWatchUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,9 @@ public class WatchRedirectController {
 
     private final GetWatchUrl getWatchUrl;
 
-    @GetMapping("/api/watch/{id}")
-    public ResponseEntity<Void> redirectToUrl(@PathVariable Long id) {
-        final var url = getWatchUrl.query(id);
+    @GetMapping("/api/watch/{id}/{platform}")
+    public ResponseEntity<Void> redirect(@PathVariable Long id, @PathVariable Platform platform) {
+        final var url = getWatchUrl.query(id, platform);
 
         return status(SEE_OTHER).location(URI.create(url)).build();
     }
