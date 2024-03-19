@@ -1,7 +1,6 @@
 package com.pancake.api.watch.api;
 
 import com.pancake.api.watch.application.GetContentsToWatch;
-import com.pancake.api.watch.application.GetContentsToWatchResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +20,10 @@ public class WatchApiController {
     private final GetContentsToWatch getContentsToWatch;
 
     @GetMapping
-    public ResponseEntity<List<GetContentsToWatchResult>> getAll() {
+    public ResponseEntity<List<WatchContentResponse>> getAll() {
         final var contents = getContentsToWatch.query();
+        final var response = contents.stream().map(WatchContentResponse::new).toList();
 
-        return status(OK).body(contents);
+        return status(OK).body(response);
     }
 }

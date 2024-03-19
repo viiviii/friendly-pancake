@@ -1,7 +1,7 @@
 package com.pancake.api;
 
 import com.pancake.api.content.api.ContentResponse;
-import com.pancake.api.watch.application.GetContentsToWatchResult;
+import com.pancake.api.watch.api.WatchContentResponse;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -91,11 +91,11 @@ class AcceptanceTest {
                 .expectBody(Void.class);
     }
 
-    private List<GetContentsToWatchResult> 시청할_컨텐츠들을_조회한다() {
+    private List<WatchContentResponse> 시청할_컨텐츠들을_조회한다() {
         return client.get().uri("/api/watches")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(GetContentsToWatchResult.class)
+                .expectBodyList(WatchContentResponse.class)
                 .returnResult().getResponseBody();
     }
 }

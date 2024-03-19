@@ -13,10 +13,9 @@ public class GetContentsToWatch {
 
     private final WatchContentRepository watchContentRepository;
 
-    public List<GetContentsToWatchResult> query() {
+    public List<WatchContent> query() {
         return watchContentRepository.findAll().stream()
                 .filter(WatchContent::canWatch)
-                .map(GetContentsToWatchResult::new)
                 .toList();
     }
 }

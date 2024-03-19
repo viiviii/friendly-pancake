@@ -6,8 +6,8 @@ import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.watch.application.GetContentsToWatch;
-import com.pancake.api.watch.application.GetContentsToWatchResult;
 import com.pancake.api.watch.application.GetWatchUrl;
+import com.pancake.api.watch.domain.WatchContent;
 import jakarta.persistence.EntityManager;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
@@ -124,7 +124,7 @@ class ApplicationTest {
 
         //then
         assertThat(actual).singleElement()
-                .returns("토르", GetContentsToWatchResult::getTitle);
+                .returns("토르", WatchContent::getTitle);
     }
 
     private Long save(Builders.ContentMetadataBuilder builder) {
