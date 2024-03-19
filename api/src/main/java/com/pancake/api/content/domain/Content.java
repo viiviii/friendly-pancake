@@ -2,6 +2,7 @@ package com.pancake.api.content.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "contents")
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
+@Getter
 public class Content {
 
     @Id
@@ -37,31 +39,13 @@ public class Content {
     public Content(String title, String description, String imageUrl) {
         this(null, title, description, imageUrl, false);
     }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public String getImageUrl() {
-        return this.imageUrl;
-    }
-
-    public List<Playback> getPlaybacks() {
-        return this.playbacks;
-    }
-
+    
     public boolean isWatched() {
         return this.watched;
     }
 
+
+    // TODO: 얘도 제거해야돼
     public void watch() {
         watched = true;
     }
@@ -70,9 +54,5 @@ public class Content {
     public void add(Playback playback) {
         this.playbacks.add(playback);
         playback.setContent(this.id);
-    }
-
-    public boolean canWatch() {
-        return !getPlaybacks().isEmpty();
     }
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddPlaybackCommand {
+public class ContentStreaming {
 
     private String url;
 }

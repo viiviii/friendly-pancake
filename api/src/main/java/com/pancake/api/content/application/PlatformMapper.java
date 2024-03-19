@@ -10,9 +10,9 @@ import java.util.stream.Stream;
 @Component
 public class PlatformMapper {
 
-    public Platform mapFrom(AddPlaybackCommand command) {
+    public Platform mapFrom(ContentStreaming streaming) {
         return getPlatforms()
-                .filter(platform -> canMap(command, platform))
+                .filter(platform -> canMap(streaming, platform))
                 .findAny().orElseThrow(IllegalArgumentException::new);
     }
 
@@ -20,8 +20,8 @@ public class PlatformMapper {
         return Arrays.stream(Platform.values());
     }
 
-    private boolean canMap(AddPlaybackCommand command, Platform platform) {
-        final var url = new PlaybackUrl(command.getUrl());
+    private boolean canMap(ContentStreaming streaming, Platform platform) {
+        final var url = new PlaybackUrl(streaming.getUrl());
 
         return url.isSatisfiedBy(platform);
     }
