@@ -4,23 +4,24 @@ import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
+import com.pancake.api.content.domain.Playback;
 import com.pancake.api.watch.application.GetContentsToWatch;
+import com.pancake.api.watch.application.GetContentsToWatchResult;
 import com.pancake.api.watch.application.GetWatchUrl;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Condition;
-import org.assertj.core.api.ObjectAssert;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
+import static com.pancake.api.content.domain.Platform.DISNEY_PLUS;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -56,10 +57,10 @@ class ApplicationTest {
         var content = contentService.save(metadata);
 
         //then
-        assertThatActualBy(Content.class, content.getId())
-                .has(title("토토로"))
-                .has(description("설명"))
-                .has(imageUrl("http://some.image"));
+        assertThat(actualBy(content.getId(), Content.class))
+                .returns("토토로", Content::getTitle)
+                .returns("설명", Content::getDescription)
+                .returns("http://some.image", Content::getImageUrl);
     }
 
     @Test
@@ -78,9 +79,12 @@ class ApplicationTest {
         );
 
         //then
-        assertThatActualBy(Content.class, contentId)
-                .extracting(Content::getPlaybacks).asList()
-                .hasSize(2);
+        assertThat(actualBy(contentId, Content.class).getPlaybacks())
+                .extracting(Playback::getPlatform, Playback::getUrl)
+                .containsExactly(
+                        tuple(NETFLIX, "https://www.netflix.com/watch/0"),
+                        tuple(DISNEY_PLUS, "https://www.disneyplus.com/video/1")
+                );
     }
 
     @Test
@@ -92,7 +96,8 @@ class ApplicationTest {
         contentService.watch(contentId);
 
         //then
-        assertThatActualBy(Content.class, contentId).is(watched());
+        assertThat(actualBy(contentId, Content.class))
+                .returns(true, Content::isWatched);
     }
 
     @Test
@@ -118,7 +123,8 @@ class ApplicationTest {
         var actual = getContentsToWatch.query();
 
         //then
-        assertThat(actual).singleElement().is(title("토르"));
+        assertThat(actual).singleElement()
+                .returns("토르", GetContentsToWatchResult::getTitle);
     }
 
     private Long save(Builders.ContentMetadataBuilder builder) {
@@ -129,28 +135,7 @@ class ApplicationTest {
         addPlayback.command(contentId, builder.build());
     }
 
-    private <T> ObjectAssert<T> assertThatActualBy(Class<T> entityClass, Object id) {
-        var actual = em.find(entityClass, id);
-
-        return assertThat(actual);
-    }
-
-    private <T> Condition<T> title(String expected) {
-        return new Condition<>(e -> {
-            var actual = ReflectionTestUtils.invokeMethod(e, "getTitle");
-            return actual != null && actual.equals(expected);
-        }, "title equals %s", expected);
-    }
-
-    private Condition<Content> description(String expected) {
-        return new Condition<>(e -> e.getDescription().equals(expected), "description equals %s", expected);
-    }
-
-    private Condition<Content> imageUrl(String expected) {
-        return new Condition<>(e -> e.getImageUrl().equals(expected), "image url equals %s", expected);
-    }
-
-    private Condition<Content> watched() {
-        return new Condition<>(Content::isWatched, "isWatched is true");
+    private <T> T actualBy(Object id, Class<T> entityClass) {
+        return em.find(entityClass, id);
     }
 }
