@@ -3,6 +3,8 @@ package com.pancake.api.content.domain;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
+import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -15,10 +17,10 @@ public class Playback {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name = "content_id")
-    private Long contentId;
+    @ManyToOne(fetch = EAGER)
+    private Content content;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     private Platform platform;
 
     private PlaybackUrl url;
@@ -27,11 +29,11 @@ public class Playback {
         this(null, null, platform, new PlaybackUrl(url));
     }
 
-    private Playback(Long id, Long contentId, Platform platform, PlaybackUrl url) {
+    private Playback(Long id, Content content, Platform platform, PlaybackUrl url) {
         mustMatch(url, platform);
 
         this.id = id;
-        this.contentId = contentId;
+        this.content = content;
         this.platform = platform;
         this.url = url;
     }
@@ -54,7 +56,7 @@ public class Playback {
         return this.platform;
     }
 
-    void setContent(Long contentId) {
-        this.contentId = contentId;
+    void setContent(Content content) {
+        this.content = content;
     }
 }
