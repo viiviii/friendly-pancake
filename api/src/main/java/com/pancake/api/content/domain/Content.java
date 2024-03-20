@@ -31,15 +31,14 @@ public class Content {
 
     private boolean watched;
 
-    // TODO
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id")
     private final List<Playback> playbacks = new ArrayList<>();
 
     public Content(String title, String description, String imageUrl) {
         this(null, title, description, imageUrl, false);
     }
-    
+
     public boolean isWatched() {
         return this.watched;
     }
