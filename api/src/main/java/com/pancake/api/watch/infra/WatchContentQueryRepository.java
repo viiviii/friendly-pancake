@@ -1,7 +1,6 @@
 package com.pancake.api.watch.infra;
 
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.domain.ContentRepository;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.watch.domain.WatchContent;
 import com.pancake.api.watch.domain.WatchContentRepository;
@@ -18,7 +17,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 class WatchContentQueryRepository implements WatchContentRepository {
 
-    private final ContentRepository contentRepository; // TODO
+    private final JpaContentQueryRepository contentRepository;
 
     @Override
     public List<WatchContent> findAll() {

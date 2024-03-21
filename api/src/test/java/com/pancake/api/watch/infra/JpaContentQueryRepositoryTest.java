@@ -2,7 +2,6 @@ package com.pancake.api.watch.infra;
 
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.watch.domain.WatchContentRepository;
 import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aPlayback;
@@ -19,11 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SuppressWarnings("NonAsciiCharacters")
 @DataJpaTest
-@Import(WatchContentQueryRepository.class)
-class WatchContentQueryRepositoryTest {
+class JpaContentQueryRepositoryTest {
 
     @Autowired
-    WatchContentRepository repository;
+    JpaContentQueryRepository repository;
 
     @Autowired
     TestEntityManager em;
@@ -54,14 +51,13 @@ class WatchContentQueryRepositoryTest {
         var actual = repository.findAll();
 
         //then
-        assertThat(actual).hasSize(3);
         assertAll(
-                () -> assertThat(statistics.getCollectionLoadCount())
-                        .as("3개의 컬렉션이 조회된다").isEqualTo(3),
-                () -> assertThat(statistics.getCollectionFetchCount())
-                        .as("컬렉션을 1번 가져온다").isEqualTo(1),
+                () -> assertThat(actual)
+                        .as("3개의 컨텐츠가 조회되고 각각 1개의 재생 정보를 가지고 있다.")
+                        .hasSize(3)
+                        .allSatisfy(e -> assertThat(e.getPlaybacks()).hasSize(1)),
                 () -> assertThat(statistics.getPrepareStatementCount())
-                        .as("select 쿼리가 1+1번 날아간다.").isEqualTo(1 + 1)
+                        .as("select 쿼리가 1번 날아간다.").isOne()
         );
     }
 
