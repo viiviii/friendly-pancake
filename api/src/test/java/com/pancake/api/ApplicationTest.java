@@ -4,7 +4,6 @@ import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.domain.Playback;
 import com.pancake.api.watch.application.GetContentsToWatch;
 import com.pancake.api.watch.application.GetWatchUrl;
 import com.pancake.api.watch.domain.WatchContent;
@@ -21,7 +20,7 @@ import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.DISNEY_PLUS;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -34,6 +33,9 @@ class ApplicationTest {
 
     @Autowired
     AddPlayback addPlayback;
+
+    @Autowired
+    GetWatchUrl getWatchUrl;
 
     @Autowired
     EntityManager em;
@@ -79,12 +81,12 @@ class ApplicationTest {
         );
 
         //then
-        assertThat(actualBy(contentId, Content.class).getPlaybacks())
-                .extracting(Playback::getPlatform, Playback::getUrl)
-                .containsExactly(
-                        tuple(NETFLIX, "https://www.netflix.com/watch/0"),
-                        tuple(DISNEY_PLUS, "https://www.disneyplus.com/video/1")
-                );
+        assertAll(
+                () -> assertThat(getWatchUrl.query(contentId, NETFLIX))
+                        .hasToString("https://www.netflix.com/watch/0"),
+                () -> assertThat(getWatchUrl.query(contentId, DISNEY_PLUS))
+                        .hasToString("https://www.disneyplus.com/video/1")
+        );
     }
 
     @Test
@@ -101,7 +103,7 @@ class ApplicationTest {
     }
 
     @Test
-    void 시청주소를_조회한다(@Autowired GetWatchUrl getWatchUrl) {
+    void 시청주소를_조회한다() {
         //given
         var contentId = save(aMetadata());
         add(contentId, aStreaming().url("https://www.netflix.com/watch/100000001"));
