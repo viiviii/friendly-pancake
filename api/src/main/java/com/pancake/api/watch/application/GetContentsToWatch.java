@@ -1,7 +1,7 @@
 package com.pancake.api.watch.application;
 
+import com.pancake.api.watch.domain.FindWatchContent;
 import com.pancake.api.watch.domain.WatchContent;
-import com.pancake.api.watch.domain.WatchContentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +11,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetContentsToWatch {
 
-    private final WatchContentRepository watchContentRepository;
+    private final FindWatchContent watchContent;
 
     public List<WatchContent> query() {
-        return watchContentRepository.findAll().stream()
+        return watchContent.findAll().stream()
                 .filter(WatchContent::canWatch)
                 .toList();
     }
