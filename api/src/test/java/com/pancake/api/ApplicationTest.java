@@ -125,7 +125,7 @@ class ApplicationTest {
         var actual = getContentsToWatch.query();
 
         //then
-        assertThat(actual).singleElement()
+        assertThat(actual.getContents()).singleElement()
                 .returns("토르", WatchContent::getTitle);
     }
 

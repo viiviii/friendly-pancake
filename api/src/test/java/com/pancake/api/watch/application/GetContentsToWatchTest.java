@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("NonAsciiCharacters")
 class GetContentsToWatchTest {
-    
+
     private final FindWatchContent watchContent = mock(FindWatchContent.class);
     private final GetContentsToWatch getContentsToWatch = new GetContentsToWatch(watchContent);
 
@@ -27,6 +27,6 @@ class GetContentsToWatchTest {
         var actual = getContentsToWatch.query();
 
         //then
-        assertThat(actual).hasSize(2);
+        assertThat(actual.getContents()).hasSize(2);
     }
 }

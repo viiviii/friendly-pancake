@@ -5,17 +5,17 @@ import com.pancake.api.watch.domain.WatchContent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class GetContentsToWatch {
 
     private final FindWatchContent watchContent;
 
-    public List<WatchContent> query() {
-        return watchContent.findAll().stream()
+    public Catalog query() {
+        final var contents = watchContent.findAll().stream()
                 .filter(WatchContent::canWatch)
                 .toList();
+
+        return new Catalog(contents);
     }
 }

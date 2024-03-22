@@ -1,5 +1,6 @@
 package com.pancake.api.watch.api;
 
+import com.pancake.api.watch.application.Catalog;
 import com.pancake.api.watch.application.GetContentsToWatch;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ class WatchApiControllerTest {
     WebTestClient client;
 
     @Test
-    void getAll() {
+    void get() {
         //given
-        var expected = List.of(aWatchContent().id(1L).build(), aWatchContent().id(2L).build());
+        var expected = new Catalog(List.of(aWatchContent().build()));
 
         given(getContentsToWatch.query()).willReturn(expected);
 
@@ -34,7 +35,7 @@ class WatchApiControllerTest {
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isOk(),
-                spec -> spec.expectBodyList(WatchContentResponse.class).hasSize(2)
+                spec -> spec.expectBody(Catalog.class).isEqualTo(expected)
         );
     }
 }
