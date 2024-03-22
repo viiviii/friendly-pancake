@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SaveContentCommand {
+public class ContentMetadata {
 
     private String title;
     private String description;
     private String imageUrl;
 
-    public Content toEntity() {
+    public Content toContent() {
         return new Content(title, description, imageUrl);
     }
 }

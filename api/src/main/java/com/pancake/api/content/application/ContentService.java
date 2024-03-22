@@ -6,38 +6,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public Content save(SaveContentCommand command) {
-        return contentRepository.save(command.toEntity());
+    public Content save(ContentMetadata metadata) {
+        return contentRepository.save(metadata.toContent());
     }
 
-    public List<Content> getAllContents() {
-        return contentRepository.findAll().stream()
-                .filter(Content::canWatch)
-                .toList();
-    }
-
-    public Content getContent(long id) {
+    public Content get(long id) {
         return contentRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
     }
 
     @Transactional
     public void watch(long id) {
-        final var content = getContent(id);
+        final var content = get(id);
         content.watch();
-    }
-
-    @Transactional
-    public void addWatch(long id, AddWatchCommand command) {
-        final var content = getContent(id);
-        content.addWatch(command.toEntity());
     }
 }

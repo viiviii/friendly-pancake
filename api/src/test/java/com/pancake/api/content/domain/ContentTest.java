@@ -3,6 +3,7 @@ package com.pancake.api.content.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.pancake.api.content.Builders.aPlayback;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ContentTest {
@@ -30,50 +31,23 @@ class ContentTest {
         assertThat(content.isWatched()).isTrue();
     }
 
-    @DisplayName("컨텐츠에 url 추가한다")
+    @DisplayName("컨텐츠에 재생 정보를 추가한다")
     @Test
     void addUrl() {
         //given
         var content = createContent();
-        var watch = createWatch();
+        var playback = aPlayback().build();
 
         //when
-        content.addWatch(watch);
+        content.add(playback);
 
         //then
-        assertThat(content.getPlaybackUrl()).isEqualTo(watch.getPlaybackUrl());
-    }
-
-    @DisplayName("시청 주소가 있는 컨텐츠는 시청 가능하다")
-    @Test
-    void canWatchIsTrue() {
-        //given
-        var content = createContent();
-        content.addWatch(createWatch());
-
-        //when
-        var actual = content.canWatch();
-        //then
-        assertThat(actual).isTrue();
-    }
-
-    @DisplayName("시청 주소가 없는 컨텐츠는 시청 불가하다")
-    @Test
-    void canWatchIsFalse() {
-        //given
-        var content = createContent();
-
-        //then
-        assertThat(content.canWatch()).isFalse();
+        assertThat(content.getPlaybacks())
+                .singleElement()
+                .isEqualTo(playback);
     }
 
     private Content createContent() {
         return new Content("테스트용 제목", "테스트용 설명", "https://occ.nflxso.net/api/0");
-    }
-
-    private Watch createWatch() {
-        var playbackUrl = new PlaybackUrl("https://www.netflix.com/watch/999");
-
-        return new Watch(playbackUrl);
     }
 }
