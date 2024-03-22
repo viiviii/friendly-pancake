@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -31,15 +33,13 @@ public class Content {
 
     private boolean watched;
 
-    // TODO
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JoinColumn(name = "content_id")
+    @OneToMany(mappedBy = "content", cascade = PERSIST, fetch = LAZY)
     private final List<Playback> playbacks = new ArrayList<>();
 
     public Content(String title, String description, String imageUrl) {
         this(null, title, description, imageUrl, false);
     }
-    
+
     public boolean isWatched() {
         return this.watched;
     }
@@ -49,10 +49,9 @@ public class Content {
     public void watch() {
         watched = true;
     }
-
-    // TODO
+    
     public void add(Playback playback) {
         this.playbacks.add(playback);
-        playback.setContent(this.id);
+        playback.setContent(this);
     }
 }

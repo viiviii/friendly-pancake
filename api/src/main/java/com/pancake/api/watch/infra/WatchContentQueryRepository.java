@@ -1,22 +1,23 @@
 package com.pancake.api.watch.infra;
 
 import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.domain.ContentRepository;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.watch.domain.WatchContent;
 import com.pancake.api.watch.domain.WatchContentRepository;
 import com.pancake.api.watch.domain.WatchOption;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 class WatchContentQueryRepository implements WatchContentRepository {
 
-    private final ContentRepository contentRepository; // TODO
+    private final JpaContentQueryRepository contentRepository;
 
     @Override
     public List<WatchContent> findAll() {
