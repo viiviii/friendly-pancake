@@ -1,31 +1,35 @@
 package com.pancake.api.watch.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class WatchContent {
 
-    private final Long id;
+    private Long id;
 
-    private final String title;
+    private String title;
 
-    private final String description;
+    private String description;
 
-    private final String imageUrl;
+    private String imageUrl;
 
-    private final boolean watched;
+    private boolean watched;
 
-    private final List<WatchOption> options;
+    private List<WatchOption> options;
 
     public boolean isWatched() {
         return this.watched;
     }
-    
+
     public boolean canWatch() {
         return !getOptions().isEmpty();
     }

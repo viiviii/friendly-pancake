@@ -3,9 +3,9 @@ package com.pancake.api.watch.infra;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.Platform;
 import com.pancake.api.content.domain.Playback;
+import com.pancake.api.watch.domain.FindWatchContent;
 import com.pancake.api.watch.domain.FindWatchOption;
 import com.pancake.api.watch.domain.WatchContent;
-import com.pancake.api.watch.domain.WatchContentRepository;
 import com.pancake.api.watch.domain.WatchOption;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
-class WatchContentQueryRepository implements WatchContentRepository, FindWatchOption {
+@RequiredArgsConstructor
+class WatchQueryRepository implements FindWatchContent, FindWatchOption {
 
     private final JpaContentQueryRepository contents;
     private final JpaPlaybackQueryRepository playbacks;

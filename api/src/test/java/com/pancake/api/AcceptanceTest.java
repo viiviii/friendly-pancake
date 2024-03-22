@@ -1,7 +1,7 @@
 package com.pancake.api;
 
 import com.pancake.api.content.api.ContentResponse;
-import com.pancake.api.watch.api.WatchContentResponse;
+import com.pancake.api.watch.application.Catalog;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.ResponseSpecConsumer;
 
-import java.util.List;
 import java.util.function.BiFunction;
 
 import static com.pancake.api.content.Builders.aMetadata;
@@ -51,13 +50,14 @@ class AcceptanceTest {
     }
 
     private ResponseSpec 시청할_컨텐츠의(String platformLabel, BiFunction<Long, String, ResponseSpec> 컨텐츠_시청) {
-        var 시청할_컨텐츠 = 시청할_컨텐츠들을_조회한다().stream()
+        var 시청할_컨텐츠 = 시청할_컨텐츠들을_조회한다()
+                .getContents().stream()
                 .findAny().orElseThrow();
         var 시청옵션 = 시청할_컨텐츠.getOptions().stream()
-                .filter(e -> e.getPlatformLabel().equals(platformLabel))
+                .filter(e -> e.getPlatform().label().equals(platformLabel))
                 .findAny().orElseThrow();
 
-        return 컨텐츠_시청.apply(시청할_컨텐츠.getId(), 시청옵션.getPlatformName());
+        return 컨텐츠_시청.apply(시청할_컨텐츠.getId(), 시청옵션.getPlatform().name());
     }
 
     private ResponseSpec 컨텐츠를_시청한다(Long id, String platformName) {
@@ -91,11 +91,11 @@ class AcceptanceTest {
                 .expectBody(Void.class);
     }
 
-    private List<WatchContentResponse> 시청할_컨텐츠들을_조회한다() {
+    private Catalog 시청할_컨텐츠들을_조회한다() {
         return client.get().uri("/api/watches")
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBodyList(WatchContentResponse.class)
+                .expectBody(Catalog.class)
                 .returnResult().getResponseBody();
     }
 }
