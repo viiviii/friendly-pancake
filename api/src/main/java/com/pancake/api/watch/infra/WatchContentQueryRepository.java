@@ -1,7 +1,9 @@
 package com.pancake.api.watch.infra;
 
 import com.pancake.api.content.domain.Content;
+import com.pancake.api.content.domain.Platform;
 import com.pancake.api.content.domain.Playback;
+import com.pancake.api.watch.domain.FindWatchOption;
 import com.pancake.api.watch.domain.WatchContent;
 import com.pancake.api.watch.domain.WatchContentRepository;
 import com.pancake.api.watch.domain.WatchOption;
@@ -15,18 +17,22 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-class WatchContentQueryRepository implements WatchContentRepository {
+class WatchContentQueryRepository implements WatchContentRepository, FindWatchOption {
 
-    private final JpaContentQueryRepository contentRepository;
+    private final JpaContentQueryRepository contents;
+    private final JpaPlaybackQueryRepository playbacks;
 
     @Override
     public List<WatchContent> findAll() {
-        return contentRepository.findAll().stream().map(this::mapToContent).toList();
+        return contents.findAll().stream()
+                .map(this::mapToContent)
+                .toList();
     }
 
     @Override
-    public Optional<WatchContent> findById(long id) {
-        return contentRepository.findById(id).map(this::mapToContent);
+    public Optional<WatchOption> findByContentIdAndPlatform(Long contentId, Platform platform) {
+        return playbacks.findByContentIdAndPlatform(contentId, platform)
+                .map(this::mapToOption);
     }
 
     private WatchContent mapToContent(Content content) {
