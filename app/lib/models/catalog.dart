@@ -4,7 +4,7 @@ class Catalog {
   final String title;
   final List<Content> contents;
 
-  Catalog({
+  const Catalog({
     required this.title,
     required this.contents,
   });
@@ -15,6 +15,15 @@ class Catalog {
       contents:
           json['contents'].map<Content>((e) => Content.fromJson(e)).toList(),
     );
+  }
+
+  List<Content> get watchedContents {
+    // todo: 서버에서 주기
+    return contents.where((e) => e.watched).take(5).toList();
+  }
+
+  List<Content> get unwatchedContents {
+    return contents.where((e) => !e.watched).toList();
   }
 
   @override
