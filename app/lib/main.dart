@@ -41,6 +41,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Content> _watchedContents = [];
+
+  // TODO
+  String _unwatchedContentsTitle = '';
   List<Content> _unwatchedContents = [];
 
   @override
@@ -50,13 +53,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _onLoad() async {
-    final response = await api.get<List>('contents');
-    final contents = response.map((json) => Content.fromJson(json)).toList();
+    final response = await api.get<Map<String, dynamic>>('watches');
+
+    final Catalog catalog = Catalog.fromJson(response);
 
     setState(() {
       // todo: 서버에서 페이징
-      _watchedContents = contents.where((e) => e.watched).take(5).toList();
-      _unwatchedContents = contents.where((e) => !e.watched).toList();
+      _watchedContents =
+          catalog.contents.where((e) => e.watched).take(5).toList();
+      _unwatchedContentsTitle = catalog.title;
+      _unwatchedContents = catalog.contents.where((e) => !e.watched).toList();
     });
   }
 
@@ -115,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Text(
-                  '추천해요',
+                  _unwatchedContentsTitle,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
@@ -171,6 +177,21 @@ class _ContentGridView extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class Catalog {
+  final String title;
+  final List<Content> contents;
+
+  Catalog._(this.title, this.contents);
+
+  factory Catalog.fromJson(Map<String, dynamic> json) {
+    return Catalog._(
+        json['title'] as String,
+        json['contents']
+            .map<Content>((json) => Content.fromJson(json))
+            .toList());
   }
 }
 
