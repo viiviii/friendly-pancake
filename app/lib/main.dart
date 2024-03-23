@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' as api;
 import 'package:pancake_app/content_save_screen.dart';
+import 'package:pancake_app/models/catalog.dart';
+import 'package:pancake_app/models/content.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets/content.dart';
 
-typedef ContentSelected<int> = void Function(int contentId);
+typedef ContentSelected<Content> = void Function(Content selected);
 
 void main() {
   runApp(const MyApp());
@@ -66,14 +68,15 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _watch(int id) async {
-    final opened = await launchUrl(api.url('contents/$id'));
+  Future<void> _watch(Content content) async {
+    final opened = await launchUrl(api
+        .url('watch/${content.id}/${content.optionToWatchNow.platformName}'));
 
     if (!opened) {
       return;
     }
 
-    await api.patch('contents/$id/watched');
+    await api.patch('contents/${content.id}/watched');
     _onLoad();
   }
 
@@ -144,7 +147,7 @@ class _ContentGridView extends StatelessWidget {
     required this.contents,
   }) : super(key: key);
 
-  final ContentSelected<int> onContentTap;
+  final ContentSelected<Content> onContentTap;
   final List<Content> contents;
 
   @override
@@ -164,7 +167,7 @@ class _ContentGridView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ContentCard(
-              onTap: () => onContentTap(content.id),
+              onTap: () => onContentTap(content),
               image: NetworkImage(content.imageUrl),
               description: content.description,
             ),
@@ -176,41 +179,6 @@ class _ContentGridView extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-class Catalog {
-  final String title;
-  final List<Content> contents;
-
-  Catalog._(this.title, this.contents);
-
-  factory Catalog.fromJson(Map<String, dynamic> json) {
-    return Catalog._(
-        json['title'] as String,
-        json['contents']
-            .map<Content>((json) => Content.fromJson(json))
-            .toList());
-  }
-}
-
-class Content {
-  final int id;
-  final String title;
-  final String description;
-  final String imageUrl;
-  final bool watched;
-
-  Content._(this.id, this.title, this.description, this.imageUrl, this.watched);
-
-  factory Content.fromJson(Map<String, dynamic> json) {
-    return Content._(
-      json['id'] as int,
-      json['title'] as String,
-      json['description'] as String,
-      json['imageUrl'] as String,
-      json['watched'] as bool,
     );
   }
 }
