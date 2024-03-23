@@ -5,9 +5,8 @@ import 'package:pancake_app/api/api.dart' as api;
 import 'package:pancake_app/content_save_screen.dart';
 import 'package:pancake_app/models/catalog.dart';
 import 'package:pancake_app/models/content.dart';
+import 'package:pancake_app/widgets/hover_slide_image_card.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'widgets/content.dart';
 
 typedef ContentSelected<Content> = void Function(Content selected);
 
@@ -166,10 +165,13 @@ class _ContentGridView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ContentCard(
+            HoverSlideImageCard(
               onTap: () => onContentTap(content),
               image: NetworkImage(content.imageUrl),
-              description: content.description,
+              overlayWidget: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: _Description(content.description),
+              ),
             ),
             Text(
               content.title,
@@ -179,6 +181,24 @@ class _ContentGridView extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _Description extends StatelessWidget {
+  const _Description(this.description);
+
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Text(
+        description,
+        style: Theme.of(context).textTheme.labelLarge,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 3,
+      ),
     );
   }
 }
