@@ -13,7 +13,6 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
 
   String? _title;
   String? _description;
-  String? _url;
   String? _imageUrl;
 
   Future<void> _onContentSaved() async {
@@ -34,7 +33,6 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
     await api.post(
       'contents',
       body: {
-        'url': _url,
         'title': _title,
         'description': _description,
         'imageUrl': _imageUrl,
@@ -76,12 +74,6 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
                       labelText: '설명',
                       hintText: '등록할 컨텐츠의 설명',
                       onSaved: (value) => _description = value,
-                    ),
-                    _ContentInputField(
-                      icon: const Icon(Icons.link),
-                      labelText: '컨텐츠 URL',
-                      hintText: '등록할 컨텐츠의 URL',
-                      onSaved: (value) => _url = value,
                     ),
                     _ContentInputField(
                       icon: const Icon(Icons.link),
