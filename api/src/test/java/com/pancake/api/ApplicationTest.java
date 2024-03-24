@@ -103,6 +103,19 @@ class ApplicationTest {
     }
 
     @Test
+    void 컨텐츠의_이미지를_변경한다() {
+        //given
+        var contentId = save(aMetadata().imageUrl("원래 이미지 주소"));
+
+        //when
+        contentService.changeImage(contentId, "바뀐 이미지 주소");
+
+        //then
+        assertThat(actualBy(contentId, Content.class))
+                .returns("바뀐 이미지 주소", Content::getImageUrl);
+    }
+
+    @Test
     void 시청주소를_조회한다() {
         //given
         var contentId = save(aMetadata());

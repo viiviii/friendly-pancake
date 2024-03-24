@@ -26,4 +26,10 @@ public class ContentService {
         final var content = get(id);
         content.watch();
     }
+
+    @Transactional
+    public void changeImage(long id, String imageUrl) {
+        final var content = get(id);
+        content.change(imageUrl);
+    }
 }

@@ -49,9 +49,13 @@ public class Content {
     public void watch() {
         watched = true;
     }
-    
+
     public void add(Playback playback) {
         this.playbacks.add(playback);
         playback.setContent(this);
+    }
+
+    public void change(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
