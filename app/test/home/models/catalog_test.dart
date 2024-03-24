@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pancake_app/models/catalog.dart';
-import 'package:pancake_app/models/content.dart';
+import 'package:pancake_app/home/models/catalog.dart';
+import 'package:pancake_app/home/models/content.dart';
 
 void main() {
   group('시청한 컨텐츠를 최대 5개 반환한다', () {
