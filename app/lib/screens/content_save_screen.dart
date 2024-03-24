@@ -18,7 +18,7 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
   Future<void> _onContentSaved() async {
     _validateFields();
     await _save();
-    _moveToHome();
+    _goToPrevious();
   }
 
   void _validateFields() {
@@ -40,9 +40,9 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
     );
   }
 
-  void _moveToHome() {
+  void _goToPrevious() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('저장되었습니다.')),
+      const SnackBar(content: Text('저장 되었습니다.')),
     );
     Navigator.of(context).pop();
   }
