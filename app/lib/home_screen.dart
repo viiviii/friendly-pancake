@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _watch(Content content) async {
     final opened = await launchUrl(
-      api.url('watch/${content.id}/${content.optionToWatchNow.platformName}'),
+      api.url('watch/${content.id}/${content.shortcutOption.platformName}'),
     );
 
     if (!opened) {

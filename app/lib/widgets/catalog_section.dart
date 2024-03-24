@@ -92,7 +92,7 @@ class _ContentCard extends StatelessWidget {
           image: NetworkImage(content.imageUrl),
           overlayWidget: Padding(
             padding: const EdgeInsets.all(15.0),
-            child: _ContentDescription(content.description),
+            child: _WatchShortcutText(content.shortcutOption),
           ),
         ),
         _ContentTitle(content.title),
@@ -116,19 +116,26 @@ class _ContentTitle extends StatelessWidget {
   }
 }
 
-class _ContentDescription extends StatelessWidget {
-  const _ContentDescription(this.description);
+class _WatchShortcutText extends StatelessWidget {
+  const _WatchShortcutText(this.option);
 
-  final String description;
+  final Option option;
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return IgnorePointer(
-      child: Text(
-        description,
-        style: Theme.of(context).textTheme.labelLarge,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 3,
+      child: Column(
+        children: [
+          Text(
+            '${option.platformLabel}에서',
+            style: textTheme.bodyLarge,
+          ),
+          Text(
+            '지금 볼래요',
+            style: textTheme.titleLarge,
+          ),
+        ],
       ),
     );
   }

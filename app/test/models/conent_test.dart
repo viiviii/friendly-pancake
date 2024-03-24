@@ -11,7 +11,7 @@ void main() {
     ]);
 
     //when
-    var actual = content.optionToWatchNow;
+    var actual = content.shortcutOption;
 
     //then
     expect(actual, equals(_option('디즈니플러스')));

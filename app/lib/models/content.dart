@@ -26,7 +26,7 @@ class Content {
     );
   }
 
-  Option get optionToWatchNow => options.first;
+  Option get shortcutOption => options.first;
 
   @override
   String toString() {
