@@ -1,6 +1,8 @@
 package com.pancake.api;
 
 import com.pancake.api.content.api.ContentResponse;
+import com.pancake.api.content.domain.Content;
+import com.pancake.api.content.domain.ContentRepository;
 import com.pancake.api.watch.application.Catalog;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +18,7 @@ import java.util.function.BiFunction;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -48,6 +51,26 @@ class AcceptanceTest {
                 컨텐츠를_시청할_수_있는_주소로_이동된다("https://www.netflix.com/watch/70106454")
         );
     }
+
+    @Test
+    void 이미지_주소를_변경한다(@Autowired ContentRepository repository) {
+        //given
+        var 컨텐츠_아이디 = 컨텐츠를_등록한다().getId();
+
+        //when
+        client.patch().uri("/api/contents/{id}/image", 컨텐츠_아이디)
+                .contentType(APPLICATION_JSON)
+                .bodyValue("https://some.other.new.image")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(Void.class);
+        var actual = repository.findById(컨텐츠_아이디);
+
+        //then
+        assertThat(actual).isPresent().get()
+                .returns("https://some.other.new.image", Content::getImageUrl);
+    }
+
 
     private ResponseSpec 시청할_컨텐츠의(String platformLabel, BiFunction<Long, String, ResponseSpec> 컨텐츠_시청) {
         var 시청할_컨텐츠 = 시청할_컨텐츠들을_조회한다()

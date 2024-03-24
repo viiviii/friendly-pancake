@@ -42,4 +42,11 @@ public class ContentApiController {
 
         return status(NO_CONTENT).build();
     }
+
+    @PatchMapping("{id}/image")
+    public ResponseEntity<Void> changeContentImage(@PathVariable Long id, @RequestBody String imageUrl) {
+        contentService.changeImage(id, imageUrl);
+
+        return status(NO_CONTENT).build();
+    }
 }
