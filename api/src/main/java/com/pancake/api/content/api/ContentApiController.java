@@ -4,12 +4,15 @@ import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentMetadata;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.ContentStreaming;
+import com.pancake.api.content.domain.ContentRepository;
+import com.pancake.api.content.domain.Playback;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
@@ -18,8 +21,16 @@ import static org.springframework.http.ResponseEntity.status;
 public class ContentApiController {
 
     private final ContentService contentService;
-
+    private final ContentRepository contentRepository;
     private final AddPlayback addPlayback;
+
+    @GetMapping
+    public ResponseEntity<List<ContentResponse>> getAll() {
+        final var contents = contentRepository.findAll();
+        final var response = contents.stream().map(ContentResponse::new).toList();
+
+        return status(OK).body(response);
+    }
 
     @PostMapping
     public ResponseEntity<ContentResponse> save(@RequestBody ContentMetadata metadata) {
@@ -27,6 +38,14 @@ public class ContentApiController {
         final var response = new ContentResponse(content);
 
         return status(CREATED).body(response);
+    }
+
+    @GetMapping("{id}/playbacks")
+    public ResponseEntity<List<Playback>> getAllPlaybacksIn(@PathVariable Long id) {
+        final var content = contentService.get(id);
+        final var response = content.getPlaybacks();
+
+        return status(OK).body(response);
     }
 
     @PostMapping("{id}/playbacks")

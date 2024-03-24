@@ -2,6 +2,7 @@ package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentService;
+import com.pancake.api.content.domain.ContentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,6 +19,9 @@ class ContentApiControllerTest {
 
     @MockBean
     ContentService contentService;
+
+    @MockBean
+    ContentRepository repository;
 
     @MockBean
     AddPlayback addPlayback;
