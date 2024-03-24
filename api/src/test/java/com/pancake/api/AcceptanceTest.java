@@ -1,8 +1,7 @@
 package com.pancake.api;
 
 import com.pancake.api.content.api.ContentResponse;
-import com.pancake.api.content.domain.Content;
-import com.pancake.api.content.domain.ContentRepository;
+import com.pancake.api.content.domain.Playback;
 import com.pancake.api.watch.application.Catalog;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
@@ -14,11 +13,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.ResponseSpecConsumer;
 
+import java.util.List;
 import java.util.function.BiFunction;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -53,24 +54,25 @@ class AcceptanceTest {
     }
 
     @Test
-    void 이미지_주소를_변경한다(@Autowired ContentRepository repository) {
-        //given
-        var 컨텐츠_아이디 = 컨텐츠를_등록한다().getId();
+    void 내가_컨텐츠를_관리한다() {
+        //준비
+        컨텐츠를_등록한다();
+        컨텐츠를_등록한다();
+        컨텐츠를_등록한다();
+        var 컨텐츠_아이디 = 컨텐츠를_선택(모든_컨텐츠를_조회한다()).getId();
+        
+        //목표
+        컨텐츠의_이미지를_변경한다(컨텐츠_아이디, "https://some.change.image");
+        컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.netflix.com/watch/3X0g0a");
 
-        //when
-        client.patch().uri("/api/contents/{id}/image", 컨텐츠_아이디)
-                .contentType(APPLICATION_JSON)
-                .bodyValue("https://some.other.new.image")
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(Void.class);
-        var actual = repository.findById(컨텐츠_아이디);
-
-        //then
-        assertThat(actual).isPresent().get()
-                .returns("https://some.other.new.image", Content::getImageUrl);
+        //결과
+        assertAll(
+                () -> assertThat(컨텐츠를_선택(모든_컨텐츠를_조회한다()))
+                        .returns("https://some.change.image", ContentResponse::getImageUrl),
+                () -> assertThat(컨텐츠의_모든_재생정보를_조회한다(컨텐츠_아이디)).singleElement()
+                        .returns("https://www.netflix.com/watch/3X0g0a", Playback::getUrl)
+        );
     }
-
 
     private ResponseSpec 시청할_컨텐츠의(String platformLabel, BiFunction<Long, String, ResponseSpec> 컨텐츠_시청) {
         var 시청할_컨텐츠 = 시청할_컨텐츠들을_조회한다()
@@ -120,5 +122,34 @@ class AcceptanceTest {
                 .expectStatus().is2xxSuccessful()
                 .expectBody(Catalog.class)
                 .returnResult().getResponseBody();
+    }
+
+    private List<ContentResponse> 모든_컨텐츠를_조회한다() {
+        return client.get().uri("/api/contents")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBodyList(ContentResponse.class)
+                .returnResult().getResponseBody();
+    }
+
+    private List<Playback> 컨텐츠의_모든_재생정보를_조회한다(Long contentId) {
+        return client.get().uri("/api/contents/{id}/playbacks", contentId)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBodyList(Playback.class)
+                .returnResult().getResponseBody();
+    }
+
+    private ContentResponse 컨텐츠를_선택(List<ContentResponse> contents) {
+        return contents.get(0);
+    }
+
+    private void 컨텐츠의_이미지를_변경한다(Long id, String imageUrl) {
+        client.patch().uri("/api/contents/{id}/image", id)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(imageUrl)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(Void.class);
     }
 }
