@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pancake_app/screens/content_save_screen.dart';
+
+import 'content_edit_screen.dart';
 
 class AdminScreen extends StatelessWidget {
   const AdminScreen({Key? key}) : super(key: key);

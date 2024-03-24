@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/content/admin_screen.dart';
 import 'package:pancake_app/home/models/catalog.dart';
-import 'package:pancake_app/screens/admin_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'models/content.dart';
