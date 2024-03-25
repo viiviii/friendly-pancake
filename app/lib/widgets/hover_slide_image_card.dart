@@ -7,12 +7,12 @@ class HoverSlideImageCard extends StatefulWidget {
     Key? key,
     required this.onTap,
     required this.image,
-    required this.overlayWidget,
+    this.overlayWidget,
   }) : super(key: key);
 
   final GestureTapCallback onTap;
   final ImageProvider image;
-  final Widget overlayWidget;
+  final Widget? overlayWidget;
 
   @override
   State<HoverSlideImageCard> createState() => _HoverSlideImageCardState();
