@@ -14,8 +14,9 @@ Future<T> get<T>(String path) async {
   return _process(() => http.get(url(path), headers: _header));
 }
 
-Future<T> patch<T>(String path) async {
-  return _process(() => http.patch(url(path), headers: _header));
+// TODO
+Future<void> patch<T>(String path, {String? body}) async {
+  await http.patch(url(path), headers: _header, body: body);
 }
 
 Future<T> _process<T>(HttpRequest request) async {

@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:pancake_app/content/content_edit_screen.dart';
 
-import 'content_edit_screen.dart';
+import 'content_save_screen.dart';
 
 class AdminScreen extends StatelessWidget {
   const AdminScreen({Key? key}) : super(key: key);
 
-  Future<void> _goToContentSave(BuildContext context) async {
+  Future<void> _goToSaveContent(BuildContext context) async {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const ContentSaveScreen()),
+    );
+  }
+
+  Future<void> _goToEditContent(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ContentEditScreen()),
     );
   }
 
@@ -25,10 +33,13 @@ class AdminScreen extends StatelessWidget {
             shrinkWrap: true,
             children: [
               _MenuCard(
-                onTap: () => _goToContentSave(context),
+                onTap: () => _goToSaveContent(context),
                 title: '컨텐츠 추가',
               ),
-              _MenuCard(onTap: () {}, title: '컨텐츠 수정'),
+              _MenuCard(
+                onTap: () => _goToEditContent(context),
+                title: '컨텐츠 수정',
+              ),
             ],
           ),
         ),
