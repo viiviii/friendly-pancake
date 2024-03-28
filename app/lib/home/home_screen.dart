@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final response = await api.get<Map<String, dynamic>>('watches');
 
     setState(() {
-      catalog = Catalog.fromJson(response);
+      catalog = Catalog.fromJson(response.body!);
     });
   }
 
