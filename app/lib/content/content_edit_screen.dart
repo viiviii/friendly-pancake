@@ -1,152 +1,126 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pancake_app/api/api.dart' as api;
-import 'package:pancake_app/widgets/hover_slide_image_card.dart';
+import 'package:pancake_app/widgets/my_future_builder.dart';
+import 'package:pancake_app/widgets/my_simple_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'model.dart';
 
-typedef ContentSelected<Content> = void Function(Content);
-
-class ContentEditScreen extends StatelessWidget {
-  const ContentEditScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 60),
-        child: _ContentListViewSection(),
-      ),
-    );
-  }
-}
-
-class _ContentListViewSection extends StatefulWidget {
-  const _ContentListViewSection({Key? key}) : super(key: key);
-
-  @override
-  State<_ContentListViewSection> createState() =>
-      _ContentListViewSectionState();
-}
-
-class _ContentListViewSectionState extends State<_ContentListViewSection> {
-  late Future<List<ContentMetadata>> _future;
-
-  @override
-  void initState() {
-    super.initState();
-    _future = _loadContents();
-  }
-
-  Future<List<ContentMetadata>> _loadContents() async {
-    final response = await api.get<List<Map<String, dynamic>>>('contents');
-    return response.map(ContentMetadata.fromJson).toList();
-  }
-
-  Future<void> _showEditContentSection(ContentMetadata content) async {
-    await showDialog<void>(
-      context: context,
-      builder: (_) => _ContentEditSection(content: content),
-    );
-  }
-
-  @override
-  Widget build(_) {
-    return _FutureBuilder<List<ContentMetadata>>(
-      future: _future,
-      builder: (_, contents) {
-        return GridView.builder(
-          itemCount: contents.length,
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            mainAxisSpacing: 15,
-            crossAxisSpacing: 15,
-            childAspectRatio: 0.56,
-          ),
-          itemBuilder: (context, index) {
-            final content = contents[index];
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HoverSlideImageCard(
-                  onTap: () => _showEditContentSection(content),
-                  image: NetworkImage(content.imageUrl),
-                ),
-                Flexible(
-                  child: Text(
-                    content.title,
-                    style: Theme.of(context).textTheme.titleSmall,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class _ContentEditSection extends StatefulWidget {
-  const _ContentEditSection({required this.content});
+class ContentEditScreen extends StatefulWidget {
+  const ContentEditScreen({super.key, required this.content});
 
   final ContentMetadata content;
 
   @override
-  State<_ContentEditSection> createState() => _ContentEditSectionState();
+  State<ContentEditScreen> createState() => _ContentEditScreenState();
 }
 
-class _ContentEditSectionState extends State<_ContentEditSection> {
-  final FocusNode _focusNode = FocusNode();
+class _ContentEditScreenState extends State<ContentEditScreen> {
   final TextEditingController _controller = TextEditingController();
-
-  late Future<List<ContentStreaming>> _future;
-  late String _previewImageUrl;
+  late Future<List<ContentStreaming>> _playbacks;
 
   bool _isPreviewError = false;
 
-  String get _editImageUrl => _controller.value.text;
-  bool get _isImageUpdated => _previewImageUrl != widget.content.imageUrl;
+  set _previewImageUrl(String imageUrl) {
+    _controller.text = imageUrl;
+    _isPreviewError = false;
+  }
+
+  String get _previewImageUrl => _controller.value.text;
+
+  bool get _imageChanged => _previewImageUrl != widget.content.imageUrl;
 
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.content.imageUrl;
     _previewImageUrl = widget.content.imageUrl;
-    _future = _loadContentStreamingList();
+    _playbacks = _getPlaybacks();
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
 
-  Future<List<ContentStreaming>> _loadContentStreamingList() async {
-    final response = await api.get<List<Map<String, dynamic>>>(
-      'contents/${widget.content.id}/playbacks',
-    );
-    return response.map(ContentStreaming.fromJson).toList();
+  Future<void> _onPaste() async {
+    final paste = await Clipboard.getData(Clipboard.kTextPlain);
+    _updatePreviewImage(paste?.text ?? '');
   }
 
-  Future<void> _savePreviewImageUrl() async {
+  Future<void> _onSave() async {
     if (_isPreviewError) {
-      _showSnackBar('저장 실패: 이미지가 올바르지 않음');
+      _showSnackBar('로드에 실패한 이미지는 저장할 수 없음');
+      return;
+    }
+    await _updateImageUrl();
+    _showSnackBar('저장 완료');
+    _close();
+  }
+
+  Future<void> _onAdd() async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) {
+        return MySimpleDialog(
+          title: const Text('스트리밍 정보 추가'),
+          child: _StreamingAddFormSection(
+            onSaved: _addPlaybackUrl,
+          ),
+        );
+      },
+    );
+  }
+
+  void _updatePreviewImage(String updateImageUrl) {
+    if (updateImageUrl.isEmpty) {
+      return;
+    }
+    if (updateImageUrl == _previewImageUrl) {
+      return;
+    }
+    setState(() => _previewImageUrl = updateImageUrl);
+  }
+
+  Future<void> _addPlaybackUrl(String? playbackUrl) async {
+    if (playbackUrl == null) {
       return;
     }
 
-    await _update(_previewImageUrl);
+    final result = await _savePlayback(playbackUrl);
+    if (!result.success) {
+      _showSnackBar('저장 실패');
+      return;
+    }
+
     _showSnackBar('저장 완료');
-    _closeEditContentSection();
+    _close();
+    setState(() {
+      _playbacks = _getPlaybacks();
+    });
   }
 
-  Future<void> _update(String imageUrl) async {
+  Future<List<ContentStreaming>> _getPlaybacks() async {
+    final response = await api.get<List<Map<String, dynamic>>>(
+      'contents/${widget.content.id}/playbacks',
+    );
+    return response.body!.map(ContentStreaming.fromJson).toList();
+  }
+
+  Future<void> _updateImageUrl() async {
     await api.patch(
       'contents/${widget.content.id}/image',
-      body: imageUrl,
+      body: _previewImageUrl,
+    );
+  }
+
+  Future<api.ApiResult> _savePlayback(String playbackUrl) async {
+    return await api.post(
+      'contents/${widget.content.id}/playbacks',
+      body: {
+        'url': playbackUrl, // TODO
+      },
     );
   }
 
@@ -156,132 +130,150 @@ class _ContentEditSectionState extends State<_ContentEditSection> {
     );
   }
 
-  void _closeEditContentSection() {
+  void _close() {
     Navigator.pop(context);
-  }
-
-  void _previewWithEditImage() {
-    if (_previewImageUrl == _editImageUrl) {
-      return;
-    }
-
-    setState(() {
-      _previewImageUrl = _editImageUrl;
-      _isPreviewError = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context).textTheme.titleMedium;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _ImagePreview(
+          imageUrl: _previewImageUrl,
+          errorBuilder: (_, error, __) {
+            _isPreviewError = true;
+            return ErrorMessage(message: '$error');
+          },
+        ),
+        const SizedBox(width: 20),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Title(
+                titleName: '이미지',
+                buttonName: '저장',
+                onPressed: _imageChanged ? _onSave : null,
+              ),
+              _ImageUrlField(
+                controller: _controller,
+                onPaste: _onPaste,
+              ),
+              const SizedBox(height: 70),
+              _Title(
+                titleName: '볼 수 있는 곳',
+                buttonName: '추가',
+                onPressed: _onAdd,
+              ),
+              MyFutureBuilder(
+                future: _playbacks,
+                builder: (_, data) {
+                  return _StreamingListView(data);
+                },
+              ), // TODO
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
-    return Scaffold(
-      body: SimpleDialog(
-        title: Text(widget.content.title),
+class _ImageUrlField extends StatelessWidget {
+  const _ImageUrlField({required this.controller, required this.onPaste});
+
+  final TextEditingController controller;
+  final VoidCallback onPaste;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        filled: true,
+        hintText: 'https://image.tmdb.org/...jpg',
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.paste),
+          onPressed: onPaste,
+        ),
+      ),
+    );
+  }
+}
+
+class _StreamingListView extends StatelessWidget {
+  const _StreamingListView(this.streamingList);
+
+  final List<ContentStreaming> streamingList;
+
+  @override
+  Widget build(BuildContext context) {
+    final availableOn = <Widget>[
+      for (final e in streamingList)
+        _ReadOnlyField(
+          e.url,
+          onPressed: () => launchUrl(Uri.parse(e.url)),
+        ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: availableOn.isNotEmpty
+          ? availableOn
+          : [const _ReadOnlyField('등록된 정보 없음')],
+    );
+  }
+}
+
+class _StreamingAddFormSection extends StatelessWidget {
+  _StreamingAddFormSection({required this.onSaved});
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FormFieldSetter<String> onSaved;
+
+  void _onSave() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    _formKey.currentState?.save();
+  }
+
+  String? _validateUrl(String? value) {
+    if (value == null || value.isEmpty) {
+      return '재생 주소는 필수 값입니다.';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          SimpleDialogOption(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ImagePreview(
-                  imageUrl: _previewImageUrl,
-                  errorBuilder: (_, error, __) {
-                    _isPreviewError = true;
-                    return _ErrorMessageSection(message: '$error');
-                  },
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Text('이미지 주소', style: titleStyle),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: TextField(
-                              focusNode: _focusNode,
-                              controller: _controller,
-                              decoration: InputDecoration(
-                                suffix: IconButton(
-                                  icon: const Icon(Icons.clear),
-                                  onPressed: _controller.clear,
-                                ),
-                                hintText: 'https://image.tmdb.org/...jpg',
-                                filled: true,
-                              ),
-                              onSubmitted: (_) => _previewWithEditImage,
-                              onTapOutside: (_) {
-                                _focusNode.unfocus();
-                                _previewWithEditImage();
-                              },
-                            ),
-                          ),
-                          TextButton(
-                            onPressed:
-                                _isImageUpdated ? _savePreviewImageUrl : null,
-                            child: const Text('저장'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 70),
-                      Text('볼 수 있는 곳', style: titleStyle),
-                      _FutureBuilder<List<ContentStreaming>>(
-                        future: _future,
-                        builder: (_, streamingList) {
-                          return _ContentStreamingListView(streamingList);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+          TextFormField(
+            decoration: const InputDecoration(
+              filled: true,
+              hintText: 'https://www.netflix.com/watch/1',
             ),
+            validator: _validateUrl,
+            onSaved: onSaved,
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 30),
           TextButton(
-            onPressed: _closeEditContentSection,
-            child: const Text('닫기'),
-          ),
+            onPressed: _onSave,
+            child: const Text('저장'),
+          )
         ],
       ),
     );
   }
 }
 
-class _ContentStreamingListView extends StatelessWidget {
-  const _ContentStreamingListView(this.streamingList);
-
-  final List<ContentStreaming> streamingList;
-
-  @override
-  Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.bodyMedium;
-
-    List<Widget> availableOn = List.unmodifiable(
-      [Text('등록된 정보 없음', style: textStyle)],
-    );
-
-    if (streamingList.isNotEmpty) {
-      availableOn = [
-        for (final e in streamingList) Text(e.url, style: textStyle)
-      ];
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: availableOn,
-    );
-  }
-}
-
 class _ImagePreview extends StatelessWidget {
-  const _ImagePreview({
-    required this.imageUrl,
-    required this.errorBuilder,
-  });
+  const _ImagePreview({required this.imageUrl, required this.errorBuilder});
 
   final String imageUrl;
   final ImageErrorWidgetBuilder errorBuilder;
@@ -297,72 +289,54 @@ class _ImagePreview extends StatelessWidget {
   }
 }
 
-typedef _WidgetBuilder<T> = Widget Function(BuildContext context, T data);
+class _Title extends StatelessWidget {
+  const _Title({
+    required this.titleName,
+    required this.buttonName,
+    this.onPressed,
+  });
 
-class _FutureBuilder<T> extends StatelessWidget {
-  const _FutureBuilder({required this.future, required this.builder});
-
-  final Future<T> future;
-  final _WidgetBuilder<T> builder;
+  final String titleName;
+  final String buttonName;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<T>(
-      future: future,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return builder(context, snapshot.data as T);
-        } else if (snapshot.hasError) {
-          return _ErrorMessageSection(message: '${snapshot.error}');
-        } else {
-          return const _ProgressIndicatorSection();
-        }
-      },
+    return Row(
+      children: [
+        Text(
+          titleName,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        TextButton(
+          onPressed: onPressed,
+          child: Text(buttonName),
+        ),
+      ],
     );
   }
 }
 
-class _ErrorMessageSection<T> extends StatelessWidget {
-  const _ErrorMessageSection({required this.message});
+class _ReadOnlyField extends StatelessWidget {
+  const _ReadOnlyField(this.value, {this.onPressed});
 
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 60,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Text(
-              message,
-              maxLines: 5,
-              softWrap: true,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProgressIndicatorSection extends StatelessWidget {
-  const _ProgressIndicatorSection();
+  final String value;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: SizedBox(
-        width: 60,
-        height: 60,
-        child: CircularProgressIndicator(),
+    return TextFormField(
+      initialValue: value,
+      readOnly: true,
+      enabled: onPressed != null,
+      maxLines: 1,
+      minLines: 1,
+      decoration: InputDecoration(
+        filled: true,
+        suffix: IconButton(
+          icon: const Icon(Icons.arrow_outward),
+          onPressed: onPressed,
+        ),
       ),
     );
   }
