@@ -41,7 +41,7 @@ class _AdminScreenState extends State<AdminScreen> {
     await showDialog<void>(
       context: context,
       builder: (_) => MySimpleDialog(
-        title: Text(content.title),
+        title: SelectableText(content.title),
         child: ContentEditSection(content: content),
       ),
     );
