@@ -55,6 +55,16 @@ class _ContentCard extends StatelessWidget {
         HoverSlideImageCard(
           onTap: () => onTap(content),
           image: NetworkImage(content.imageUrl), // TODO: widget or image
+          errorBuilder: (_, __, ___) {
+            return const ColoredBox(
+              color: Colors.redAccent,
+              child: Icon(
+                Icons.error_outline,
+                color: Colors.white,
+                size: 80,
+              ),
+            );
+          },
         ),
         Flexible(
           child: Text(

@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 class HoverSlideImageCard extends StatefulWidget {
   const HoverSlideImageCard({
     Key? key,
-    required this.onTap,
     required this.image,
+    required this.onTap,
+    this.errorBuilder,
     this.overlayWidget,
   }) : super(key: key);
 
-  final GestureTapCallback onTap;
   final ImageProvider image;
+  final GestureTapCallback onTap;
+  final ImageErrorWidgetBuilder? errorBuilder;
   final Widget? overlayWidget;
 
   @override
@@ -71,9 +73,11 @@ class _HoverSlideImageCardState extends State<HoverSlideImageCard>
           child: Stack(
             alignment: Alignment.bottomLeft,
             children: [
-              _Image(
-                opacity: _opacityAnimation,
+              Image(
                 image: widget.image,
+                opacity: _opacityAnimation,
+                fit: BoxFit.cover,
+                errorBuilder: widget.errorBuilder,
               ),
               FadeTransition(
                 opacity: _controller.view,
@@ -129,22 +133,6 @@ class _Card extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: child,
       ),
-    );
-  }
-}
-
-class _Image extends StatelessWidget {
-  const _Image({required this.opacity, required this.image});
-
-  final ImageProvider image;
-  final Animation<double> opacity;
-
-  @override
-  Widget build(BuildContext context) {
-    return Image(
-      image: image,
-      opacity: opacity,
-      fit: BoxFit.cover,
     );
   }
 }
