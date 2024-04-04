@@ -73,11 +73,14 @@ class _HoverSlideImageCardState extends State<HoverSlideImageCard>
           child: Stack(
             alignment: Alignment.bottomLeft,
             children: [
-              Image(
-                image: widget.image,
-                opacity: _opacityAnimation,
-                fit: BoxFit.cover,
-                errorBuilder: widget.errorBuilder,
+              AspectRatio(
+                aspectRatio: 2 / 3,
+                child: Image(
+                  image: widget.image,
+                  opacity: _opacityAnimation,
+                  fit: BoxFit.cover,
+                  errorBuilder: widget.errorBuilder,
+                ),
               ),
               FadeTransition(
                 opacity: _controller.view,
