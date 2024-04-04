@@ -90,12 +90,15 @@ class _ContentCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         HoverSlideImageCard(
-          onTap: () => onSelected(content),
           image: NetworkImage(content.imageUrl),
+          onTap: () => onSelected(content),
           overlayWidget: Padding(
             padding: const EdgeInsets.all(15.0),
             child: _WatchShortcutText(content.shortcutOption),
           ),
+          errorBuilder: (_, __, ___) {
+            return const Center(child: Text('이미지를 로드할 수 없음'));
+          },
         ),
         _ContentTitle(content.title),
       ],

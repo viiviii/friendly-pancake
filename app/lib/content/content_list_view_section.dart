@@ -26,6 +26,7 @@ class ContentListViewSection extends StatelessWidget {
             maxCrossAxisExtent: 200,
             mainAxisSpacing: 15,
             crossAxisSpacing: 15,
+            // TODO: childAspectRatio - 원래는 이미지 비율과 같아야하지만 title 때문에 임의의 상수 계산해서 넣음
             childAspectRatio: 0.56,
           ),
           itemBuilder: (context, index) {
@@ -55,6 +56,16 @@ class _ContentCard extends StatelessWidget {
         HoverSlideImageCard(
           onTap: () => onTap(content),
           image: NetworkImage(content.imageUrl), // TODO: widget or image
+          errorBuilder: (_, __, ___) {
+            return const ColoredBox(
+              color: Colors.redAccent,
+              child: Icon(
+                Icons.error_outline,
+                color: Colors.white,
+                size: 80,
+              ),
+            );
+          },
         ),
         Flexible(
           child: Text(
