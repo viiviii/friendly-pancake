@@ -65,6 +65,7 @@ class _Watchlist extends StatelessWidget {
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 300,
         crossAxisSpacing: 15,
+        childAspectRatio: 0.56,
       ),
       itemBuilder: (_, index) {
         return _ContentCard(
