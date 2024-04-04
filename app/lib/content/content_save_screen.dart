@@ -49,48 +49,34 @@ class _ContentSaveScreenState extends State<ContentSaveScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 20,
-            horizontal: 30,
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          _ContentInputField(
+            icon: const Icon(Icons.text_format),
+            labelText: '타이틀',
+            hintText: '등록할 컨텐츠의 타이틀',
+            onSaved: (value) => _title = value,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: ListView(
-                  children: [
-                    _ContentInputField(
-                      icon: const Icon(Icons.text_format),
-                      labelText: '타이틀',
-                      hintText: '등록할 컨텐츠의 타이틀',
-                      onSaved: (value) => _title = value,
-                    ),
-                    _ContentInputField(
-                      icon: const Icon(Icons.text_format),
-                      labelText: '설명',
-                      hintText: '등록할 컨텐츠의 설명',
-                      onSaved: (value) => _description = value,
-                    ),
-                    _ContentInputField(
-                      icon: const Icon(Icons.link),
-                      labelText: '썸네일 URL',
-                      hintText: '등록할 컨텐츠의 썸네일 URL',
-                      onSaved: (value) => _imageUrl = value,
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: _onContentSaved,
-                child: const Text('Submit'),
-              ),
-            ],
+          _ContentInputField(
+            icon: const Icon(Icons.text_format),
+            labelText: '설명',
+            hintText: '등록할 컨텐츠의 설명',
+            onSaved: (value) => _description = value,
           ),
-        ),
+          _ContentInputField(
+            icon: const Icon(Icons.link),
+            labelText: '썸네일 URL',
+            hintText: '등록할 컨텐츠의 썸네일 URL',
+            onSaved: (value) => _imageUrl = value,
+          ),
+          const SizedBox(height: 30),
+          ElevatedButton(
+            onPressed: _onContentSaved,
+            child: const Text('Submit'),
+          ),
+        ],
       ),
     );
   }

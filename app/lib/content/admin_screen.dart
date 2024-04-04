@@ -9,9 +9,12 @@ class AdminScreen extends StatelessWidget {
   const AdminScreen({Key? key}) : super(key: key);
 
   Future<void> _goToSaveContent(BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ContentSaveScreen()),
+    await showDialog<void>(
+      context: context,
+      builder: (_) => const MySimpleDialog(
+        title: Text('컨텐츠 추가'),
+        child: ContentSaveScreen(),
+      ),
     );
   }
 
@@ -22,12 +25,10 @@ class AdminScreen extends StatelessWidget {
         builder: (_) => ContentListViewScreen(
           onTap: (content) => showDialog<void>(
             context: context,
-            builder: (_) {
-              return MySimpleDialog(
-                title: Text(content.title),
-                child: ContentEditScreen(content: content),
-              );
-            },
+            builder: (_) => MySimpleDialog(
+              title: Text(content.title),
+              child: ContentEditScreen(content: content),
+            ),
           ),
         ),
       ),
