@@ -7,16 +7,16 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'model.dart';
 
-class ContentEditScreen extends StatefulWidget {
-  const ContentEditScreen({super.key, required this.content});
+class ContentEditSection extends StatefulWidget {
+  const ContentEditSection({super.key, required this.content});
 
   final ContentMetadata content;
 
   @override
-  State<ContentEditScreen> createState() => _ContentEditScreenState();
+  State<ContentEditSection> createState() => _ContentEditSectionState();
 }
 
-class _ContentEditScreenState extends State<ContentEditScreen> {
+class _ContentEditSectionState extends State<ContentEditSection> {
   final TextEditingController _controller = TextEditingController();
   late Future<List<ContentStreaming>> _playbacks;
 

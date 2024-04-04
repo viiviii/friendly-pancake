@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' as api;
 
-class ContentSaveScreen extends StatefulWidget {
-  const ContentSaveScreen({super.key});
+class ContentSaveSection extends StatefulWidget {
+  const ContentSaveSection({super.key});
 
   @override
-  State<ContentSaveScreen> createState() => _ContentSaveScreenState();
+  State<ContentSaveSection> createState() => _ContentSaveSectionState();
 }
 
-class _ContentSaveScreenState extends State<ContentSaveScreen> {
+class _ContentSaveSectionState extends State<ContentSaveSection> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? _title;
