@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' as api;
-import 'package:pancake_app/content_save_screen.dart';
-import 'package:pancake_app/models/catalog.dart';
-import 'package:pancake_app/models/content.dart';
-import 'package:pancake_app/widgets/catalog_section.dart';
+import 'package:pancake_app/content/admin_screen.dart';
+import 'package:pancake_app/home/models/catalog.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'models/content.dart';
+import 'views/catalog_section.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final response = await api.get<Map<String, dynamic>>('watches');
 
     setState(() {
-      catalog = Catalog.fromJson(response);
+      catalog = Catalog.fromJson(response.body!);
     });
   }
 
@@ -43,10 +44,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _onLoad();
   }
 
-  Future<void> _moveToContentSave() async {
+  Future<void> _goToAdmin() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const ContentSaveScreen()),
+      MaterialPageRoute(builder: (_) => const AdminScreen()),
     );
 
     _onLoad();
@@ -61,8 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: ElevatedButton(
-              onPressed: _moveToContentSave,
-              child: const Text('등록'),
+              onPressed: _goToAdmin,
+              child: const Text('임시'),
             ),
           ),
         ],

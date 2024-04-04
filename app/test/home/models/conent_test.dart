@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pancake_app/models/content.dart';
+import 'package:pancake_app/home/models/content.dart';
 
 void main() {
   test('바로 시청할 옵션으로 첫번째 옵션을 반환한다', () {

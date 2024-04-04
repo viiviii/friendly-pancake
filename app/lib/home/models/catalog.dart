@@ -1,4 +1,4 @@
-import 'package:pancake_app/models/content.dart';
+import 'content.dart';
 
 class Catalog {
   final String title;

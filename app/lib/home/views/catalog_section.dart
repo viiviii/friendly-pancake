@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pancake_app/models/catalog.dart';
-import 'package:pancake_app/models/content.dart';
+import 'package:pancake_app/home/models/catalog.dart';
 import 'package:pancake_app/widgets/hover_slide_image_card.dart';
+
+import '../models/content.dart';
 
 typedef ContentSelected<Content> = void Function(Content selected);
 
@@ -64,6 +65,7 @@ class _Watchlist extends StatelessWidget {
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 300,
         crossAxisSpacing: 15,
+        childAspectRatio: 0.56,
       ),
       itemBuilder: (_, index) {
         return _ContentCard(
