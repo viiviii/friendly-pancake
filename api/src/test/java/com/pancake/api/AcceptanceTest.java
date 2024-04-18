@@ -18,6 +18,7 @@ import java.util.function.BiFunction;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
+import static com.pancake.api.setting.Builders.aEnabledSetting;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -43,10 +44,11 @@ class AcceptanceTest {
         var 컨텐츠_아이디 = 컨텐츠를_등록한다().getId();
         컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.disneyplus.com/video/6e386dd6");
         컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.netflix.com/watch/70106454");
+        시청할_플랫폼을_설정한다("NETFLIX");
 
         //목표
-        var 결과 = 시청할_컨텐츠의("넷플릭스", this::컨텐츠를_시청한다);
-
+        var 결과 = 시청할_컨텐츠의("NETFLIX", this::컨텐츠를_시청한다);
+        
         //결과
         결과.expectAll(
                 컨텐츠를_시청할_수_있는_주소로_이동된다("https://www.netflix.com/watch/70106454")
@@ -60,7 +62,7 @@ class AcceptanceTest {
         컨텐츠를_등록한다();
         컨텐츠를_등록한다();
         var 컨텐츠_아이디 = 컨텐츠를_선택(모든_컨텐츠를_조회한다()).getId();
-        
+
         //목표
         컨텐츠의_이미지를_변경한다(컨텐츠_아이디, "https://some.change.image");
         컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.netflix.com/watch/3X0g0a");
@@ -74,12 +76,12 @@ class AcceptanceTest {
         );
     }
 
-    private ResponseSpec 시청할_컨텐츠의(String platformLabel, BiFunction<Long, String, ResponseSpec> 컨텐츠_시청) {
+    private ResponseSpec 시청할_컨텐츠의(String platformName, BiFunction<Long, String, ResponseSpec> 컨텐츠_시청) {
         var 시청할_컨텐츠 = 시청할_컨텐츠들을_조회한다()
                 .getContents().stream()
                 .findAny().orElseThrow();
         var 시청옵션 = 시청할_컨텐츠.getOptions().stream()
-                .filter(e -> e.getPlatform().label().equals(platformLabel))
+                .filter(e -> e.getPlatform().name().equals(platformName))
                 .findAny().orElseThrow();
 
         return 컨텐츠_시청.apply(시청할_컨텐츠.getId(), 시청옵션.getPlatform().name());
@@ -109,6 +111,16 @@ class AcceptanceTest {
         var request = aStreaming().url(url).build();
 
         client.post().uri("/api/contents/{id}/playbacks", contentId)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(Void.class);
+    }
+
+    private void 시청할_플랫폼을_설정한다(String platformName) {
+        var request = aEnabledSetting().build();
+        client.put().uri("/api/settings/platforms/{name}", platformName)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
