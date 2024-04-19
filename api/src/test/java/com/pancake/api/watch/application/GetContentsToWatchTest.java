@@ -19,7 +19,7 @@ class GetContentsToWatchTest {
     private final GetContentsToWatch getContentsToWatch = new GetContentsToWatch(findWatchContent, findWatchSetting);
 
     @Test
-    void 설정한_플랫폼에서_시청할_수_있는_컨텐츠만_포함된다() {
+    void 설정한_플랫폼에서_시청_가능한_컨텐츠만_포함된다() {
         //given
         var content = mock(WatchContent.class);
         given(findWatchContent.findAll()).willReturn(of(content));
@@ -34,7 +34,7 @@ class GetContentsToWatchTest {
     }
 
     @Test
-    void 설정한_플랫폼에서_시청할_수_없는_컨텐츠는_제외된다() {
+    void 설정한_플랫폼에서_시청_불가능한_컨텐츠는_제외된다() {
         //given
         var content = mock(WatchContent.class);
         given(findWatchContent.findAll()).willReturn(of(content, content, content));
