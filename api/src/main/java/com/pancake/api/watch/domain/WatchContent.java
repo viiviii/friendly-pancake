@@ -1,5 +1,6 @@
 package com.pancake.api.watch.domain;
 
+import com.pancake.api.content.domain.Platform;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,11 +27,14 @@ public class WatchContent {
 
     private List<WatchOption> options;
 
+    // TODO: 너 이거 뺴먹었어
     public boolean isWatched() {
         return this.watched;
     }
 
-    public boolean canWatch() {
-        return !getOptions().isEmpty();
+    public boolean canWatchOnAny(List<Platform> platforms) {
+        return getOptions().stream()
+                .map(WatchOption::getPlatform)
+                .anyMatch(platforms::contains);
     }
 }
