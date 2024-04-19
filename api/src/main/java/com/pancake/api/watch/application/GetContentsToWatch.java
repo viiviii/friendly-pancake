@@ -1,7 +1,7 @@
 package com.pancake.api.watch.application;
 
+import com.pancake.api.watch.domain.FindEnabledPlatforms;
 import com.pancake.api.watch.domain.FindWatchContent;
-import com.pancake.api.watch.domain.WatchContent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,13 +9,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GetContentsToWatch {
 
-    private final FindWatchContent watchContent;
+    private final FindWatchContent contents;
+
+    private final FindEnabledPlatforms settings;
 
     public Catalog query() {
-        final var contents = watchContent.findAll().stream()
-                .filter(WatchContent::canWatch)
+        final var enabledPlatforms = settings.findEnabledPlatforms();
+        final var watchableContents = contents.findAll().stream()
+                .filter(e -> e.canWatchOnAny(enabledPlatforms))
                 .toList();
 
-        return new Catalog(contents);
+        return new Catalog(watchableContents);
     }
 }

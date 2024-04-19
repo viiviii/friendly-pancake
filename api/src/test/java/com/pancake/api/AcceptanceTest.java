@@ -3,6 +3,7 @@ package com.pancake.api;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.watch.application.Catalog;
+import com.pancake.api.watch.domain.WatchContent;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +14,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.ResponseSpecConsumer;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.BiFunction;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.setting.Builders.aEnabledSetting;
+import static java.time.LocalDate.parse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -39,16 +42,15 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자가_컨텐츠를_시청한다() {
+    void 사용자는_컨텐츠를_시청할_수_있다() {
         //준비
         var 컨텐츠_아이디 = 컨텐츠를_등록한다().getId();
         컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.disneyplus.com/video/6e386dd6");
         컨텐츠에_시청주소를_추가한다(컨텐츠_아이디, "https://www.netflix.com/watch/70106454");
-        시청할_플랫폼을_설정한다("NETFLIX");
 
         //목표
         var 결과 = 시청할_컨텐츠의("NETFLIX", this::컨텐츠를_시청한다);
-        
+
         //결과
         결과.expectAll(
                 컨텐츠를_시청할_수_있는_주소로_이동된다("https://www.netflix.com/watch/70106454")
@@ -56,7 +58,25 @@ class AcceptanceTest {
     }
 
     @Test
-    void 내가_컨텐츠를_관리한다() {
+    void 사용자는_원하는_플랫폼의_컨텐츠만_조회할_수_있다() {
+        //given
+        컨텐츠에_시청주소를_추가한다(컨텐츠를_등록한다().getId(), "https://www.disneyplus.com/video/6e386dd6");
+        컨텐츠에_시청주소를_추가한다(컨텐츠를_등록한다().getId(), "https://www.netflix.com/watch/70106454");
+        컨텐츠에_시청주소를_추가한다(컨텐츠를_등록한다().getId(), "https://www.netflix.com/watch/10295049");
+
+        //when
+        시청할_플랫폼을_설정한다("NETFLIX", parse("2099-12-31"));
+        시청할_플랫폼을_설정한다("DISNEY_PLUS", parse("1999-12-31"));
+
+        //then
+        assertThat(시청할_컨텐츠들을_조회한다().getContents())
+                .flatExtracting(WatchContent::getOptions)
+                .allSatisfy(e -> assertThat(e.getPlatform().name()).isEqualTo("NETFLIX"));
+    }
+
+
+    @Test
+    void 나는_컨텐츠를_관리할_수_있다() {
         //준비
         컨텐츠를_등록한다();
         컨텐츠를_등록한다();
@@ -118,8 +138,8 @@ class AcceptanceTest {
                 .expectBody(Void.class);
     }
 
-    private void 시청할_플랫폼을_설정한다(String platformName) {
-        var request = aEnabledSetting().build();
+    private void 시청할_플랫폼을_설정한다(String platformName, LocalDate disableAt) {
+        var request = aEnabledSetting().disabledAt(disableAt).build();
         client.put().uri("/api/settings/platforms/{name}", platformName)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(request)
