@@ -1,4 +1,4 @@
-package com.pancake.api.setting;
+package com.pancake.api.setting.domain;
 
 import com.pancake.api.content.domain.Platform;
 import jakarta.persistence.Entity;

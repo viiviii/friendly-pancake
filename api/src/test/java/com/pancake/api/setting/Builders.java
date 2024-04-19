@@ -1,6 +1,6 @@
 package com.pancake.api.setting;
 
-import com.pancake.api.setting.SettingApiController.EnableRequest;
+import com.pancake.api.setting.api.SettingApiController.EnableRequest;
 import lombok.Builder;
 
 import java.time.LocalDate;

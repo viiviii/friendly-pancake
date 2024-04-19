@@ -1,6 +1,8 @@
-package com.pancake.api.setting;
+package com.pancake.api.setting.application;
 
 import com.pancake.api.content.domain.Platform;
+import com.pancake.api.setting.domain.Setting;
+import com.pancake.api.setting.domain.SettingRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

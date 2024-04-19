@@ -1,5 +1,6 @@
-package com.pancake.api.setting;
+package com.pancake.api.setting.api;
 
+import com.pancake.api.setting.application.SetEnablePlatform;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

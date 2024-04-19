@@ -1,6 +1,7 @@
-package com.pancake.api.setting;
+package com.pancake.api.setting.api;
 
 import com.pancake.api.content.domain.Platform;
+import com.pancake.api.setting.application.SetEnablePlatform;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
