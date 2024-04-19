@@ -27,16 +27,14 @@ public class WatchContent {
 
     private List<WatchOption> options;
 
+    // TODO: 너 이거 뺴먹었어
     public boolean isWatched() {
         return this.watched;
     }
 
-    // TODO: 제거
-    public boolean canWatch() {
-        return !getOptions().isEmpty();
-    }
-
     public boolean canWatchOnAny(List<Platform> platforms) {
-        return true; // TODO
+        return getOptions().stream()
+                .map(WatchOption::getPlatform)
+                .anyMatch(platforms::contains);
     }
 }
