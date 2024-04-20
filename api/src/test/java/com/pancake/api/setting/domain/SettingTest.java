@@ -2,7 +2,7 @@ package com.pancake.api.setting.domain;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SettingTest {
 
     @Test
-    void 비활성화_날짜가_지정되지_않았으면_활성화_상태이다() {
+    void 비활성화_날짜가_지정되지_않았으면_항상_활성화_상태이다() {
         //given
         var given = setting(null);
 
@@ -23,9 +23,9 @@ class SettingTest {
     }
 
     @Test
-    void 오늘이_비활성화_날짜_이전이면_활성화_상태이다() {
+    void 현재_시간이_비활성화_날짜_이전이면_활성화_상태이다() {
         //given
-        var given = setting("2099-12-31");
+        var given = setting("2099-12-31T00:00Z");
 
         //when
         var actual = given.isEnabled();
@@ -35,9 +35,9 @@ class SettingTest {
     }
 
     @Test
-    void 오늘이_비활성화_날짜이거나_이후면_비활성화_상태이다() {
+    void 현재_시간이_비활성화_날짜_이후면_비활성화_상태이다() {
         //given
-        var given = setting("1999-12-31");
+        var given = setting("1999-12-31T00:00Z");
 
         //when
         var actual = given.isEnabled();
@@ -47,14 +47,14 @@ class SettingTest {
     }
 
     private Setting setting(String disableAt) {
-        return new Setting(NETFLIX, parse(disableAt));
+        return new Setting(NETFLIX, disableAt(disableAt));
     }
 
-    private LocalDate parse(String date) {
+    private DisableDateTime disableAt(String date) {
         if (date == null) {
             return null;
         }
-        return LocalDate.parse(date);
+        return new DisableDateTime(ZonedDateTime.parse(date));
     }
 
 }

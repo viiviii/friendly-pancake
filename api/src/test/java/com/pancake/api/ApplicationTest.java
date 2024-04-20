@@ -6,6 +6,7 @@ import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.setting.application.SetEnablePlatform;
+import com.pancake.api.setting.domain.DisableDateTime;
 import com.pancake.api.setting.domain.Setting;
 import com.pancake.api.watch.application.GetContentsToWatch;
 import com.pancake.api.watch.application.GetWatchUrl;
@@ -19,12 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
-import static java.time.LocalDate.parse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
@@ -166,11 +167,15 @@ class ApplicationTest {
         @Test
         void 비활성화_날짜로_플랫폼_활성화를_설정한다() {
             //when
-            setEnablePlatform.command(NETFLIX, parse("2080-09-01"));
+            setEnablePlatform.command(NETFLIX, disableAt("2080-09-01T00:00Z"));
 
             //then
             assertThat(actualBy(NETFLIX, Setting.class))
-                    .returns(parse("2080-09-01"), Setting::getDisableAt);
+                    .returns(disableAt("2080-09-01T00:00Z"), Setting::getDisableAt);
+        }
+
+        private DisableDateTime disableAt(String value) {
+            return new DisableDateTime(ZonedDateTime.parse(value));
         }
     }
 
