@@ -1,11 +1,20 @@
 package com.pancake.api.setting.domain;
 
+import jakarta.persistence.Embeddable;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-class DisableDateTime {
+import static lombok.AccessLevel.PRIVATE;
 
-    private final ZonedDateTime disableAt;
+@Embeddable
+@NoArgsConstructor(access = PRIVATE)
+@EqualsAndHashCode
+public class DisableDateTime {
+
+    private ZonedDateTime disableAt;
 
     public DisableDateTime(ZonedDateTime dateTime) {
         this.disableAt = toUtc(dateTime);

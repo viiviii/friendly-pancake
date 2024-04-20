@@ -59,6 +59,19 @@ class DisableDateTimeTest {
         assertThat(actual).isEqualTo(given.toString());
     }
 
+    @Test
+    void equality() {
+        //given
+        var given = create("2000-01-01T00:00Z");
+        var same = create("2000-01-01T00:00Z");
+        var different = create("2099-12-31T23:59Z");
+
+        //then
+        assertThat(given)
+                .isEqualTo(same).hasSameHashCodeAs(same)
+                .isNotEqualTo(different).doesNotHaveSameHashCodeAs(different);
+    }
+
     private DisableDateTime create(String value) {
         return new DisableDateTime(zoned(value));
     }
