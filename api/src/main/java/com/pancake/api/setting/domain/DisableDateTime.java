@@ -13,18 +13,18 @@ import static lombok.AccessLevel.PRIVATE;
 @EqualsAndHashCode
 public class DisableDateTime {
 
-    private Instant disableAt;
+    private Instant disableFrom;
 
     public DisableDateTime(Instant dateTime) {
-        this.disableAt = dateTime;
+        this.disableFrom = dateTime;
     }
 
     public boolean isAfter(Instant other) {
-        return disableAt.isAfter(other);
+        return disableFrom.isAfter(other);
     }
 
     @Override
     public String toString() {
-        return disableAt.toString();
+        return disableFrom.toString();
     }
 }

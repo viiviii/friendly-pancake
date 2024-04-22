@@ -22,11 +22,11 @@ public class SettingApiController {
 
     @PutMapping("platforms/{platform}")
     public ResponseEntity<Void> enablePlatform(@PathVariable Platform platform, @RequestBody EnableRequest request) {
-        setEnablePlatform.command(platform, new DisableDateTime(request.disabledAt()));
+        setEnablePlatform.command(platform, new DisableDateTime(request.disableFrom()));
 
         return status(NO_CONTENT).build();
     }
 
-    public record EnableRequest(Instant disabledAt) {
+    public record EnableRequest(Instant disableFrom) {
     }
 }

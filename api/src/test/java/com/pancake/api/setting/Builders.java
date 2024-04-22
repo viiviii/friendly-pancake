@@ -13,7 +13,7 @@ public abstract class Builders {
     }
 
     @Builder(builderMethodName = "enableSettingBuilder")
-    private static EnableRequest create(String disabledAt) {
-        return new EnableRequest(Instant.parse(disabledAt));
+    private static EnableRequest create(String disableFrom) {
+        return new EnableRequest(Instant.parse(disableFrom));
     }
 }

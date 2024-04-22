@@ -167,14 +167,14 @@ class ApplicationTest {
         @Test
         void 비활성화_날짜로_플랫폼_활성화를_설정한다() {
             //when
-            setEnablePlatform.command(NETFLIX, disableAt("2080-09-01T00:00:00Z"));
+            setEnablePlatform.command(NETFLIX, disableFrom("2080-09-01T00:00:00Z"));
 
             //then
             assertThat(actualBy(NETFLIX, Setting.class))
-                    .returns(disableAt("2080-09-01T00:00:00Z"), Setting::getDisableAt);
+                    .returns(disableFrom("2080-09-01T00:00:00Z"), Setting::getDisableFrom);
         }
 
-        private DisableDateTime disableAt(String value) {
+        private DisableDateTime disableFrom(String value) {
             return new DisableDateTime(Instant.parse(value));
         }
     }

@@ -46,11 +46,11 @@ class SettingTest {
         assertThat(actual).isFalse();
     }
 
-    private Setting setting(String disableAt) {
-        return new Setting(NETFLIX, disableAt(disableAt));
+    private Setting setting(String disableFrom) {
+        return new Setting(NETFLIX, disableFrom(disableFrom));
     }
 
-    private DisableDateTime disableAt(String date) {
+    private DisableDateTime disableFrom(String date) {
         if (date == null) {
             return null;
         }

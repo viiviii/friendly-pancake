@@ -120,10 +120,10 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private void 플랫폼_활성화_여부를_설정한다(String platformName, String disableAt) {
+    private void 플랫폼_활성화_여부를_설정한다(String platformName, String disableFrom) {
         client.put().uri("/api/settings/platforms/{name}", platformName)
                 .contentType(APPLICATION_JSON)
-                .bodyValue(aEnabledSetting().disabledAt(disableAt).build())
+                .bodyValue(aEnabledSetting().disableFrom(disableFrom).build())
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(Void.class);

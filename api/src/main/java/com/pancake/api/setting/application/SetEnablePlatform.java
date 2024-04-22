@@ -15,9 +15,9 @@ public class SetEnablePlatform {
     private final SettingRepository repository;
 
     @Transactional
-    public void command(Platform platform, DisableDateTime disableAt) {
+    public void command(Platform platform, DisableDateTime disableFrom) {
         var setting = settingWith(platform);
-        setting.disableFrom(disableAt);
+        setting.disableFrom(disableFrom);
     }
 
     private Setting settingWith(Platform platform) {

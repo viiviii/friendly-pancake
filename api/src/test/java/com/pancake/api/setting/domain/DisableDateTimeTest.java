@@ -39,7 +39,8 @@ class DisableDateTimeTest {
 
 
         //then
-        assertThat(actual).isEqualTo(given.toString());
+        assertThat(actual).as("ISO-8601 방식으로 출력된다")
+                .isEqualTo(given.toString());
     }
 
     @Test

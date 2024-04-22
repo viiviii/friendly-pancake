@@ -25,13 +25,13 @@ public class Setting {
     @Enumerated(STRING)
     private Platform platform;
 
-    private DisableDateTime disableAt;
+    private DisableDateTime disableFrom;
 
-    public void disableFrom(DisableDateTime disableAt) {
-        this.disableAt = disableAt;
+    public void disableFrom(DisableDateTime disableFrom) {
+        this.disableFrom = disableFrom;
     }
 
     public boolean isEnabled() {
-        return disableAt == null || disableAt.isAfter(Instant.now()); // TODO
+        return disableFrom == null || disableFrom.isAfter(Instant.now()); // TODO
     }
 }

@@ -28,7 +28,7 @@ class SettingApiControllerTest {
     @Test
     void 비활성화_날짜로_플랫폼_활성화를_설정한다() {
         //given
-        var request = Map.of("disabledAt", "2080-09-01T00:00:00Z");
+        var request = Map.of("disableFrom", "2080-09-01T00:00:00Z");
 
         //when
         var response = client.put()
