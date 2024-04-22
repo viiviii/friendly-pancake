@@ -4,8 +4,7 @@ import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -14,17 +13,13 @@ import static lombok.AccessLevel.PRIVATE;
 @EqualsAndHashCode
 public class DisableDateTime {
 
-    private ZonedDateTime disableAt;
+    private Instant disableAt;
 
-    public DisableDateTime(ZonedDateTime dateTime) {
-        this.disableAt = toUtc(dateTime);
+    public DisableDateTime(Instant dateTime) {
+        this.disableAt = dateTime;
     }
 
-    private ZonedDateTime toUtc(ZonedDateTime dateTime) {
-        return dateTime.withZoneSameInstant(ZoneOffset.UTC);
-    }
-
-    public boolean isAfter(ZonedDateTime other) {
+    public boolean isAfter(Instant other) {
         return disableAt.isAfter(other);
     }
 

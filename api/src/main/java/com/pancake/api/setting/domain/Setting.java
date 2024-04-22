@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import static jakarta.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
@@ -32,6 +32,6 @@ public class Setting {
     }
 
     public boolean isEnabled() {
-        return disableAt == null || disableAt.isAfter(ZonedDateTime.now());
+        return disableAt == null || disableAt.isAfter(Instant.now()); // TODO
     }
 }

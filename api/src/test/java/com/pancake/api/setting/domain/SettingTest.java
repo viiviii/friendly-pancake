@@ -2,7 +2,7 @@ package com.pancake.api.setting.domain;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +25,7 @@ class SettingTest {
     @Test
     void 현재_시간이_비활성화_날짜_이전이면_활성화_상태이다() {
         //given
-        var given = setting("2099-12-31T00:00Z");
+        var given = setting("2099-12-31T00:00:00Z");
 
         //when
         var actual = given.isEnabled();
@@ -37,7 +37,7 @@ class SettingTest {
     @Test
     void 현재_시간이_비활성화_날짜_이후면_비활성화_상태이다() {
         //given
-        var given = setting("1999-12-31T00:00Z");
+        var given = setting("1999-12-31T00:00:00Z");
 
         //when
         var actual = given.isEnabled();
@@ -54,7 +54,7 @@ class SettingTest {
         if (date == null) {
             return null;
         }
-        return new DisableDateTime(ZonedDateTime.parse(date));
+        return new DisableDateTime(Instant.parse(date));
     }
 
 }

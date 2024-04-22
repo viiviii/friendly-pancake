@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static com.pancake.api.content.Builders.aMetadata;
@@ -167,15 +167,15 @@ class ApplicationTest {
         @Test
         void 비활성화_날짜로_플랫폼_활성화를_설정한다() {
             //when
-            setEnablePlatform.command(NETFLIX, disableAt("2080-09-01T00:00Z"));
+            setEnablePlatform.command(NETFLIX, disableAt("2080-09-01T00:00:00Z"));
 
             //then
             assertThat(actualBy(NETFLIX, Setting.class))
-                    .returns(disableAt("2080-09-01T00:00Z"), Setting::getDisableAt);
+                    .returns(disableAt("2080-09-01T00:00:00Z"), Setting::getDisableAt);
         }
 
         private DisableDateTime disableAt(String value) {
-            return new DisableDateTime(ZonedDateTime.parse(value));
+            return new DisableDateTime(Instant.parse(value));
         }
     }
 
