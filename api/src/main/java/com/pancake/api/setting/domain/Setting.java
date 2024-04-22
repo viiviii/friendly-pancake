@@ -31,7 +31,7 @@ public class Setting {
         this.disableFrom = disableFrom;
     }
 
-    public boolean isEnabled() {
-        return disableFrom == null || disableFrom.isAfter(Instant.now()); // TODO
+    public boolean isEnabledAt(Instant other) {
+        return disableFrom == null || disableFrom.isAfter(other);
     }
 }

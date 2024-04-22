@@ -5,6 +5,8 @@ import com.pancake.api.watch.domain.FindWatchContent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class GetContentsToWatch {
@@ -14,7 +16,7 @@ public class GetContentsToWatch {
     private final FindEnabledPlatforms settings;
 
     public Catalog query() {
-        final var enabledPlatforms = settings.findEnabledPlatforms();
+        final var enabledPlatforms = settings.findEnabledPlatformsAt(Instant.now());
         final var watchableContents = contents.findAll().stream()
                 .filter(e -> e.canWatchOnAny(enabledPlatforms))
                 .toList();

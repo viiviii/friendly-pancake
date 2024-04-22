@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -23,7 +24,7 @@ class GetContentsToWatchTest {
         //given
         var content = mock(WatchContent.class);
         given(findWatchContent.findAll()).willReturn(of(content));
-        given(findWatchSetting.findEnabledPlatforms()).willReturn(of(NETFLIX));
+        given(findWatchSetting.findEnabledPlatformsAt(any())).willReturn(of(NETFLIX));
         given(content.canWatchOnAny(of(NETFLIX))).willReturn(true);
 
         //when
@@ -38,7 +39,7 @@ class GetContentsToWatchTest {
         //given
         var content = mock(WatchContent.class);
         given(findWatchContent.findAll()).willReturn(of(content, content, content));
-        given(findWatchSetting.findEnabledPlatforms()).willReturn(of(NETFLIX));
+        given(findWatchSetting.findEnabledPlatformsAt(any())).willReturn(of(NETFLIX));
         given(content.canWatchOnAny(of(NETFLIX))).willReturn(false);
 
         //when
