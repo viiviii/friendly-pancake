@@ -50,11 +50,11 @@ class SettingTest {
         return new Setting(NETFLIX, disableFrom(disableFrom));
     }
 
-    private DisableDateTime disableFrom(String date) {
+    private Instant disableFrom(String date) {
         if (date == null) {
             return null;
         }
-        return new DisableDateTime(Instant.parse(date));
+        return Instant.parse(date);
     }
 
 }

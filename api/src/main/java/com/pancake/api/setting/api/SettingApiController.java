@@ -2,7 +2,6 @@ package com.pancake.api.setting.api;
 
 import com.pancake.api.content.domain.Platform;
 import com.pancake.api.setting.application.SetEnablePlatform;
-import com.pancake.api.setting.domain.DisableDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,7 @@ public class SettingApiController {
 
     @PutMapping("platforms/{platform}")
     public ResponseEntity<Void> enablePlatform(@PathVariable Platform platform, @RequestBody EnableRequest request) {
-        setEnablePlatform.command(platform, new DisableDateTime(request.disableFrom()));
+        setEnablePlatform.command(platform, request.disableFrom());
 
         return status(NO_CONTENT).build();
     }

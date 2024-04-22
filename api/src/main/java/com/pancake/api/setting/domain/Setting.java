@@ -25,9 +25,9 @@ public class Setting {
     @Enumerated(STRING)
     private Platform platform;
 
-    private DisableDateTime disableFrom;
+    private Instant disableFrom;
 
-    public void disableFrom(DisableDateTime disableFrom) {
+    public void setValue(Instant disableFrom) {
         this.disableFrom = disableFrom;
     }
 

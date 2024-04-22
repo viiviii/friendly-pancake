@@ -1,7 +1,6 @@
 package com.pancake.api.setting.api;
 
 import com.pancake.api.setting.application.SetEnablePlatform;
-import com.pancake.api.setting.domain.DisableDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -45,7 +44,7 @@ class SettingApiControllerTest {
         );
     }
 
-    private DisableDateTime disableFrom(String value) {
-        return new DisableDateTime(Instant.parse(value));
+    private Instant disableFrom(String value) {
+        return Instant.parse(value);
     }
 }

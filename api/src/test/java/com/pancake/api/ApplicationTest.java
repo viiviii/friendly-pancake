@@ -6,7 +6,6 @@ import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.setting.application.SetEnablePlatform;
-import com.pancake.api.setting.domain.DisableDateTime;
 import com.pancake.api.setting.domain.Setting;
 import com.pancake.api.watch.application.GetContentsToWatch;
 import com.pancake.api.watch.application.GetWatchUrl;
@@ -174,8 +173,8 @@ class ApplicationTest {
                     .returns(disableFrom("2080-09-01T00:00:00Z"), Setting::getDisableFrom);
         }
 
-        private DisableDateTime disableFrom(String value) {
-            return new DisableDateTime(Instant.parse(value));
+        private Instant disableFrom(String value) {
+            return Instant.parse(value);
         }
     }
 
