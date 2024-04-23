@@ -7,7 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -16,13 +16,12 @@ public class SetEnablePlatform {
     private final SettingRepository repository;
 
     @Transactional
-    public void command(Platform platform, LocalDate disableAt) {
-        var setting = settingWith(platform);
-        setting.disableFrom(disableAt);
+    public void command(Platform platform, Instant disableFrom) {
+        var enablePlatform = getWith(platform);
+        enablePlatform.setValue(disableFrom);
     }
 
-    private Setting settingWith(Platform platform) {
-        return repository.findById(platform)
-                .orElseThrow(IllegalStateException::new);
+    private Setting getWith(Platform platform) {
+        return repository.findById(platform).orElseThrow(IllegalStateException::new);
     }
 }

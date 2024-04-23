@@ -1,9 +1,10 @@
 package com.pancake.api.setting;
 
-import com.pancake.api.setting.api.SettingApiController.EnableRequest;
 import lombok.Builder;
 
-import java.time.LocalDate;
+import java.time.Instant;
+
+import static com.pancake.api.setting.api.SettingApiController.EnableRequest;
 
 public abstract class Builders {
 
@@ -12,7 +13,7 @@ public abstract class Builders {
     }
 
     @Builder(builderMethodName = "enableSettingBuilder")
-    private static EnableRequest create(LocalDate disabledAt) {
-        return new EnableRequest(disabledAt);
+    private static EnableRequest create(String disableFrom) {
+        return new EnableRequest(Instant.parse(disableFrom));
     }
 }

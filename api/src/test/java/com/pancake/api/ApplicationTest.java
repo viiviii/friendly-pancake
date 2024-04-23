@@ -19,12 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.time.Instant;
 import java.util.List;
 
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
-import static java.time.LocalDate.parse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
@@ -166,11 +166,15 @@ class ApplicationTest {
         @Test
         void 비활성화_날짜로_플랫폼_활성화를_설정한다() {
             //when
-            setEnablePlatform.command(NETFLIX, parse("2080-09-01"));
+            setEnablePlatform.command(NETFLIX, disableFrom("2080-09-01T00:00:00Z"));
 
             //then
             assertThat(actualBy(NETFLIX, Setting.class))
-                    .returns(parse("2080-09-01"), Setting::getDisableAt);
+                    .returns(disableFrom("2080-09-01T00:00:00Z"), Setting::getDisableFrom);
+        }
+
+        private Instant disableFrom(String value) {
+            return Instant.parse(value);
         }
     }
 

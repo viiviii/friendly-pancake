@@ -9,10 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import static jakarta.persistence.EnumType.STRING;
-import static java.time.LocalDate.now;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -25,14 +24,14 @@ public class Setting {
     @Id
     @Enumerated(STRING)
     private Platform platform;
-    
-    private LocalDate disableAt;
 
-    public void disableFrom(LocalDate disableAt) {
-        this.disableAt = disableAt;
+    private Instant disableFrom;
+
+    public void setValue(Instant disableFrom) {
+        this.disableFrom = disableFrom;
     }
 
-    public boolean isEnabled() {
-        return disableAt == null || disableAt.isAfter(now());
+    public boolean isEnabledAt(Instant other) {
+        return disableFrom == null || disableFrom.isAfter(other);
     }
 }

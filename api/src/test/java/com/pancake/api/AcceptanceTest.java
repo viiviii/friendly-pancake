@@ -22,7 +22,6 @@ import java.util.function.Function;
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.setting.Builders.aEnabledSetting;
-import static java.time.LocalDate.parse;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -63,8 +62,8 @@ class AcceptanceTest {
         등록된_컨텐츠에(시청주소를_추가한다("https://www.netflix.com/watch/10295049"));
 
         //when
-        플랫폼_활성화_여부를_설정한다("NETFLIX", "2099-12-31");
-        플랫폼_활성화_여부를_설정한다("DISNEY_PLUS", "1999-12-31");
+        플랫폼_활성화_여부를_설정한다("NETFLIX", "2099-12-31T00:00:00Z");
+        플랫폼_활성화_여부를_설정한다("DISNEY_PLUS", "1999-12-31T00:00:00Z");
 
         //then
         then(시청할_컨텐츠_목록의(this::모든_시청_옵션)).are(넷플릭스에서_시청_가능하다());
@@ -121,10 +120,10 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private void 플랫폼_활성화_여부를_설정한다(String platformName, String disableAt) {
+    private void 플랫폼_활성화_여부를_설정한다(String platformName, String disableFrom) {
         client.put().uri("/api/settings/platforms/{name}", platformName)
                 .contentType(APPLICATION_JSON)
-                .bodyValue(aEnabledSetting().disabledAt(parse(disableAt)).build())
+                .bodyValue(aEnabledSetting().disableFrom(disableFrom).build())
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(Void.class);

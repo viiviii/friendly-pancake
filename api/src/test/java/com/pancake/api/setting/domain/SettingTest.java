@@ -2,7 +2,7 @@ package com.pancake.api.setting.domain;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
+import java.time.Instant;
 
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,50 +11,54 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SettingTest {
 
     @Test
-    void 비활성화_날짜가_지정되지_않았으면_활성화_상태이다() {
+    void 비활성화_날짜가_지정되지_않았으면_항상_활성화_상태이다() {
         //given
-        var given = setting(null);
+        var given = create(null);
 
         //when
-        var actual = given.isEnabled();
+        var actual = given.isEnabledAt(instant("2000-01-01T00:00:00Z"));
 
         //then
         assertThat(actual).isTrue();
     }
 
     @Test
-    void 오늘이_비활성화_날짜_이전이면_활성화_상태이다() {
+    void 주어진_시간이_비활성화_날짜_이전이면_활성화_상태이다() {
         //given
-        var given = setting("2099-12-31");
+        var given = create("2000-01-02T00:00:00Z");
 
         //when
-        var actual = given.isEnabled();
+        var actual = given.isEnabledAt(instant("2000-01-01T00:00:00Z"));
 
         //then
         assertThat(actual).isTrue();
     }
 
     @Test
-    void 오늘이_비활성화_날짜이거나_이후면_비활성화_상태이다() {
+    void 주어진_시간이_비활성화_날짜_이후면_비활성화_상태이다() {
         //given
-        var given = setting("1999-12-31");
+        var given = create("2000-01-01T00:00:00Z");
 
         //when
-        var actual = given.isEnabled();
+        var actual = given.isEnabledAt(instant("2000-01-01T00:00:00Z"));
 
         //then
         assertThat(actual).isFalse();
     }
 
-    private Setting setting(String disableAt) {
-        return new Setting(NETFLIX, parse(disableAt));
+    private Setting create(String disableFrom) {
+        return new Setting(NETFLIX, disableFrom(disableFrom));
     }
 
-    private LocalDate parse(String date) {
+    private Instant instant(String datetime) {
+        return Instant.parse(datetime);
+    }
+
+    private Instant disableFrom(String date) {
         if (date == null) {
             return null;
         }
-        return LocalDate.parse(date);
+        return instant(date);
     }
 
 }
