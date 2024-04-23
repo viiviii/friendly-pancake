@@ -10,6 +10,7 @@ import java.time.Clock;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static java.time.Instant.parse;
 import static java.time.ZoneOffset.UTC;
+import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,12 +27,15 @@ class GetContentsToWatchTest {
     private final GetContentsToWatch getContentsToWatch = new GetContentsToWatch(findWatchContent, findEnabledPlatforms, clock);
 
     @Test
-    void 현재_시간을_기준으로_활성화된_플랫폼을_찾는다() {
+    void 현재_시간의_5분_후를_기준으로_활성화된_플랫폼을_찾는다() {
+        //given
+        var expected = clock.instant().plus(5, MINUTES);
+
         //when
         getContentsToWatch.query();
 
         //then
-        then(findEnabledPlatforms).should().findEnabledPlatformsAt(clock.instant());
+        then(findEnabledPlatforms).should().findEnabledPlatformsAt(expected);
     }
 
     @Test
