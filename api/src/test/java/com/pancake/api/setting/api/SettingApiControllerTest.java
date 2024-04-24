@@ -25,6 +25,26 @@ class SettingApiControllerTest {
     WebTestClient client;
 
     @Test
+    void null_값으로_플랫폼_활성화를_설정한다() {
+        //given
+        var request = "{\"disableFrom\": null}";
+
+        //when
+        var response = client.put()
+                .uri("/api/settings/platforms/{name}", NETFLIX)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange();
+
+        //then
+        verify(enablePlatform).command(NETFLIX, disableFrom(null));
+        response.expectAll(
+                spec -> spec.expectStatus().isNoContent(),
+                spec -> spec.expectBody(Void.class)
+        );
+    }
+
+    @Test
     void 비활성화_날짜로_플랫폼_활성화를_설정한다() {
         //given
         var request = Map.of("disableFrom", "2080-09-01T00:00:00Z");
@@ -45,6 +65,9 @@ class SettingApiControllerTest {
     }
 
     private Instant disableFrom(String value) {
+        if (value == null) {
+            return null;
+        }
         return Instant.parse(value);
     }
 }
