@@ -17,6 +17,10 @@ class Platform {
     );
   }
 
+  Map<String, String?> toJson() {
+    return {'disableFrom': disableFrom?.toUtc().toIso8601String()};
+  }
+
   @override
   String toString() {
     return 'Platform{label: $label, name: $name, disableFrom: $disableFrom}';

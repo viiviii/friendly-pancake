@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pancake_app/api/api.dart' as api;
 
 import 'model.dart';
+import 'view_model.dart';
 
 class EnablePlatformSection extends StatelessWidget {
   const EnablePlatformSection({
@@ -10,7 +10,7 @@ class EnablePlatformSection extends StatelessWidget {
     required this.onSettingChanged,
   });
 
-  final List<PlatformSetting> data;
+  final List<Platform> data;
   final VoidCallback onSettingChanged;
 
   @override
@@ -34,9 +34,11 @@ class EnablePlatformSection extends StatelessWidget {
                 shrinkWrap: true,
                 itemCount: data.length,
                 itemBuilder: (_, index) {
-                  return _SettingTile(
-                    onChanged: onSettingChanged,
-                    setting: data[index],
+                  return EnablePlatform(
+                    platform: data[index],
+                    child: _SettingTile(
+                      onChanged: onSettingChanged,
+                    ),
                   );
                 },
               ),
@@ -48,73 +50,53 @@ class EnablePlatformSection extends StatelessWidget {
   }
 }
 
-class _SettingTile extends StatefulWidget {
-  const _SettingTile({required this.setting, required this.onChanged});
+class _SettingTile extends StatelessWidget {
+  const _SettingTile({required this.onChanged});
 
-  final PlatformSetting setting;
   final VoidCallback onChanged;
 
-  @override
-  State<_SettingTile> createState() => _SettingTileState();
-}
-
-class _SettingTileState extends State<_SettingTile> {
-  late bool _enabled;
-  DateTime? _picked;
-
-  @override
-  void initState() {
-    super.initState();
-    _enabled = widget.setting.disableFrom?.isAfter(DateTime.now()) ?? true;
+  Future<void> _onSwitch(bool? value, EnablePlatform platform) async {
+    await platform.enableSwitch(value!);
+    onChanged();
   }
 
-  Future<void> _onSwitch(bool? value) async {
-    setState(() {
-      _enabled = value!;
-      _picked = _enabled ? null : DateTime.now();
-    });
-    await _changeSetting();
-    widget.onChanged();
+  Future<void> _onPickDisableDate(
+      BuildContext context, EnablePlatform platform) async {
+    final disableFrom = await _showDisableDatePicker(
+      context,
+      range: platform.selectableRange,
+      disableFrom: platform.disableFrom,
+    );
+
+    await platform.pick(disableFrom);
+    onChanged();
   }
 
-  Future<void> _showDatePicker() async {
-    _picked = await showDatePicker(
+  Future<DateTime?> _showDisableDatePicker(BuildContext context,
+      {required DateTimeRange range, DateTime? disableFrom}) async {
+    return showDatePicker(
       context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-      initialDate: widget.setting.disableFrom?.toLocal() ??
-          DateTime.now(), // TODO: 버전 올리면 optional
-      currentDate: widget.setting.disableFrom?.toLocal(),
+      firstDate: range.start,
+      lastDate: range.end,
+      initialDate: disableFrom ?? DateTime.now(), // TODO: 버전 올리면 optional
+      currentDate: disableFrom,
       helpText: '비활성화 날짜 선택',
     );
-    if (_picked == null) {
-      return;
-    }
-    await _changeSetting();
-    widget.onChanged();
-  }
-
-  Future<void> _changeSetting() async {
-    final platform = widget.setting.platformName;
-    final disableFrom = _picked?.toUtc().toIso8601String();
-    await api.put('settings/platforms/$platform', body: {
-      'disableFrom': disableFrom,
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final platform = EnablePlatform.of(context);
     return ListTile(
-      enabled: _enabled,
-      selected: _enabled,
-      onTap: _showDatePicker,
-      leading: Text(_enabled ? '👀' : '💤'), // TODO: 이모지 색깔 보이게(버전 올려야됨)
-      title: Text(widget.setting.platformLabel),
-      subtitle: Text(widget.setting.disableFrom?.toLocal().toIso8601String() ??
-          ''), // TODO: 포맷 추가
+      enabled: platform.enabled,
+      selected: platform.enabled,
+      onTap: () => _onPickDisableDate(context, platform),
+      leading: Text(platform.enableMessage), // TODO: 이모지 색깔 보이게(버전 올려야됨)
+      title: Text(platform.label),
+      subtitle: Text(platform.disableMessage),
       trailing: Switch(
-        onChanged: _onSwitch,
-        value: _enabled,
+        onChanged: (enabled) => _onSwitch(enabled, platform),
+        value: platform.enabled,
       ),
     );
   }
