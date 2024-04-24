@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' as api;
 import 'package:pancake_app/content/admin_screen.dart';
 import 'package:pancake_app/home/models/catalog.dart';
+import 'package:pancake_app/setting/setting_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'models/content.dart';
@@ -53,12 +54,28 @@ class _HomeScreenState extends State<HomeScreen> {
     _onLoad();
   }
 
+  Future<void> _goToSetting() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SettingScreen()),
+    );
+
+    _onLoad();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Demo Home Page'),
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: ElevatedButton(
+              onPressed: _goToSetting,
+              child: const Text('설정'),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: ElevatedButton(

@@ -15,9 +15,13 @@ Future<ApiResult<T>> get<T>(String path) async {
   return _process(() => http.get(url(path), headers: _header));
 }
 
+Future<ApiResult<T>> put<T>(String path, {Map<String, Object?>? body}) async {
+  return _process(
+      () => http.put(url(path), headers: _header, body: jsonEncode(body)));
+}
+
 // TODO: body
 Future<ApiResult<T>> patch<T>(String path, {String? body}) async {
-  await http.patch(url(path), headers: _header, body: body);
   return _process(() => http.patch(url(path), headers: _header, body: body));
 }
 
