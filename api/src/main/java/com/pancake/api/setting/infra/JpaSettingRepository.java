@@ -19,6 +19,4 @@ interface JpaSettingRepository extends Repository<Setting, Platform>,
                 .map(Setting::getPlatform)
                 .toList();
     }
-
-    List<Setting> findAll();
 }
