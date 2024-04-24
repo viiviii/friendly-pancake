@@ -1,5 +1,7 @@
 package com.pancake.api.setting.api;
 
+import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
+import com.pancake.api.setting.application.GetPlatformSettings;
 import com.pancake.api.setting.application.SetEnablePlatform;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +10,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 import static com.pancake.api.content.domain.Platform.NETFLIX;
+import static com.pancake.api.setting.Builders.aSetting;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -19,7 +24,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 class SettingApiControllerTest {
 
     @MockBean
-    SetEnablePlatform enablePlatform;
+    SetEnablePlatform setEnablePlatform;
+
+    @MockBean
+    GetPlatformSettings getPlatformSettings;
 
     @Autowired
     WebTestClient client;
@@ -37,7 +45,7 @@ class SettingApiControllerTest {
                 .exchange();
 
         //then
-        verify(enablePlatform).command(NETFLIX, disableFrom(null));
+        verify(setEnablePlatform).command(NETFLIX, disableFrom(null));
         response.expectAll(
                 spec -> spec.expectStatus().isNoContent(),
                 spec -> spec.expectBody(Void.class)
@@ -57,10 +65,27 @@ class SettingApiControllerTest {
                 .exchange();
 
         //then
-        verify(enablePlatform).command(NETFLIX, disableFrom("2080-09-01T00:00:00Z"));
+        verify(setEnablePlatform).command(NETFLIX, disableFrom("2080-09-01T00:00:00Z"));
         response.expectAll(
                 spec -> spec.expectStatus().isNoContent(),
                 spec -> spec.expectBody(Void.class)
+        );
+    }
+
+    @Test
+    void 플랫폼_설정을_조회한다() {
+        //given
+        var setting = aSetting().build();
+        given(getPlatformSettings.query()).willReturn(List.of(setting));
+
+        //when
+        var response = client.get().uri("/api/settings/platforms").exchange();
+
+        //then
+        response.expectAll(
+                spec -> spec.expectStatus().isOk(),
+                spec -> spec.expectBodyList(PlatformSettingResponse.class)
+                        .isEqualTo(List.of(new PlatformSettingResponse(setting)))
         );
     }
 

@@ -2,6 +2,7 @@ package com.pancake.api;
 
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
+import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
 import com.pancake.api.watch.domain.WatchOption;
 import org.assertj.core.api.Condition;
@@ -62,8 +63,8 @@ class AcceptanceTest {
         등록된_컨텐츠에(시청주소를_추가한다("https://www.netflix.com/watch/10295049"));
 
         //when
-        플랫폼_활성화_여부를_설정한다("NETFLIX", null);
-        플랫폼_활성화_여부를_설정한다("DISNEY_PLUS", "1999-12-31T00:00:00Z");
+        플랫폼_설정의(활성화_여부를_설정한다("넷플릭스", null)
+                .andThen(활성화_여부를_설정한다("디즈니플러스", "1999-12-31T00:00:00Z")));
 
         //then
         then(시청할_컨텐츠_목록의(this::모든_시청_옵션)).are(넷플릭스에서_시청_가능하다());
@@ -161,6 +162,16 @@ class AcceptanceTest {
         fn.accept(response);
     }
 
+    private void 플랫폼_설정의(Consumer<List<PlatformSettingResponse>> fn) {
+        var response = client.get().uri("/api/settings/platforms")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBodyList(PlatformSettingResponse.class)
+                .returnResult().getResponseBody();
+
+        fn.accept(response);
+    }
+
     private Consumer<ContentResponse> 시청주소를_추가한다(String url) {
         return content -> client.post().uri("/api/contents/{id}/playbacks", content.getId())
                 .contentType(APPLICATION_JSON)
@@ -177,5 +188,20 @@ class AcceptanceTest {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(Void.class);
+    }
+
+    private Consumer<List<PlatformSettingResponse>> 활성화_여부를_설정한다(String platformLabel, String disableFrom) {
+        return settings -> {
+            var platformName = settings.stream()
+                    .filter(e -> e.platformLabel().equals(platformLabel))
+                    .map(PlatformSettingResponse::platformName)
+                    .findAny().orElseThrow();
+            client.put().uri("/api/settings/platforms/{name}", platformName)
+                    .contentType(APPLICATION_JSON)
+                    .bodyValue(aEnableSetting().disableFrom(disableFrom).build())
+                    .exchange()
+                    .expectStatus().is2xxSuccessful()
+                    .expectBody(Void.class);
+        };
     }
 }
