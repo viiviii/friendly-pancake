@@ -10,7 +10,7 @@ on:
 
 env:
   directory: app
-  flutter-version: 3.7.12
+  flutter-version: 3.19.6
 
 jobs:
   build:
