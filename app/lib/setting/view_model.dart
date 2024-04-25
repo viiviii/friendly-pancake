@@ -24,15 +24,15 @@ class EnablePlatform extends InheritedWidget {
 
   bool get enabled => disableFrom?.isAfter(DateTime.now()) ?? true;
 
-  String get enableMessage => enabled ? '👀' : '💤';
+  String get enableEmoji => enabled ? '👀' : '💤';
 
   // TODO: intl 라이브러리 추가
-  String get disableMessage {
-    final disable = disableFrom;
-    if (!enabled || disable == null) {
-      return '';
+  Text? get disableDateText {
+    final date = disableFrom;
+    if (!enabled || date == null) {
+      return null;
     }
-    return '${disable.year}년 ${disable.month}월 ${disable.day}일부터 비활성화';
+    return Text('${date.year}년 ${date.month}월 ${date.day}일부터 비활성화');
   }
 
   DateTimeRange get selectableRange {

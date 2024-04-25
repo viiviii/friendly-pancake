@@ -78,7 +78,6 @@ class _SettingTile extends StatelessWidget {
       context: context,
       firstDate: range.start,
       lastDate: range.end,
-      initialDate: disableFrom ?? DateTime.now(), // TODO: 버전 올리면 optional
       currentDate: disableFrom,
       helpText: '비활성화 날짜 선택',
     );
@@ -87,16 +86,22 @@ class _SettingTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final platform = EnablePlatform.of(context);
-    return ListTile(
-      enabled: platform.enabled,
-      selected: platform.enabled,
-      onTap: () => _onPickDisableDate(context, platform),
-      leading: Text(platform.enableMessage), // TODO: 이모지 색깔 보이게(버전 올려야됨)
-      title: Text(platform.label),
-      subtitle: Text(platform.disableMessage),
-      trailing: Switch(
-        onChanged: (enabled) => _onSwitch(enabled, platform),
-        value: platform.enabled,
+    return Card(
+      child: ListTile(
+        enabled: platform.enabled,
+        selected: platform.enabled,
+        onTap: () => _onPickDisableDate(context, platform),
+        minVerticalPadding: 16,
+        leading: Text(
+          platform.enableEmoji,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        title: Text(platform.label),
+        subtitle: platform.disableDateText,
+        trailing: Switch(
+          onChanged: (enabled) => _onSwitch(enabled, platform),
+          value: platform.enabled,
+        ),
       ),
     );
   }
