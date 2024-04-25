@@ -91,13 +91,13 @@ class _SettingTile extends StatelessWidget {
         enabled: platform.enabled,
         selected: platform.enabled,
         onTap: () => _onPickDisableDate(context, platform),
+        minVerticalPadding: 16,
         leading: Text(
-          platform.enableMessage,
+          platform.enableEmoji,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         title: Text(platform.label),
-        minVerticalPadding: 8,
-        subtitle: Text(platform.disableMessage),
+        subtitle: platform.disableDateText,
         trailing: Switch(
           onChanged: (enabled) => _onSwitch(enabled, platform),
           value: platform.enabled,

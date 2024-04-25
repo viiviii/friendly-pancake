@@ -51,34 +51,35 @@ void main() {
       );
 
       //when
-      var actual = platform.disableMessage;
+      var actual = platform.disableDateText;
 
       //then
-      expect(actual, equals('2099년 1월 20일부터 비활성화'));
+      expect(actual, isNotNull);
+      expect(actual!.data, equals('2099년 1월 20일부터 비활성화'));
       expect(platform.enabled, isTrue);
     });
 
-    test('현재 활성화 상태이고 비활성화 날짜가 없으면 빈 문자열을 반환한다', () {
+    test('현재 활성화 상태이고 비활성화 날짜가 없으면 위젯을 반환하지 않는다', () {
       //given
       var platform = enablePlatformWith(null);
 
       //when
-      var actual = platform.disableMessage;
+      var actual = platform.disableDateText;
 
       //then
-      expect(actual, isEmpty);
+      expect(actual, isNull);
       expect(platform.enabled, isTrue);
     });
 
-    test('현재 비활성화 상태이면 빈 문자열을 반환한다', () {
+    test('현재 비활성화 상태이면 위젯을 반환하지 않는다', () {
       //given
       var platform = enablePlatformWith(DateTime.parse('2000-01-20 20:18:04Z'));
 
       //when
-      var actual = platform.disableMessage;
+      var actual = platform.disableDateText;
 
       //then
-      expect(actual, isEmpty);
+      expect(actual, isNull);
       expect(platform.enabled, isFalse);
     });
   });
