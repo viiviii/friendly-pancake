@@ -1,7 +1,11 @@
 package com.pancake.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
+import com.pancake.api.content.infra.SearchMovieResult;
+import com.pancake.api.search.SearchContentMetadata;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
 import com.pancake.api.watch.domain.WatchOption;
@@ -10,8 +14,12 @@ import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.ResponseSpecConsumer;
@@ -20,20 +28,27 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.pancake.api.content.Builders.aMetadata;
-import static com.pancake.api.content.Builders.aStreaming;
+import static com.pancake.api.content.Builders.*;
 import static com.pancake.api.setting.Builders.aEnableSetting;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestToUriTemplate;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = "spring.flyway.clean-disabled=false")
+@AutoConfigureMockRestServiceServer
 @SuppressWarnings("NonAsciiCharacters")
 class AcceptanceTest {
 
     @Autowired
     WebTestClient client;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @AfterEach
     void cleanUp(@Autowired Flyway flyway) {
@@ -68,6 +83,27 @@ class AcceptanceTest {
 
         //then
         then(시청할_컨텐츠_목록의(this::모든_시청_옵션)).are(넷플릭스에서_시청_가능하다());
+    }
+
+    @Test
+    void 사용자는_컨텐츠를_검색하고_등록할_수_있다(@Autowired MockServerRestClientCustomizer customizer) {
+        //given
+        외부_API는_모킹한다(customizer.getServer(), aSearchMovieResult().title("포뇨"));
+
+        //when
+        var response = 컨텐츠를_검색한다("포뇨");
+//        컨텐츠를_등록한다("포뇨", "외부_API의_컨텐츠_아이디");
+
+        //then
+//        then(모든_컨텐츠_목록의(this::첫번째를_선택))
+//                .is(제목은("포뇨"));
+    }
+
+    private void 외부_API는_모킹한다(MockRestServiceServer server, SearchMovieResult.Builder builder) {
+        var expect = builder.build();
+        server.expect(requestToUriTemplate("https://api.themoviedb.org/3/search/movie?query={builder}&language=ko", expect.title()))
+                .andExpect(method(GET))
+                .andRespond(withSuccess(asJson(aTmdbPage().result(expect).build()), MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -121,15 +157,6 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private void 플랫폼_활성화_여부를_설정한다(String platformName, String disableFrom) {
-        client.put().uri("/api/settings/platforms/{name}", platformName)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(aEnableSetting().disableFrom(disableFrom).build())
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(Void.class);
-    }
-
     private <T> T 시청할_컨텐츠_목록의(Function<Catalog, T> fn) {
         var response = client.get().uri("/api/watches")
                 .exchange()
@@ -172,6 +199,15 @@ class AcceptanceTest {
         fn.accept(response);
     }
 
+    private SearchContentMetadata.Result 컨텐츠를_검색한다(String title) {
+        return client.get().uri("/api/search/contents?query={title}", title)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(SearchContentMetadata.Result.class)
+                .returnResult().getResponseBody();
+
+    }
+
     private Consumer<ContentResponse> 시청주소를_추가한다(String url) {
         return content -> client.post().uri("/api/contents/{id}/playbacks", content.getId())
                 .contentType(APPLICATION_JSON)
@@ -203,5 +239,13 @@ class AcceptanceTest {
                     .expectStatus().is2xxSuccessful()
                     .expectBody(Void.class);
         };
+    }
+
+    private String asJson(Object object) {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
