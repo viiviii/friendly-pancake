@@ -8,13 +8,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.client.MockRestServiceServer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestToUriTemplate;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RestClientTest(TmdbApiClient.class)
+@RestClientTest(
+        components = TmdbApiClient.class,
+        properties = "api.tmdb.token=test-token")
 @Import(TmdbApiClientConfiguration.class)
 class TmdbApiClientTest {
 
@@ -29,6 +31,7 @@ class TmdbApiClientTest {
         //given
         server.expect(requestToUriTemplate("https://api.themoviedb.org/3/search/movie?query={title}&language=ko", "이웃집 토토로"))
                 .andExpect(method(GET))
+                .andExpect(header(AUTHORIZATION, "Bearer test-token"))
                 .andRespond(withSuccess("""
                         {"page":1,"results":[{"adult":false,"backdrop_path":"/fxYazFVeOCHpHwuqGuiqcCTw162.jpg",
                         "genre_ids":[14,16,10751],"id":8392,"original_language":"ja","original_title":"となりのトトロ",
