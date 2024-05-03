@@ -30,7 +30,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 @SuppressWarnings("NonAsciiCharacters")
 @SpringBootTest(webEnvironment = NONE)
-@TestPropertySource(properties = "spring.flyway.clean-disabled=false")
+@TestPropertySource(properties = {"spring.flyway.clean-disabled=false", "api.tmdb.token=test-token"})
 class ApplicationTest {
 
     @Autowired

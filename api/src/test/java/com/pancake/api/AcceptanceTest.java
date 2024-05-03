@@ -39,7 +39,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@TestPropertySource(properties = "spring.flyway.clean-disabled=false")
+@TestPropertySource(properties = {"spring.flyway.clean-disabled=false", "api.tmdb.token=test-token"})
 @AutoConfigureMockRestServiceServer
 @SuppressWarnings("NonAsciiCharacters")
 class AcceptanceTest {
