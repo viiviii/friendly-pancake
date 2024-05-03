@@ -1,10 +1,9 @@
 package com.pancake.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
-import com.pancake.api.content.infra.SearchMovieResult;
+import com.pancake.api.content.infra.MockTmdbServerConfiguration;
+import com.pancake.api.content.infra.MockTmdbServerConfiguration.TmdbMockServer;
 import com.pancake.api.search.SearchContentMetadata;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
@@ -14,12 +13,9 @@ import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
-import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec.ResponseSpecConsumer;
@@ -32,23 +28,16 @@ import static com.pancake.api.content.Builders.*;
 import static com.pancake.api.setting.Builders.aEnableSetting;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestToUriTemplate;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @TestPropertySource(properties = {"spring.flyway.clean-disabled=false", "api.tmdb.token=test-token"})
-@AutoConfigureMockRestServiceServer
+@Import(MockTmdbServerConfiguration.class)
 @SuppressWarnings("NonAsciiCharacters")
 class AcceptanceTest {
 
     @Autowired
     WebTestClient client;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     @AfterEach
     void cleanUp(@Autowired Flyway flyway) {
@@ -86,9 +75,12 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자는_컨텐츠를_검색하고_등록할_수_있다(@Autowired MockServerRestClientCustomizer customizer) {
+    void 사용자는_컨텐츠를_검색하고_등록할_수_있다(@Autowired TmdbMockServer mock) {
         //given
-        외부_API는_모킹한다(customizer.getServer(), aSearchMovieResult().title("포뇨"));
+        mock.request("/search/movie?query={q}&language=ko", "포뇨")
+                .willReturn(aTmdbPage()
+                        .result(aSearchMovieResult().title("포뇨").build())
+                        .build());
 
         //when
         var response = 컨텐츠를_검색한다("포뇨");
@@ -99,12 +91,6 @@ class AcceptanceTest {
 //                .is(제목은("포뇨"));
     }
 
-    private void 외부_API는_모킹한다(MockRestServiceServer server, SearchMovieResult.Builder builder) {
-        var expect = builder.build();
-        server.expect(requestToUriTemplate("https://api.themoviedb.org/3/search/movie?query={builder}&language=ko", expect.title()))
-                .andExpect(method(GET))
-                .andRespond(withSuccess(asJson(aTmdbPage().result(expect).build()), MediaType.APPLICATION_JSON));
-    }
 
     @Test
     void 나는_컨텐츠를_관리할_수_있다() {
@@ -241,11 +227,4 @@ class AcceptanceTest {
         };
     }
 
-    private String asJson(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
