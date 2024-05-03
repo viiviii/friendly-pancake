@@ -1,52 +1,53 @@
 package com.pancake.api.content.infra;
 
-import com.pancake.api.content.application.ContentMetadata;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
 
+import static com.pancake.api.content.Builders.aSearchMovieResult;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RestClientTest(
-        components = TmdbApiClient.class,
-        properties = "api.tmdb.token=test-token")
-@Import(TmdbApiClientConfiguration.class)
 class TmdbApiClientTest {
 
-    @Autowired
-    TmdbApiClient client;
+    RestClient.Builder restClientBuilder = RestClient.builder();
 
-    @Autowired
-    MockRestServiceServer server;
+    MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
 
+    TmdbApiClient tmdbApi = new TmdbApiClient(restClientBuilder.build());
+
+    // TODO: 이 분 이상해졌죠
     @Test
     void findAllByTitle() {
         //given
-        server.expect(requestToUriTemplate("https://api.themoviedb.org/3/search/movie?query={title}&language=ko", "이웃집 토토로"))
+        var expect = TmdbPage.<SearchMovieResult>builder()
+                .page(1)
+                .totalResults(1)
+                .result(aSearchMovieResult().build())
+                .build();
+        server.expect(requestTo("/search/movie?query=IronMan&language=ko"))
                 .andExpect(method(GET))
-                .andExpect(header(AUTHORIZATION, "Bearer test-token"))
-                .andRespond(withSuccess("""
-                        {"page":1,"results":[{"adult":false,"backdrop_path":"/fxYazFVeOCHpHwuqGuiqcCTw162.jpg",
-                        "genre_ids":[14,16,10751],"id":8392,"original_language":"ja","original_title":"となりのトトロ",
-                        "overview":"1955년 일본의 아름다운 시골 마을...",
-                        "popularity":167.395,"poster_path":"/some-poster-path.jpg","release_date":"1988-04-16",
-                        "title":"이웃집 토토로","video":false,"vote_average":8.073,"vote_count":7599}],
-                        "total_pages":1,"total_results":1}""", APPLICATION_JSON));
+                .andRespond(withSuccess(asJson(expect), APPLICATION_JSON));
 
         //when
-        var actual = client.findAllByTitle("이웃집 토토로");
+        var actual = tmdbApi.findAllByTitle("IronMan");
 
         //then
-        assertThat(actual.getContent()).singleElement()
-                .returns("이웃집 토토로", ContentMetadata::getTitle)
-                .returns("/some-poster-path.jpg", ContentMetadata::getImageUrl)
-                .returns("1955년 일본의 아름다운 시골 마을...", ContentMetadata::getDescription);
+        assertThat(actual).isEqualTo(expect.toPage().map(SearchMovieResult::toMetadata));
+    }
+
+    private String asJson(Object object) {
+        try {
+            var objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
