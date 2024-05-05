@@ -18,31 +18,31 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class MockTmdbServerConfiguration {
 
     @Bean
-    MockServerRestClientCustomizer mockTmdbServerCustomizer() {
+    MockServerRestClientCustomizer mockServerRestClientCustomizer() {
         return new MockServerRestClientCustomizer();
     }
 
     @Bean
-    TmdbMockServer mockTmdbServer(MockServerRestClientCustomizer mockTmdbServerCustomizer, ObjectMapper objectMapper) {
-        return new TmdbMockServer(mockTmdbServerCustomizer, objectMapper);
+    MockTmdbServer mockTmdbServer(MockServerRestClientCustomizer customizer) {
+        return new MockTmdbServer(customizer.getServer());
     }
 
-    public static final class TmdbMockServer {
+    public static final class MockTmdbServer {
 
         private final MockRestServiceServer server;
         private final ObjectMapper objectMapper;
         private ResponseActions actions;
 
-        public TmdbMockServer(MockServerRestClientCustomizer customizer, ObjectMapper objectMapper) {
-            this.server = customizer.getServer();
-            this.objectMapper = objectMapper.copy().setPropertyNamingStrategy(SNAKE_CASE);
+        public MockTmdbServer(MockRestServiceServer server) {
+            this.server = server;
+            this.objectMapper = new ObjectMapper().setPropertyNamingStrategy(SNAKE_CASE);
         }
 
-        public TmdbMockServer request(String path, Object... uriVars) {
+        public MockTmdbServer request(String path, Object... uriVars) {
             actions = server.expect(requestToUriTemplate(format("https://api.themoviedb.org/3/%s", path), uriVars));
             return this;
         }
-        
+
         public void willReturn(Object body) {
             actions.andRespond(withSuccess()
                     .contentType(APPLICATION_JSON)

@@ -3,7 +3,7 @@ package com.pancake.api;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.content.infra.MockTmdbServerConfiguration;
-import com.pancake.api.content.infra.MockTmdbServerConfiguration.TmdbMockServer;
+import com.pancake.api.content.infra.MockTmdbServerConfiguration.MockTmdbServer;
 import com.pancake.api.search.SearchContentMetadata;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
@@ -75,9 +75,9 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자는_컨텐츠를_검색하고_등록할_수_있다(@Autowired TmdbMockServer mock) {
+    void 사용자는_컨텐츠를_검색하고_등록할_수_있다(@Autowired MockTmdbServer mock) {
         //given
-        mock.request("/search/movie?query={q}&language=ko", "포뇨")
+        mock.request("/search/movie?query={title}&language=ko", "포뇨")
                 .willReturn(aTmdbPage()
                         .result(aSearchMovieResult().title("포뇨").build())
                         .build());
