@@ -1,4 +1,4 @@
-package com.pancake.api.content.infra;
+package com.pancake.api.content.infra.api;
 
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SuppressWarnings("NonAsciiCharacters")
 class TmdbPageTest {
-    
+
     @Test
     void 다음_페이지가_없을_때() {
         //given

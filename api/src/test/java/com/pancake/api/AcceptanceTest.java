@@ -2,8 +2,8 @@ package com.pancake.api;
 
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
-import com.pancake.api.content.infra.MockTmdbServerConfiguration;
-import com.pancake.api.content.infra.MockTmdbServerConfiguration.MockTmdbServer;
+import com.pancake.api.content.infra.api.MockTmdbServerConfiguration;
+import com.pancake.api.content.infra.api.MockTmdbServerConfiguration.MockTmdbServer;
 import com.pancake.api.search.SearchContentMetadata;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
@@ -79,7 +79,7 @@ class AcceptanceTest {
         //given
         mock.request("/search/movie?query={title}&language=ko", "포뇨")
                 .willReturn(aTmdbPage()
-                        .result(aSearchMovieResult().title("포뇨").build())
+                        .result(aTmdbMovie().title("포뇨").build())
                         .build());
 
         //when

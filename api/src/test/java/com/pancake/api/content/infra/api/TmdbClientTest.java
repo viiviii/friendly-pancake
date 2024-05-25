@@ -1,4 +1,4 @@
-package com.pancake.api.content.infra;
+package com.pancake.api.content.infra.api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,9 +13,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @SuppressWarnings("NonAsciiCharacters")
-class TmdbApiClientTest {
+class TmdbClientTest {
 
-    TmdbApiClient client;
+    TmdbClient client;
 
     MockRestServiceServer server;
 
@@ -27,9 +27,9 @@ class TmdbApiClientTest {
         client = HttpServiceProxyFactory
                 .builderFor(RestClientAdapter.create(builder.build()))
                 .build()
-                .createClient(TmdbApiClient.class);
+                .createClient(TmdbClient.class);
     }
-    
+
     @Test
     void 제목으로_영화를_검색한다() {
         //given

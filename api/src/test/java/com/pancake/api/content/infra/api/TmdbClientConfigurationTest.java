@@ -1,4 +1,4 @@
-package com.pancake.api.content.infra;
+package com.pancake.api.content.infra.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +13,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RestClientTest(components = TmdbApiClientConfiguration.class, properties = "api.tmdb.token=test-token")
+@RestClientTest(components = TmdbClientConfiguration.class, properties = "api.tmdb.token=test-token")
 @SuppressWarnings("NonAsciiCharacters")
-class TmdbApiClientConfigurationTest {
+class TmdbClientConfigurationTest {
 
     @Autowired
-    TmdbApiClient client;
+    TmdbClient client;
 
     @Autowired
     MockRestServiceServer server;
@@ -66,7 +66,7 @@ class TmdbApiClientConfigurationTest {
         assertThat(actual.totalPages()).isEqualTo(1);
     }
 
-    private TmdbPage<SearchMovieResult> clientExchange() {
+    private TmdbPage<TmdbMovie> clientExchange() {
         return client.searchMoviesBy("SomeTitle");
     }
 }

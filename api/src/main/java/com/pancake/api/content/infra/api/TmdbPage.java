@@ -1,4 +1,4 @@
-package com.pancake.api.content.infra;
+package com.pancake.api.content.infra.api;
 
 import lombok.Builder;
 import lombok.Singular;

@@ -4,8 +4,8 @@ import com.pancake.api.content.application.ContentMetadata;
 import com.pancake.api.content.application.ContentStreaming;
 import com.pancake.api.content.domain.Platform;
 import com.pancake.api.content.domain.Playback;
-import com.pancake.api.content.infra.SearchMovieResult;
-import com.pancake.api.content.infra.TmdbPage;
+import com.pancake.api.content.infra.api.TmdbMovie;
+import com.pancake.api.content.infra.api.TmdbPage;
 import lombok.Builder;
 
 import java.util.List;
@@ -38,8 +38,8 @@ public abstract class Builders {
                 .totalResults(1);
     }
 
-    public static SearchMovieResult.Builder aSearchMovieResult() {
-        return SearchMovieResult.builder()
+    public static TmdbMovie.Builder aTmdbMovie() {
+        return TmdbMovie.builder()
                 .adult(false)
                 .backdropPath("/fxYazFVeOCHpHwu.jpg")
                 .genreIds(List.of(14, 16, 10751))

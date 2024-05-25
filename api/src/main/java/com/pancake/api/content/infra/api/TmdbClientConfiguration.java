@@ -1,4 +1,4 @@
-package com.pancake.api.content.infra;
+package com.pancake.api.content.infra.api;
 
 
 import org.springframework.beans.factory.annotation.Value;
@@ -23,11 +23,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.util.UriComponentsBuilder.fromUri;
 
 @Configuration(proxyBeanMethods = false)
-class TmdbApiClientConfiguration {
+class TmdbClientConfiguration {
 
     // TODO: error status code 처리
     @Bean
-    TmdbApiClient tmdbApiClient(RestClient.Builder client, @Value("${api.tmdb.token}") String token, Jackson2ObjectMapperBuilder objectMapper) {
+    TmdbClient tmdbApiClient(RestClient.Builder client, @Value("${api.tmdb.token}") String token, Jackson2ObjectMapperBuilder objectMapper) {
         return createFrom(client
                 .requestInitializer(setRequiredHeadersWith(token))
                 .requestInterceptor(addLanguageQuery())
@@ -35,11 +35,11 @@ class TmdbApiClientConfiguration {
         );
     }
 
-    private TmdbApiClient createFrom(RestClient.Builder client) {
+    private TmdbClient createFrom(RestClient.Builder client) {
         return HttpServiceProxyFactory
                 .builderFor(RestClientAdapter.create(client.build()))
                 .build()
-                .createClient(TmdbApiClient.class);
+                .createClient(TmdbClient.class);
     }
 
     private ClientHttpRequestInitializer setRequiredHeadersWith(String token) {
