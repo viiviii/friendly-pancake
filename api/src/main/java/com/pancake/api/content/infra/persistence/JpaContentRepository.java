@@ -1,4 +1,4 @@
-package com.pancake.api.content.infra;
+package com.pancake.api.content.infra.persistence;
 
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.ContentRepository;
