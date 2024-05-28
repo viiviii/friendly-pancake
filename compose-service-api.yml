@@ -3,7 +3,9 @@ services:
     image: ghcr.io/viiviii/friendly-pancake-api:0.2421.12
     secrets:
       - source: spring_datasource_properties
-        target: /application.properties
+        target: /config/database/application.properties
+      - source: tmdb_api_properties
+        target: /config/tmdb/application.properties
     healthcheck:
       test: curl -f localhost:8080/actuator/health
       #      interval: 1m
@@ -16,3 +18,5 @@ services:
 secrets:
   spring_datasource_properties:
     environment: spring_datasource_properties
+  tmdb_api_properties:
+    environment: tmdb_api_properties
