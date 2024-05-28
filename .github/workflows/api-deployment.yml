@@ -41,6 +41,7 @@ jobs:
         if: steps.current.outputs.id == null
         env:
           spring_datasource_properties: ${{ secrets.SPRING_DATASOURCE_PROPERTIES }}
+          tmdb_api_properties: ${{ secrets.TMDB_API_PROPERTIES }}
         run: docker compose up --wait --build --detach
 
       - name: '🚀 Deploy newly api service'
@@ -48,6 +49,7 @@ jobs:
         id: newly
         env:
           spring_datasource_properties: ${{ secrets.SPRING_DATASOURCE_PROPERTIES }}
+          tmdb_api_properties: ${{ secrets.TMDB_API_PROPERTIES }}
         run: docker compose up --wait --build --detach --remove-orphans --no-recreate --scale api=2 api
 
       - name: '🔄 Reload nginx'
