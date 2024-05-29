@@ -7,14 +7,3 @@ spring:
 
 server:
   shutdown: graceful
-
----
-
-spring:
-  config.activate.on-profile: local
-  jpa:
-    properties:
-      hibernate.format_sql: true
-logging:
-  level:
-    org.hibernate.SQL: debug # SQL logger 통해 출력
