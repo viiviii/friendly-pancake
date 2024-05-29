@@ -8,12 +8,14 @@ in-memory db로 실행하는 예시
 
 ```
 export spring_datasource_properties="\
-spring.datasource.url=jdbc:h2:mem:test \
-spring.datasource.username=sa \
-spring.datasource.password="
+spring.datasource.url=jdbc:h2:mem:test
+spring.datasource.username=sa
+spring.datasource.password=
+"
 
 export tmdb_api_properties="\
-api.tmdb.token=$ACCESS_TOKEN"
+api.tmdb.token=$ACCESS_TOKEN
+"
 ```
 
 
