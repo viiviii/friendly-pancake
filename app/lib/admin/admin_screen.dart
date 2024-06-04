@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' as api;
-import 'package:pancake_app/content/content_list_view_section.dart';
 import 'package:pancake_app/widgets/my_future_builder.dart';
 import 'package:pancake_app/widgets/my_simple_dialog.dart';
 
-import 'content_edit_section.dart';
-import 'content_save_section.dart';
-import 'model.dart';
+import 'models/metadata.dart';
+import 'views/content_edit_section.dart';
+import 'views/content_list_view_section.dart';
+import 'views/content_save_section.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({Key? key}) : super(key: key);

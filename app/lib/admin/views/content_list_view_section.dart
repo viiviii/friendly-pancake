@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/widgets/hover_slide_image_card.dart';
 
-import 'model.dart';
+import '../models/metadata.dart';
 
 typedef ContentSelected<ContentMetadata> = void Function(
     ContentMetadata content);
