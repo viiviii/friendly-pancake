@@ -20,6 +20,6 @@ class ContentMetadataAdapter implements FindContentMetadata {
     }
 
     private ContentMetadata toMetadata(TmdbMovie movie) {
-        return new ContentMetadata(movie.title(), movie.overview(), movie.posterPath());
+        return new ContentMetadata(movie.title(), movie.originalTitle(), movie.overview(), movie.posterUrl(), movie.releaseDate());
     }
 }
