@@ -5,7 +5,8 @@ import 'package:pancake_app/widgets/my_future_builder.dart';
 import 'package:pancake_app/widgets/my_simple_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'model.dart';
+import '../models/metadata.dart';
+import '../models/streaming.dart';
 
 class ContentEditSection extends StatefulWidget {
   const ContentEditSection({super.key, required this.content});
