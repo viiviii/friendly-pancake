@@ -23,8 +23,8 @@ public class MockTmdbServerConfiguration {
     }
 
     @Bean
-    MockTmdbServer mockTmdbServer(MockServerRestClientCustomizer customizer) {
-        return new MockTmdbServer(customizer.getServer());
+    MockTmdbServer mockTmdbServer(MockServerRestClientCustomizer customizer, ObjectMapper objectMapper) {
+        return new MockTmdbServer(customizer.getServer(), objectMapper);
     }
 
     public static final class MockTmdbServer {
@@ -33,9 +33,9 @@ public class MockTmdbServerConfiguration {
         private final ObjectMapper objectMapper;
         private ResponseActions actions;
 
-        public MockTmdbServer(MockRestServiceServer server) {
+        public MockTmdbServer(MockRestServiceServer server, ObjectMapper objectMapper) {
             this.server = server;
-            this.objectMapper = new ObjectMapper().setPropertyNamingStrategy(SNAKE_CASE);
+            this.objectMapper = objectMapper.setPropertyNamingStrategy(SNAKE_CASE);
         }
 
         public MockTmdbServer request(String path, Object... uriVars) {
