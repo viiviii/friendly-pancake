@@ -8,6 +8,7 @@ import com.pancake.api.content.infra.api.TmdbMovie;
 import com.pancake.api.content.infra.api.TmdbPage;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.pancake.api.content.domain.Platform.NETFLIX;
@@ -47,7 +48,9 @@ public abstract class Builders {
                 .originalLanguage("ja")
                 .originalTitle("となりのトトロ")
                 .overview("1955년 일본의 아름다운 시골 마을, 상냥하고 의젓한 11살 사츠키와 장난꾸러기에 호기심 많은 4살의 메이...")
+                .popularity(0.601f)
                 .posterPath("/c9zCkL0rTkNQ1HB9c.jpg")
+                .releaseDate(LocalDate.of(2099, 12, 29))
                 .title("이웃집 토토로")
                 .video(false)
                 .voteAverage(8.073f)
@@ -56,7 +59,7 @@ public abstract class Builders {
 
     @Builder(builderMethodName = "contentMetadata")
     private static ContentMetadata create(String title, String description, String imageUrl) {
-        return new ContentMetadata(title, description, imageUrl);
+        return new ContentMetadata(title, "original title", description, imageUrl, LocalDate.of(2099, 12, 31));
     }
 
     @Builder(builderMethodName = "contentStreaming")
