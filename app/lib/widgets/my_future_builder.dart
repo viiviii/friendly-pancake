@@ -9,7 +9,7 @@ class MyFutureBuilder<T> extends StatelessWidget {
     required this.builder,
   });
 
-  final Future<T> future;
+  final Future<T>? future;
   final WidgetBuilder<T> builder;
 
   @override
