@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/admin/admin_screen.dart';
 import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/content/content_screen.dart';
 import 'package:pancake_app/home/models/catalog.dart';
 import 'package:pancake_app/setting/setting_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -45,6 +46,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _onLoad();
   }
 
+  Future<void> _goToContent() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ContentScreen()),
+    );
+
+    _onLoad();
+  }
+
   Future<void> _goToAdmin() async {
     await Navigator.push(
       context,
@@ -69,6 +79,13 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Flutter Demo Home Page'),
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: ElevatedButton(
+              onPressed: _goToContent,
+              child: const Text('컨텐츠'),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: ElevatedButton(
