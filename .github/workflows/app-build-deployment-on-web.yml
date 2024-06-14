@@ -39,7 +39,7 @@ jobs:
         with:
           flutter-version: ${{ env.flutter-version }}
           channel: stable
-          flutter-version-file: pubspec.yaml # path to pubspec.yaml
+          flutter-version-file: ${{ env.directory }}/pubspec.yaml
 
       - name: '✅ Check tests pass'
         working-directory: ${{ env.directory }}
