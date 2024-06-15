@@ -10,7 +10,7 @@ extension MyTestGesture on WidgetController {
   }
 }
 
-/// 👀 https://github.com/flutter/flutter/blob/3.7.12/packages/flutter/test/painting/image_test_utils.dart
+/// 👀 https://github.com/flutter/flutter/blob/3.22.0/packages/flutter/test/painting/image_test_utils.dart
 class TestImageProvider extends ImageProvider<TestImageProvider> {
   const TestImageProvider(this.image);
 
@@ -22,8 +22,8 @@ class TestImageProvider extends ImageProvider<TestImageProvider> {
   }
 
   @override
-  ImageStreamCompleter loadBuffer(
-      TestImageProvider key, DecoderBufferCallback decode) {
+  ImageStreamCompleter loadImage(
+      TestImageProvider key, ImageDecoderCallback decode) {
     return OneFrameImageStreamCompleter(
       SynchronousFuture<ImageInfo>(ImageInfo(image: image)),
     );

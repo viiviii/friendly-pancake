@@ -84,12 +84,11 @@ class _ContentSaveSectionState extends State<ContentSaveSection> {
 
 class _ContentInputField extends StatelessWidget {
   const _ContentInputField({
-    Key? key,
     required this.icon,
     required this.labelText,
     required this.hintText,
     required this.onSaved,
-  }) : super(key: key);
+  });
 
   final Icon icon;
   final String labelText;

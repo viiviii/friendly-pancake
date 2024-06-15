@@ -9,7 +9,7 @@ import 'views/content_list_view_section.dart';
 import 'views/content_save_section.dart';
 
 class AdminScreen extends StatefulWidget {
-  const AdminScreen({Key? key}) : super(key: key);
+  const AdminScreen({super.key});
 
   @override
   State<AdminScreen> createState() => _AdminScreenState();

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 
 class HoverSlideImageCard extends StatefulWidget {
   const HoverSlideImageCard({
-    Key? key,
+    super.key,
     required this.image,
     required this.onTap,
     this.errorBuilder,
     this.overlayWidget,
-  }) : super(key: key);
+  });
 
   final ImageProvider image;
   final GestureTapCallback onTap;
