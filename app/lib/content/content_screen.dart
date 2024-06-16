@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pancake_app/api/api.dart' show api;
 
 import 'view_models/content_search_view_model.dart';
 import 'views/content_search_bar_section.dart';
@@ -12,7 +13,7 @@ class ContentScreen extends StatefulWidget {
 }
 
 class _ContentScreenState extends State<ContentScreen> {
-  final SearchViewModel _viewModel = SearchViewModel();
+  final SearchViewModel _viewModel = SearchViewModel(api);
   Future<SearchResult>? _searchResult;
 
   void onSearched(String query) {

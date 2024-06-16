@@ -1,7 +1,10 @@
-import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/api/api.dart' show Api;
 import 'package:pancake_app/content/models/content_search_model.dart';
 
 class SearchViewModel {
+  SearchViewModel(this._api);
+
+  final Api _api;
   SearchResult? _current = const SearchResult.empty();
 
   Future<SearchResult>? searchBy(String query) {
@@ -21,7 +24,7 @@ class SearchViewModel {
   }
 
   Future<SearchResponse> _fetch(String query) async {
-    final response = await api.get('search/contents?query=$query');
+    final response = await _api.get('search/contents?query=$query');
 
     return SearchResponse(response.body!);
   }

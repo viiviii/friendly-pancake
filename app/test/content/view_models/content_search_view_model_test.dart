@@ -1,9 +1,63 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:pancake_app/api/api.dart' show Api;
 import 'package:pancake_app/content/view_models/content_search_view_model.dart';
 
 const minutes1 = Duration(minutes: 1);
 
 void main() {
+  group('api 호출', () {
+    test('쿼리가 빈 값이면 호출하지 않는다', () async {
+      //given
+      var count = 0;
+      var viewModel = SearchViewModel(Api(
+        baseUrl: '',
+        client: MockClient(whenRequest(() => count += 1)),
+      ));
+
+      //when
+      await viewModel.searchBy('');
+
+      //then
+      expect(count, equals(0));
+    });
+
+    test('쿼리가 이전 쿼리와 같으면 호출하지 않는다', () async {
+      //given
+      var count = 0;
+      var viewModel = SearchViewModel(Api(
+        baseUrl: '',
+        client: MockClient(whenRequest(() => count += 1)),
+      ));
+
+      //when
+      await viewModel.searchBy('path');
+      await viewModel.searchBy('path');
+
+      //then
+      expect(count, 1);
+    });
+
+    test('쿼리가 이전 쿼리와 같지 않으면 호출한다', () async {
+      //given
+      var count = 0;
+      var viewModel = SearchViewModel(Api(
+        baseUrl: '',
+        client: MockClient(whenRequest(() => count += 1)),
+      ));
+
+      //when
+      await viewModel.searchBy('path1');
+      await viewModel.searchBy('path2');
+
+      //then
+      expect(count, 2);
+    });
+  });
+
   group('검색 결과 메시지', () {
     test('결과가 없는 경우 메시지를 반환한다', () {
       expect(
@@ -70,4 +124,11 @@ class _DisplayTitle with DisplayTitle {
   _DisplayTitle({required this.title, this.originalTitle = ''});
 
   String call() => displayTitle;
+}
+
+MockClientHandler whenRequest(Function fn) {
+  return (_) async {
+    fn();
+    return http.Response(json.encode({'hasNext': false, 'contents': []}), 200);
+  };
 }
