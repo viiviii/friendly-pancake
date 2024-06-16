@@ -71,14 +71,11 @@ mixin SearchResultMessage<T> {
   List<T> get data;
 
   String? get searchResultMessage {
-    if (data.isEmpty) {
-      return '"$query"에 대한 검색 결과가 없습니다.';
-    }
-    if (hasMore) {
-      return '💡 이외 더 많은 검색 결과가 있습니다. 더 자세한 검색어를 사용해 보세요!';
-    }
-
-    return null;
+    return switch (this) {
+      _ when data.isEmpty => '"$query"에 대한 검색 결과가 없습니다.',
+      _ when hasMore => '💡 이외 더 많은 검색 결과가 있습니다. 더 자세한 검색어를 사용해 보세요!',
+      _ => null,
+    };
   }
 }
 
@@ -87,10 +84,9 @@ mixin DisplayTitle {
   String get originalTitle;
 
   String get displayTitle {
-    if (title == originalTitle) {
-      return title;
-    }
-
-    return '$title ($originalTitle)';
+    return switch (this) {
+      _ when title == originalTitle => title,
+      _ => '$title ($originalTitle)',
+    };
   }
 }
