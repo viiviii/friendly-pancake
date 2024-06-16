@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/api/api.dart' show api;
 
 import 'model.dart';
 

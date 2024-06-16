@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/api/api.dart' show api, ApiResult;
 import 'package:pancake_app/widgets/my_future_builder.dart';
 import 'package:pancake_app/widgets/my_simple_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -116,7 +116,7 @@ class _ContentEditSectionState extends State<ContentEditSection> {
     );
   }
 
-  Future<api.ApiResult> _savePlayback(String playbackUrl) async {
+  Future<ApiResult> _savePlayback(String playbackUrl) async {
     return await api.post(
       'contents/${widget.content.id}/playbacks',
       body: {
