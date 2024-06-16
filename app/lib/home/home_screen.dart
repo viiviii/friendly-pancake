@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/admin/admin_screen.dart';
-import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/api/api.dart' show api;
 import 'package:pancake_app/content/content_screen.dart';
 import 'package:pancake_app/home/models/catalog.dart';
 import 'package:pancake_app/setting/setting_screen.dart';

@@ -1,7 +1,10 @@
-import 'package:pancake_app/api/api.dart' as api;
+import 'package:pancake_app/api/api.dart' show Api;
 import 'package:pancake_app/content/models/content_search_model.dart';
 
 class SearchViewModel {
+  SearchViewModel(this._api);
+
+  final Api _api;
   SearchResult? _current = const SearchResult.empty();
 
   Future<SearchResult>? searchBy(String query) {
@@ -21,7 +24,7 @@ class SearchViewModel {
   }
 
   Future<SearchResponse> _fetch(String query) async {
-    final response = await api.get('search/contents?query=$query');
+    final response = await _api.get('search/contents?query=$query');
 
     return SearchResponse(response.body!);
   }
@@ -68,14 +71,11 @@ mixin SearchResultMessage<T> {
   List<T> get data;
 
   String? get searchResultMessage {
-    if (data.isEmpty) {
-      return '"$query"에 대한 검색 결과가 없습니다.';
-    }
-    if (hasMore) {
-      return '💡 이외 더 많은 검색 결과가 있습니다. 더 자세한 검색어를 사용해 보세요!';
-    }
-
-    return null;
+    return switch (this) {
+      _ when data.isEmpty => '"$query"에 대한 검색 결과가 없습니다.',
+      _ when hasMore => '💡 이외 더 많은 검색 결과가 있습니다. 더 자세한 검색어를 사용해 보세요!',
+      _ => null,
+    };
   }
 }
 
@@ -84,10 +84,9 @@ mixin DisplayTitle {
   String get originalTitle;
 
   String get displayTitle {
-    if (title == originalTitle) {
-      return title;
-    }
-
-    return '$title ($originalTitle)';
+    return switch (this) {
+      _ when title == originalTitle => title,
+      _ => '$title ($originalTitle)',
+    };
   }
 }

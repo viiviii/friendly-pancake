@@ -1,6 +1,6 @@
-import 'dart:convert';
+import 'http.dart';
+import 'url.dart';
 
-import 'package:http/http.dart' as http;
+export 'http.dart' show ApiResult, Api;
 
-part 'http.dart';
-part 'url.dart';
+final api = Api(baseUrl: Url.value, client: createClient());
