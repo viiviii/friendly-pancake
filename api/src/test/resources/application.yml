@@ -1,0 +1,9 @@
+spring:
+  profiles:
+    active: test
+  flyway:
+    clean-disabled: false
+
+api:
+  tmdb:
+    token: 'test-token' # 참고: 이 값을 비교하는 테스트가 존재함
