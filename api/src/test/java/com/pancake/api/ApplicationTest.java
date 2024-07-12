@@ -7,6 +7,7 @@ import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.Playback;
+import com.pancake.api.search.FindContentMetadata;
 import com.pancake.api.setting.application.SetEnablePlatform;
 import com.pancake.api.setting.domain.Setting;
 import com.pancake.api.watch.application.GetContentsToWatch;
@@ -19,6 +20,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,6 +32,8 @@ import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -55,6 +61,9 @@ class ApplicationTest {
         @Autowired
         BookmarkService bookmarkService;
 
+        @Autowired
+        FindContentMetadata findContentMetadata;
+
         @Test
         void 컨텐츠를_북마크에_추가한다() {
             //given
@@ -65,15 +74,28 @@ class ApplicationTest {
                     .contentSource("TMDB")
                     .build();
 
+            given(findContentMetadata.findById("8392"))
+                    .willReturn(aMetadata().title("토토로").build()); // TODO
+
             //when
             var actual = bookmarkService.save(bookmark);
 
             //then
-            assertThat(actualBy(actual.getId(), Bookmark.class))
+            assertThat(actual)
                     .returns("토토로", Bookmark::getRecordTitle)
                     .returns("8392", Bookmark::getContentId)
                     .returns("movie", Bookmark::getContentType)
                     .returns("TMDB", Bookmark::getContentSource);
+        }
+
+        @TestConfiguration
+        static class FindContentMetadataMock {
+
+            @Bean
+            @Primary
+            public FindContentMetadata findContentMetadata() {
+                return mock(FindContentMetadata.class);
+            }
         }
     }
 
