@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Instant;
 import java.util.List;
 
-import static com.pancake.api.bookmark.Builders.aSaveBookmarkCommand;
+import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
@@ -58,7 +58,7 @@ class ApplicationTest {
         @Test
         void 컨텐츠를_북마크에_추가한다() {
             //given
-            var content = aSaveBookmarkCommand()
+            var bookmark = aBookmarkSaveCommand()
                     .title("토토로")
                     .contentId("8392")
                     .contentType("movie")
@@ -66,7 +66,7 @@ class ApplicationTest {
                     .build();
 
             //when
-            var actual = bookmarkService.save(content);
+            var actual = bookmarkService.save(bookmark);
 
             //then
             assertThat(actualBy(actual.getId(), Bookmark.class))
