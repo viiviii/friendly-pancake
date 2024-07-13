@@ -19,7 +19,15 @@ class ContentMetadataAdapter implements FindContentMetadata {
         return response.toPage().map(this::toMetadata);
     }
 
+    @Override
+    public ContentMetadata findById(String id) {
+        final var response = tmdbApiClient.getMovieBy(id);
+
+        return toMetadata(response);
+    }
+
     private ContentMetadata toMetadata(TmdbMovie movie) {
-        return new ContentMetadata(movie.title(), movie.originalTitle(), movie.overview(), movie.posterUrl(), movie.releaseDate());
+        return new ContentMetadata(movie.id() + "", "movie", // TODO
+                movie.title(), movie.originalTitle(), movie.overview(), movie.posterUrl(), movie.releaseDate());
     }
 }

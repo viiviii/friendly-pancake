@@ -17,6 +17,8 @@ public abstract class Builders {
 
     public static ContentMetadataBuilder aMetadata() {
         return contentMetadata()
+                .id("99999")
+                .contentType("movie")
                 .title("테스트용 제목")
                 .description("테스트용 설명")
                 .imageUrl("테스트용 이미지 주소");
@@ -58,8 +60,8 @@ public abstract class Builders {
     }
 
     @Builder(builderMethodName = "contentMetadata")
-    private static ContentMetadata create(String title, String description, String imageUrl) {
-        return new ContentMetadata(title, "original title", description, imageUrl, LocalDate.of(2099, 12, 31));
+    private static ContentMetadata create(String id, String contentType, String title, String description, String imageUrl) {
+        return new ContentMetadata(id, contentType, title, "original title", description, imageUrl, LocalDate.of(2099, 12, 31));
     }
 
     @Builder(builderMethodName = "contentStreaming")

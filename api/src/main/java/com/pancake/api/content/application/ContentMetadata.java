@@ -12,8 +12,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ContentMetadata {
 
+    private String id;
+    private String contentType; // TODO: 이거 여기 맞냐
     private String title;
-    private String originalTitle;
+    private String originalTitle; // TODO: 필요없음
     private String description;
     private String imageUrl;
     private LocalDate releaseDate;

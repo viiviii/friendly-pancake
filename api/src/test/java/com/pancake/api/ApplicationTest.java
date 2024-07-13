@@ -1,5 +1,7 @@
 package com.pancake.api;
 
+import com.pancake.api.bookmark.Bookmark;
+import com.pancake.api.bookmark.BookmarkService;
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentService;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Instant;
 import java.util.List;
 
+import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
 import static com.pancake.api.content.Builders.aMetadata;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
@@ -28,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 @SuppressWarnings("NonAsciiCharacters")
-@SpringBootTest(webEnvironment = NONE)
+@SpringBootTest(webEnvironment = NONE, classes = TestConfig.class)
 class ApplicationTest {
 
     @Autowired
@@ -37,7 +40,6 @@ class ApplicationTest {
     @Autowired
     AddPlayback addPlayback;
 
-
     @Autowired
     EntityManager em;
 
@@ -45,6 +47,39 @@ class ApplicationTest {
     void cleanUp(@Autowired Flyway flyway) {
         flyway.clean();
         flyway.migrate();
+    }
+
+    @Nested
+    class 북마크 {
+
+        @Autowired
+        BookmarkService bookmarkService;
+
+        @Autowired
+        MemoryMetadataRepository metadata;
+
+        @Test
+        void 컨텐츠를_북마크에_추가한다() {
+            //given
+            var bookmark = aBookmarkSaveCommand()
+                    .title("토토로")
+                    .contentId("8392")
+                    .contentType("movie")
+                    .contentSource("TMDB")
+                    .build();
+
+            metadata.존재한다(aMetadata().id("8392").title("토토로"));
+
+            //when
+            var actual = bookmarkService.save(bookmark);
+
+            //then
+            assertThat(actual)
+                    .returns("토토로", Bookmark::getRecordTitle)
+                    .returns("8392", Bookmark::getContentId)
+                    .returns("movie", Bookmark::getContentType)
+                    .returns("TMDB", Bookmark::getContentSource);
+        }
     }
 
     @Nested

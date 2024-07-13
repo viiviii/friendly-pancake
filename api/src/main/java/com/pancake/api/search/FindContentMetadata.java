@@ -5,5 +5,7 @@ import org.springframework.data.domain.Page;
 
 public interface FindContentMetadata {
 
+    ContentMetadata findById(String id);
+
     Page<ContentMetadata> findAllByTitle(String title);
 }
