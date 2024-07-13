@@ -1,50 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:pancake_app/widgets/my_future_builder.dart';
 
 import '../view_models/content_search_view_model.dart';
 
+typedef ContentSelected<SearchContent> = void Function(SearchContent content);
+
 class ContentSearchResultSection extends StatelessWidget {
-  const ContentSearchResultSection({super.key, required this.search});
+  const ContentSearchResultSection({
+    super.key,
+    required this.onItemAdded,
+    required this.result,
+  });
 
-  final Future<SearchResult> search;
-
-  @override
-  Widget build(BuildContext context) {
-    return MyFutureBuilder<SearchResult>(
-      future: search,
-      builder: (_, data) {
-        return Column(
-          children: [
-            _SearchResultListView(data),
-            if (data.searchResultMessage != null)
-              _SearchResultMessage(data.searchResultMessage!)
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _SearchResultListView extends StatelessWidget {
-  const _SearchResultListView(this.search);
-
-  final SearchResult search;
+  final ContentSelected<SearchContent> onItemAdded;
+  final SearchResult result;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: search.data.length,
-      itemBuilder: (_, i) {
-        return _SearchItemView(content: search.data[i]);
-      },
+    return Column(
+      children: [
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: result.data.length,
+          itemBuilder: (_, i) {
+            return _SearchItemView(
+              onAdded: onItemAdded,
+              content: result.data[i],
+            );
+          },
+        ),
+        if (result.searchResultMessage != null)
+          _SearchResultMessage(result.searchResultMessage!)
+      ],
     );
   }
 }
 
 class _SearchItemView extends StatelessWidget {
-  const _SearchItemView({required this.content});
+  const _SearchItemView({
+    required this.onAdded,
+    required this.content,
+  });
 
+  final ContentSelected<SearchContent> onAdded;
   final SearchContent content;
 
   @override
@@ -83,7 +80,7 @@ class _SearchItemView extends StatelessWidget {
           ),
           dividerPadding,
           IconButton(
-            onPressed: () {}, // TODO: 컨텐츠 등록하기 기능 연결
+            onPressed: () => onAdded(content),
             icon: const Icon(Icons.add),
           ),
           dividerPadding,
