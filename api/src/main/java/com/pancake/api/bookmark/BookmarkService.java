@@ -13,7 +13,7 @@ public class BookmarkService {
 
     public Bookmark save(BookmarkSaveCommand command) {
         final var metadata = getContentMetadata.queryBy(command.contentId());
-        if (!metadata.getTitle().equals(command.title())) {
+        if (metadata == null || !metadata.getTitle().equals(command.title())) {
             throw new IllegalArgumentException();
         }
         final var bookmark = command.toBookmark();

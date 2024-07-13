@@ -16,6 +16,21 @@ class BookmarkServiceTest {
     private final BookmarkRepository bookmarkRepository = mock(BookmarkRepository.class);
     private final BookmarkService bookmarkService = new BookmarkService(getContentMetadata, bookmarkRepository);
 
+    @Test
+    void 메타데이터가_존재하지_않으면_예외가_발생한다() {
+        //given
+        var bookmark = aBookmarkSaveCommand()
+                .contentId("8392")
+                .build();
+
+        given(getContentMetadata.queryBy("8392")).willReturn(null);
+
+        //when
+        ThrowingCallable actual = () -> bookmarkService.save(bookmark);
+
+        //then
+        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+    }
 
     @Test
     void 저장한_제목과_검색결과의_제목이_다른_경우_예외가_발생한다() {
