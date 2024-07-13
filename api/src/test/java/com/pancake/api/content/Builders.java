@@ -17,6 +17,8 @@ public abstract class Builders {
 
     public static ContentMetadataBuilder aMetadata() {
         return contentMetadata()
+                .id("99999")
+                .contentType("movie")
                 .title("테스트용 제목")
                 .description("테스트용 설명")
                 .imageUrl("테스트용 이미지 주소");

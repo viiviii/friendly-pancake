@@ -4,8 +4,6 @@ import com.pancake.api.bookmark.BookmarkApiController.BookmarkResponse;
 import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
-import com.pancake.api.content.infra.api.MockTmdbServerConfiguration;
-import com.pancake.api.content.infra.api.MockTmdbServerConfiguration.MockTmdbServer;
 import com.pancake.api.search.SearchContentMetadata;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
@@ -17,7 +15,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
@@ -32,8 +29,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@SpringBootTest(webEnvironment = RANDOM_PORT)
-@Import(MockTmdbServerConfiguration.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = TestConfig.class)
 @SuppressWarnings("NonAsciiCharacters")
 class AcceptanceTest {
 
@@ -78,15 +74,9 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자는_컨텐츠를_검색하고_북마크에_저장할_수_있다(@Autowired MockTmdbServer mock) {
+    void 사용자는_컨텐츠를_검색하고_북마크에_저장할_수_있다(@Autowired MemoryMetadataRepository 메타데이터) {
         //given
-        // TODO: 이거 맞냐
-        mock.request("/search/movie?query={title}&language=ko", "귀여븐 포뇨")
-                .willReturn(aTmdbPage()
-                        .result(aTmdbMovie().id(6767).title("귀여븐 포뇨").build())
-                        .build());
-        mock.request("/movie/{id}?language=ko", 6767)
-                .willReturn(aMetadata().title("귀여븐 포뇨").build());
+        메타데이터.존재한다(aMetadata().title("귀여븐 포뇨"));
 
         //when
         var 검색_결과 = 컨텐츠를_검색한다("귀여븐 포뇨");
