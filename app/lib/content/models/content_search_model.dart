@@ -15,6 +15,7 @@ class SearchResponse {
 }
 
 class SearchResponseItem {
+  final String id;
   final String title;
   final String originalTitle;
   final String description;
@@ -22,7 +23,8 @@ class SearchResponseItem {
   final String releaseDate;
 
   SearchResponseItem(dynamic json)
-      : title = json['title'] as String,
+      : id = json['id'] as String,
+        title = json['title'] as String,
         originalTitle = json['originalTitle'] as String,
         description = json['description'] as String,
         imageUrl = json['imageUrl'] as String,
@@ -30,7 +32,7 @@ class SearchResponseItem {
 
   @override
   String toString() {
-    return 'SearchResponseItem{title: $title, originalTitle: $originalTitle, '
+    return 'SearchResponseItem{id: $id, title: $title, originalTitle: $originalTitle, '
         'description: $description, imageUrl: $imageUrl, releaseDate: $releaseDate}';
   }
 }
