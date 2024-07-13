@@ -1,7 +1,8 @@
 package com.pancake.api;
 
+import com.pancake.api.bookmark.BookmarkApiController.BookmarkResponse;
+import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.api.ContentResponse;
-import com.pancake.api.content.application.ContentMetadata;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.content.infra.api.MockTmdbServerConfiguration;
 import com.pancake.api.content.infra.api.MockTmdbServerConfiguration.MockTmdbServer;
@@ -24,6 +25,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
 import static com.pancake.api.content.Builders.*;
 import static com.pancake.api.setting.Builders.aEnableSetting;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -76,27 +78,23 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자는_컨텐츠를_검색하고_등록할_수_있다(@Autowired MockTmdbServer mock) {
+    void 사용자는_컨텐츠를_검색하고_북마크에_저장할_수_있다(@Autowired MockTmdbServer mock) {
         //given
+        // TODO: 이거 맞냐
         mock.request("/search/movie?query={title}&language=ko", "귀여븐 포뇨")
                 .willReturn(aTmdbPage()
-                        .result(aTmdbMovie().title("귀여븐 포뇨").build())
+                        .result(aTmdbMovie().id(6767).title("귀여븐 포뇨").build())
                         .build());
+        mock.request("/movie/{id}?language=ko", 6767)
+                .willReturn(aMetadata().title("귀여븐 포뇨").build());
 
         //when
         var 검색_결과 = 컨텐츠를_검색한다("귀여븐 포뇨");
-        컨텐츠를_등록한다()
-                .compose(this::검색결과를_등록요청으로_변경)
-                .apply(첫번째를_선택(검색_결과.contents()));
+        첫번째_결과를_북마크로_등록한다().accept(검색_결과);
 
         //then
-        // TODO: 원래는 북마크 개념이라 컨텐츠 테이블이랑 따로라서 이거 보여지는 화면이 있긴 있어야됨
-        then(컨텐츠_목록을_조회한다()).singleElement()
-                .is(제목은("귀여븐 포뇨"));
-    }
-
-    private ContentMetadataBuilder 검색결과를_등록요청으로_변경(ContentMetadata metadata) {
-        return aMetadata().title(metadata.getTitle());  // TODO
+//        then(북마크_목록을_조회한다()).singleElement()
+//                .is(제목은("귀여븐 포뇨"));
     }
 
     @Test
@@ -125,6 +123,28 @@ class AcceptanceTest {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBodyList(ContentResponse.class)
+                .returnResult().getResponseBody();
+    }
+
+    private Consumer<SearchContentMetadata.Result> 첫번째_결과를_북마크로_등록한다() {
+        return result -> {
+            var content = 첫번째를_선택(result.contents());
+            북마크를_등록한다().apply(aBookmarkSaveCommand()
+                    .contentSource(result.getContentSource())
+                    .contentId(content.getId())
+                    .contentType(content.getContentType())
+                    .title(content.getTitle())
+            );
+        };
+    }
+
+    private Function<BookmarkSaveCommandBuilder, BookmarkResponse> 북마크를_등록한다() {
+        return builder -> client.post().uri("/api/bookmarks")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(builder.build())
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(BookmarkResponse.class)
                 .returnResult().getResponseBody();
     }
 

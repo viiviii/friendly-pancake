@@ -19,5 +19,9 @@ public class SearchContentMetadata {
     }
 
     public record Result(boolean hasNext, List<ContentMetadata> contents) {
+
+        public String getContentSource() {
+            return "TMDB"; // TODO
+        }
     }
 }

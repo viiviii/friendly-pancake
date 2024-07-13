@@ -43,4 +43,18 @@ class TmdbClientTest {
         //then
         server.verify();
     }
+
+    @Test
+    void 영화의_상세정보를_조회한다() {
+        //given
+        server.expect(requestTo("https://api.themoviedb.org/3/movie/123"))
+                .andExpect(method(GET))
+                .andRespond(withSuccess());
+
+        //when
+        client.getMovieBy("123");
+
+        //then
+        server.verify();
+    }
 }
