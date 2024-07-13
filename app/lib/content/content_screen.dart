@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' show api;
 
+import '../widgets/my_future_builder.dart';
 import 'view_models/content_search_view_model.dart';
 import 'views/content_search_bar_section.dart';
 import 'views/content_search_result_section.dart';
@@ -22,6 +23,10 @@ class _ContentScreenState extends State<ContentScreen> {
     });
   }
 
+  void onAddToBookmark(SearchContent content) {
+    _viewModel.addToBookmark(content);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,8 +39,15 @@ class _ContentScreenState extends State<ContentScreen> {
           children: [
             ContentSearchBarSection(onSubmitted: onSearched),
             const SizedBox(height: 30),
-            if (_searchResult != null)
-              ContentSearchResultSection(search: _searchResult!),
+            MyFutureBuilder<SearchResult>(
+              future: _searchResult,
+              builder: (_, data) {
+                return ContentSearchResultSection(
+                  onItemAdded: onAddToBookmark,
+                  result: data,
+                );
+              },
+            )
           ],
         ),
       ),

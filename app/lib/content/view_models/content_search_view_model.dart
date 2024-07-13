@@ -15,18 +15,31 @@ class SearchViewModel {
     return _searchBy(query);
   }
 
+  Future<void> addToBookmark(SearchContent searchContent) async {
+    await _postBookmark(searchContent);
+  }
+
   Future<SearchResult> _searchBy(String query) async {
-    final response = await _fetch(query);
+    final response = await _getMovie(query);
     final result = SearchResult(query: query, response: response);
     _current = result;
 
     return result;
   }
 
-  Future<SearchResponse> _fetch(String query) async {
+  Future<SearchResponse> _getMovie(String query) async {
     final response = await _api.get('search/contents?query=$query');
 
     return SearchResponse(response.body!);
+  }
+
+  Future<void> _postBookmark(SearchContent searchContent) async {
+    await _api.post('bookmarks', body: {
+      'contentSource': 'TMDB', // TODO: 하드코딩
+      'contentId': searchContent.id,
+      'contentType': 'movie', // TODO: 하드코딩, tv도 생길 예정임
+      'title': searchContent.title,
+    });
   }
 }
 
@@ -49,6 +62,7 @@ class SearchResult with SearchResultMessage<SearchContent> {
 }
 
 class SearchContent with DisplayTitle {
+  final String id;
   @override
   final String title;
   @override
@@ -58,7 +72,8 @@ class SearchContent with DisplayTitle {
   final String releaseDate;
 
   SearchContent(SearchResponseItem item)
-      : title = item.title,
+      : id = item.id,
+        title = item.title,
         originalTitle = item.originalTitle,
         description = item.description,
         imageUrl = item.imageUrl,

@@ -17,7 +17,9 @@ class MyFutureBuilder<T> extends StatelessWidget {
     return FutureBuilder<T>(
       future: future,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.none) {
+          return const SizedBox.shrink();
+        } else if (snapshot.hasData) {
           return builder(context, snapshot.data as T);
         } else if (snapshot.hasError) {
           return ErrorMessage(message: '${snapshot.error}');
