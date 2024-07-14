@@ -2,6 +2,7 @@ package com.pancake.api;
 
 import com.pancake.api.bookmark.Bookmark;
 import com.pancake.api.bookmark.BookmarkService;
+import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentService;
@@ -79,6 +80,25 @@ class ApplicationTest {
                     .returns("8392", Bookmark::getContentId)
                     .returns("movie", Bookmark::getContentType)
                     .returns("TMDB", Bookmark::getContentSource);
+        }
+
+        @Test
+        void 북마크_목록을_조회한다() {
+            //given
+            metadata.존재한다(aMetadata().id("8392").title("토토로"));
+            metadata.존재한다(aMetadata().id("9090").title("토토로"));
+            save(aBookmarkSaveCommand().contentId("8392").title("토토로"));
+            save(aBookmarkSaveCommand().contentId("9090").title("토토로"));
+
+            //when
+            var actual = bookmarkService.getList();
+
+            //then
+            assertThat(actual).hasSize(2);
+        }
+
+        private Bookmark save(BookmarkSaveCommandBuilder builder) {
+            return bookmarkService.save(builder.build());
         }
     }
 

@@ -5,7 +5,11 @@ import lombok.Builder;
 public abstract class Builders {
 
     public static Builders.BookmarkSaveCommandBuilder aBookmarkSaveCommand() {
-        return saveBookmarkCommand();
+        return saveBookmarkCommand()
+                .contentId("9999")
+                .contentSource("TMDB")
+                .contentType("movie")
+                .title("테스트용 타이틀");
     }
 
     @Builder(builderMethodName = "saveBookmarkCommand")
