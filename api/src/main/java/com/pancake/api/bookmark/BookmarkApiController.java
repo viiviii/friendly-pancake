@@ -33,9 +33,9 @@ public class BookmarkApiController {
         return status(OK).body(response);
     }
 
-    public record BookmarkResponse(Long id, String contentId, String recordTitle) {
+    public record BookmarkResponse(Long id, String contentId, String contentType, String recordTitle) {
         public BookmarkResponse(Bookmark bookmark) {
-            this(bookmark.getId(), bookmark.getContentId(), bookmark.getRecordTitle());
+            this(bookmark.getId(), bookmark.getContentId(), bookmark.getContentType(), bookmark.getRecordTitle());
         }
     }
 }
