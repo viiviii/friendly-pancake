@@ -2,12 +2,12 @@ package com.pancake.api.bookmark;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
@@ -24,9 +24,12 @@ public class BookmarkApiController {
         return status(CREATED).body(new BookmarkResponse(bookmark));
     }
 
-    public record BookmarkResponse(Long id, String contentId) {
-        public BookmarkResponse(Bookmark bookmark) {
-            this(bookmark.getId(), bookmark.getContentId());
-        }
+    @GetMapping
+    public ResponseEntity<List<BookmarkResponse>> getList() {
+        final var response = bookmarkService.getList().stream()
+                .map(BookmarkResponse::new)
+                .toList();
+
+        return status(OK).body(response);
     }
 }

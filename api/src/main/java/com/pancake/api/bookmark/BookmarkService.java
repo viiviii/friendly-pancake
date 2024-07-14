@@ -3,6 +3,8 @@ package com.pancake.api.bookmark;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BookmarkService {
@@ -19,5 +21,9 @@ public class BookmarkService {
         final var bookmark = command.toBookmark();
 
         return bookmarkRepository.save(bookmark);
+    }
+
+    public List<Bookmark> getList() {
+        return bookmarkRepository.findAll();
     }
 }
