@@ -83,8 +83,8 @@ class AcceptanceTest {
         첫번째_결과를_북마크로_등록한다().accept(검색_결과);
 
         //then
-//        then(북마크_목록을_조회한다()).singleElement()
-//                .is(제목은("귀여븐 포뇨"));
+        then(북마크_목록을_조회한다()).singleElement()
+                .is(제목은("귀여븐 포뇨"));
     }
 
     @Test
@@ -113,6 +113,14 @@ class AcceptanceTest {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBodyList(ContentResponse.class)
+                .returnResult().getResponseBody();
+    }
+
+    private List<BookmarkResponse> 북마크_목록을_조회한다() {
+        return client.get().uri("/api/bookmarks")
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBodyList(BookmarkResponse.class)
                 .returnResult().getResponseBody();
     }
 
@@ -233,8 +241,8 @@ class AcceptanceTest {
                 "%s에서 시청 가능하다", platformLabel);
     }
 
-    private Condition<ContentResponse> 제목은(String title) {
-        return new Condition<>(e -> e.getTitle().equals(title),
+    private Condition<BookmarkResponse> 제목은(String title) {
+        return new Condition<>(e -> e.recordTitle().equals(title),
                 "컨텐츠 제목은 %s이다", title);
     }
 
