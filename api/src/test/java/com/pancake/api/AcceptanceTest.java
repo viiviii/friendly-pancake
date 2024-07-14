@@ -1,6 +1,6 @@
 package com.pancake.api;
 
-import com.pancake.api.bookmark.BookmarkApiController.BookmarkResponse;
+import com.pancake.api.bookmark.BookmarkResponse;
 import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.domain.Playback;
