@@ -12,7 +12,7 @@ class ContentSearchResultSection extends StatelessWidget {
   });
 
   final ContentSelected<SearchContent> onItemAdded;
-  final SearchResult result;
+  final ContentSearchResult result;
 
   @override
   Widget build(BuildContext context) {

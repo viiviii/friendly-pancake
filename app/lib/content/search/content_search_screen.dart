@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' show api;
+import 'package:pancake_app/widgets/my_future_builder.dart';
 
-import '../widgets/my_future_builder.dart';
 import 'view_models/content_search_view_model.dart';
 import 'views/content_search_bar_section.dart';
 import 'views/content_search_result_section.dart';
 
-class ContentScreen extends StatefulWidget {
-  const ContentScreen({super.key});
+class ContentSearchScreen extends StatefulWidget {
+  const ContentSearchScreen({super.key});
 
   @override
-  State<ContentScreen> createState() => _ContentScreenState();
+  State<ContentSearchScreen> createState() => _ContentSearchScreenState();
 }
 
-class _ContentScreenState extends State<ContentScreen> {
-  final SearchViewModel _viewModel = SearchViewModel(api);
-  Future<SearchResult>? _searchResult;
+class _ContentSearchScreenState extends State<ContentSearchScreen> {
+  final ContentSearchViewModel _viewModel = ContentSearchViewModel(api);
+  Future<ContentSearchResult>? _searchResult;
 
   void onSearched(String query) {
     setState(() {
@@ -39,7 +39,7 @@ class _ContentScreenState extends State<ContentScreen> {
           children: [
             ContentSearchBarSection(onSubmitted: onSearched),
             const SizedBox(height: 30),
-            MyFutureBuilder<SearchResult>(
+            MyFutureBuilder<ContentSearchResult>(
               future: _searchResult,
               builder: (_, data) {
                 return ContentSearchResultSection(
