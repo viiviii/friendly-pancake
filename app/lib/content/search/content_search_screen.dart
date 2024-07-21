@@ -7,7 +7,9 @@ import 'views/content_search_bar_section.dart';
 import 'views/content_search_result_section.dart';
 
 class ContentSearchScreen extends StatefulWidget {
-  const ContentSearchScreen({super.key});
+  const ContentSearchScreen({super.key, required this.onSelected});
+
+  final ValueSetter<SearchContent> onSelected;
 
   @override
   State<ContentSearchScreen> createState() => _ContentSearchScreenState();
@@ -17,14 +19,10 @@ class _ContentSearchScreenState extends State<ContentSearchScreen> {
   final ContentSearchViewModel _viewModel = ContentSearchViewModel(api);
   Future<ContentSearchResult>? _searchResult;
 
-  void onSearched(String query) {
+  void _onSearched(String query) {
     setState(() {
       _searchResult = _viewModel.searchBy(query);
     });
-  }
-
-  void onAddToBookmark(SearchContent content) {
-    _viewModel.addToBookmark(content);
   }
 
   @override
@@ -34,13 +32,13 @@ class _ContentSearchScreenState extends State<ContentSearchScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 80.0),
         child: ListView(
           children: [
-            ContentSearchBarSection(onSubmitted: onSearched),
+            ContentSearchBarSection(onSubmitted: _onSearched),
             const SizedBox(height: 30),
             MyFutureBuilder<ContentSearchResult>(
               future: _searchResult,
               builder: (_, data) {
                 return ContentSearchResultSection(
-                  onItemAdded: onAddToBookmark,
+                  onItemAdded: widget.onSelected,
                   result: data,
                 );
               },

@@ -1,32 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:pancake_app/api/api.dart' show api;
 import 'package:pancake_app/content/bookmark/bookmark_screen.dart';
 import 'package:pancake_app/content/search/content_search_screen.dart';
+import 'package:pancake_app/content/search/view_models/content_search_view_model.dart';
 
 class ContentScreen extends StatefulWidget {
   const ContentScreen({super.key});
-
-  static const List<Destination> menu = [
-    Destination(
-      screen: ContentSearchScreen(),
-      icon: Icon(Icons.search),
-      label: Text('검색'),
-    ),
-    Destination(
-      screen: BookmarkScreen(),
-      icon: Icon(Icons.bookmark),
-      label: Text('북마크'),
-    ),
-  ];
 
   @override
   State<ContentScreen> createState() => _ContentScreenState();
 }
 
 class _ContentScreenState extends State<ContentScreen> {
+  late final List<Destination> _menu = [
+    Destination(
+      screen: ContentSearchScreen(onSelected: addToBookmark),
+      icon: const Icon(Icons.search),
+      label: const Text('검색'),
+    ),
+    const Destination(
+      screen: BookmarkScreen(),
+      icon: Icon(Icons.bookmark),
+      label: Text('북마크'),
+    ),
+  ];
+
   int _selectedIndex = 0;
 
   Future<void> _onMenuSelected(int index) async {
     setState(() => _selectedIndex = index);
+  }
+
+  Future<void> addToBookmark(SearchContent searchContent) async {
+    await api.post('bookmarks', body: {
+      'contentSource': 'TMDB', // TODO: 하드코딩
+      'contentId': searchContent.id,
+      'contentType': 'movie', // TODO: 하드코딩, tv도 생길 예정임
+      'title': searchContent.title,
+    });
   }
 
   @override
@@ -39,14 +50,14 @@ class _ContentScreenState extends State<ContentScreen> {
         children: [
           _RailNavigation(
             onDestinationSelected: _onMenuSelected,
-            destinations: ContentScreen.menu
+            destinations: _menu
                 .map((e) =>
                     NavigationRailDestination(icon: e.icon, label: e.label))
                 .toList(),
             selectedIndex: _selectedIndex,
           ),
           Expanded(
-            child: ContentScreen.menu[_selectedIndex].screen,
+            child: _menu[_selectedIndex].screen,
           ),
         ],
       ),
