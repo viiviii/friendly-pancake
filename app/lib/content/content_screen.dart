@@ -14,7 +14,7 @@ class ContentScreen extends StatefulWidget {
 class _ContentScreenState extends State<ContentScreen> {
   late final List<Destination> _menu = [
     Destination(
-      screen: ContentSearchScreen(onSelected: addToBookmark),
+      screen: ContentSearchScreen(onSelected: _addToBookmark),
       icon: const Icon(Icons.search),
       label: const Text('검색'),
     ),
@@ -31,13 +31,24 @@ class _ContentScreenState extends State<ContentScreen> {
     setState(() => _selectedIndex = index);
   }
 
-  Future<void> addToBookmark(SearchContent searchContent) async {
+  Future<void> _addToBookmark(SearchContent searchContent) async {
+    await _postBookmark(searchContent);
+    alertSavedMessage();
+  }
+
+  Future<void> _postBookmark(SearchContent searchContent) async {
     await api.post('bookmarks', body: {
       'contentSource': 'TMDB', // TODO: 하드코딩
       'contentId': searchContent.id,
       'contentType': 'movie', // TODO: 하드코딩, tv도 생길 예정임
       'title': searchContent.title,
     });
+  }
+
+  void alertSavedMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('저장 되었습니다.')),
+    );
   }
 
   @override
