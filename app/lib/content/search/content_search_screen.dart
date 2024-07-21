@@ -27,25 +27,21 @@ class _ContentSearchScreenState extends State<ContentSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 80.0),
-        child: ListView(
-          children: [
-            ContentSearchBarSection(onSubmitted: _onSearched),
-            const SizedBox(height: 30),
-            MyFutureBuilder<ContentSearchResult>(
-              future: _searchResult,
-              builder: (_, data) {
-                return ContentSearchResultSection(
-                  onItemAdded: widget.onSelected,
-                  result: data,
-                );
-              },
-            )
-          ],
-        ),
-      ),
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        ContentSearchBarSection(onSubmitted: _onSearched),
+        const SizedBox(height: 30),
+        MyFutureBuilder<ContentSearchResult>(
+          future: _searchResult,
+          builder: (_, data) {
+            return ContentSearchResultSection(
+              onItemAdded: widget.onSelected,
+              result: data,
+            );
+          },
+        )
+      ],
     );
   }
 }

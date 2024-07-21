@@ -26,25 +26,21 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 200),
-        child: MyFutureBuilder<List<Bookmark>>(
-          future: _bookmarks,
-          builder: (_, data) {
-            return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (_, i) {
-                final item = data[i];
-                return ListTile(
-                  title: Text(item.recordTitle),
-                  trailing: Text(item.contentType),
-                );
-              },
+    return MyFutureBuilder<List<Bookmark>>(
+      future: _bookmarks,
+      builder: (_, data) {
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: data.length,
+          itemBuilder: (_, i) {
+            final item = data[i];
+            return ListTile(
+              title: Text(item.recordTitle),
+              trailing: Text(item.contentType),
             );
           },
-        ),
-      ),
+        );
+      },
     );
   }
 }
