@@ -16,19 +16,19 @@ class _ContentScreenState extends State<ContentScreen> {
     Destination(
       screen: ContentSearchScreen(onSelected: _addToBookmark),
       icon: const Icon(Icons.search),
-      label: const Text('검색'),
+      label: '검색',
     ),
     const Destination(
       screen: BookmarkScreen(),
       icon: Icon(Icons.bookmark),
-      label: Text('북마크'),
+      label: '북마크',
     ),
   ];
 
-  int _selectedIndex = 0;
+  int _currentIndex = 0;
 
   Future<void> _onMenuSelected(int index) async {
-    setState(() => _selectedIndex = index);
+    setState(() => _currentIndex = index);
   }
 
   Future<void> _addToBookmark(SearchContent searchContent) async {
@@ -53,25 +53,47 @@ class _ContentScreenState extends State<ContentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    print('screenWidth=$screenWidth');
     return Scaffold(
       appBar: AppBar(
         title: const Text('컨텐츠'),
       ),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _RailNavigation(
-            onDestinationSelected: _onMenuSelected,
-            destinations: _menu
-                .map((e) =>
-                    NavigationRailDestination(icon: e.icon, label: e.label))
-                .toList(),
-            selectedIndex: _selectedIndex,
-          ),
-          Expanded(
-            child: _menu[_selectedIndex].screen,
+          if (screenWidth > 700)
+            _RailNavigation(
+              onDestinationSelected: _onMenuSelected,
+              destinations: _menu
+                  .map((e) => NavigationRailDestination(
+                      icon: e.icon, label: Text(e.label)))
+                  .toList(),
+              selectedIndex: _currentIndex,
+            ),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 30,
+                horizontal: 100,
+              ),
+              child: _menu[_currentIndex].screen,
+            ),
           ),
         ],
       ),
+      bottomNavigationBar: screenWidth <= 700
+          ? NavigationBar(
+              // labelBehavior: labelBehavior,
+              selectedIndex: _currentIndex,
+              onDestinationSelected: _onMenuSelected,
+              destinations: _menu
+                  .map((e) =>
+                      NavigationDestination(icon: e.icon, label: e.label))
+                  .toList(),
+            )
+          : null,
     );
   }
 }
@@ -94,7 +116,7 @@ class _RailNavigation extends StatelessWidget {
       onDestinationSelected: onDestinationSelected,
       destinations: destinations,
       extended: true,
-      minExtendedWidth: 100,
+      minExtendedWidth: 150,
     );
   }
 }
@@ -108,5 +130,5 @@ class Destination {
 
   final Widget screen;
   final Widget icon;
-  final Widget label;
+  final String label;
 }
