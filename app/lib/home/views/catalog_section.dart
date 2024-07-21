@@ -4,13 +4,14 @@ import 'package:pancake_app/widgets/hover_slide_image_card.dart';
 
 import '../models/content.dart';
 
-typedef ContentSelected<Content> = void Function(Content selected);
-
 class CatalogSection extends StatelessWidget {
-  const CatalogSection(
-      {super.key, required this.onSelected, required this.catalog});
+  const CatalogSection({
+    super.key,
+    required this.onSelected,
+    required this.catalog,
+  });
 
-  final ContentSelected<Content> onSelected;
+  final ValueSetter<Content> onSelected;
   final Catalog catalog;
 
   @override
@@ -53,7 +54,7 @@ class _WatchlistTitle extends StatelessWidget {
 class _Watchlist extends StatelessWidget {
   const _Watchlist({required this.onSelected, required this.contents});
 
-  final ContentSelected<Content> onSelected;
+  final ValueSetter<Content> onSelected;
   final List<Content> contents;
 
   @override
@@ -80,7 +81,7 @@ class _Watchlist extends StatelessWidget {
 class _ContentCard extends StatelessWidget {
   const _ContentCard(this.content, {required this.onSelected});
 
-  final ContentSelected<Content> onSelected;
+  final ValueSetter<Content> onSelected;
   final Content content;
 
   @override
