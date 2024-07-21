@@ -30,9 +30,6 @@ class _ContentSearchScreenState extends State<ContentSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('컨텐츠'),
-      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 80.0),
         child: ListView(

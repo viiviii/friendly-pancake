@@ -27,9 +27,6 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('북마크 목록'),
-      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 200),
         child: MyFutureBuilder<List<Bookmark>>(
