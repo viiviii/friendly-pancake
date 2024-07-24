@@ -3,9 +3,6 @@ import 'package:pancake_app/widgets/hover_slide_image_card.dart';
 
 import '../models/metadata.dart';
 
-typedef ContentSelected<ContentMetadata> = void Function(
-    ContentMetadata content);
-
 class ContentListViewSection extends StatelessWidget {
   const ContentListViewSection({
     super.key,
@@ -13,7 +10,7 @@ class ContentListViewSection extends StatelessWidget {
     required this.onTap,
   });
   final List<ContentMetadata> contents;
-  final ContentSelected onTap;
+  final ValueSetter<ContentMetadata> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +41,7 @@ class ContentListViewSection extends StatelessWidget {
 class _ContentCard extends StatelessWidget {
   const _ContentCard({required this.onTap, required this.content});
 
-  final ContentSelected onTap;
+  final ValueSetter<ContentMetadata> onTap;
   final ContentMetadata content;
 
   @override

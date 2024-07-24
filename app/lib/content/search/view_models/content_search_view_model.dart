@@ -1,13 +1,14 @@
 import 'package:pancake_app/api/api.dart' show Api;
-import 'package:pancake_app/content/models/content_search_model.dart';
 
-class SearchViewModel {
-  SearchViewModel(this._api);
+import '../models/content_search_model.dart';
+
+class ContentSearchViewModel {
+  ContentSearchViewModel(this._api);
 
   final Api _api;
-  SearchResult? _current = const SearchResult.empty();
+  ContentSearchResult? _current = const ContentSearchResult.empty();
 
-  Future<SearchResult>? searchBy(String query) {
+  Future<ContentSearchResult>? searchBy(String query) {
     if (query.isEmpty || query == _current?.query) {
       return null;
     }
@@ -15,35 +16,22 @@ class SearchViewModel {
     return _searchBy(query);
   }
 
-  Future<void> addToBookmark(SearchContent searchContent) async {
-    await _postBookmark(searchContent);
-  }
-
-  Future<SearchResult> _searchBy(String query) async {
+  Future<ContentSearchResult> _searchBy(String query) async {
     final response = await _getMovie(query);
-    final result = SearchResult(query: query, response: response);
+    final result = ContentSearchResult(query: query, response: response);
     _current = result;
 
     return result;
   }
 
-  Future<SearchResponse> _getMovie(String query) async {
+  Future<ContentSearchResponse> _getMovie(String query) async {
     final response = await _api.get('search/contents?query=$query');
 
-    return SearchResponse(response.body!);
-  }
-
-  Future<void> _postBookmark(SearchContent searchContent) async {
-    await _api.post('bookmarks', body: {
-      'contentSource': 'TMDB', // TODO: 하드코딩
-      'contentId': searchContent.id,
-      'contentType': 'movie', // TODO: 하드코딩, tv도 생길 예정임
-      'title': searchContent.title,
-    });
+    return ContentSearchResponse(response.body!);
   }
 }
 
-class SearchResult with SearchResultMessage<SearchContent> {
+class ContentSearchResult with SearchResultMessage<SearchContent> {
   @override
   final String query;
   @override
@@ -51,12 +39,13 @@ class SearchResult with SearchResultMessage<SearchContent> {
   @override
   final List<SearchContent> data;
 
-  const SearchResult.empty()
+  const ContentSearchResult.empty()
       : query = '',
         hasMore = false,
         data = const [];
 
-  SearchResult({required this.query, required SearchResponse response})
+  ContentSearchResult(
+      {required this.query, required ContentSearchResponse response})
       : hasMore = response.hasNext,
         data = response.contents.map(SearchContent.new).toList();
 }
@@ -71,7 +60,7 @@ class SearchContent with DisplayTitle {
   final String imageUrl;
   final String releaseDate;
 
-  SearchContent(SearchResponseItem item)
+  SearchContent(ContentSearchResponseItem item)
       : id = item.id,
         title = item.title,
         originalTitle = item.originalTitle,

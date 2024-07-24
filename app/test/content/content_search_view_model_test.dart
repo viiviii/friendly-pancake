@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:pancake_app/api/api.dart' show Api;
-import 'package:pancake_app/content/view_models/content_search_view_model.dart';
+import 'package:pancake_app/content/search/view_models/content_search_view_model.dart';
 
 const minutes1 = Duration(minutes: 1);
 
@@ -13,7 +13,7 @@ void main() {
     test('쿼리가 빈 값이면 호출하지 않는다', () async {
       //given
       var count = 0;
-      var viewModel = SearchViewModel(Api(
+      var viewModel = ContentSearchViewModel(Api(
         baseUrl: '',
         client: MockClient(whenRequest(() => count += 1)),
       ));
@@ -28,7 +28,7 @@ void main() {
     test('쿼리가 이전 쿼리와 같으면 호출하지 않는다', () async {
       //given
       var count = 0;
-      var viewModel = SearchViewModel(Api(
+      var viewModel = ContentSearchViewModel(Api(
         baseUrl: '',
         client: MockClient(whenRequest(() => count += 1)),
       ));
@@ -44,7 +44,7 @@ void main() {
     test('쿼리가 이전 쿼리와 같지 않으면 호출한다', () async {
       //given
       var count = 0;
-      var viewModel = SearchViewModel(Api(
+      var viewModel = ContentSearchViewModel(Api(
         baseUrl: '',
         client: MockClient(whenRequest(() => count += 1)),
       ));

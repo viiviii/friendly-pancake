@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/home/home_screen.dart';
 
-typedef ContentSelected<Content> = void Function(Content selected);
-
 void main() {
   runApp(const MyApp());
 }

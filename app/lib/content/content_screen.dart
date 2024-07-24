@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pancake_app/api/api.dart' show api;
-
-import '../widgets/my_future_builder.dart';
-import 'view_models/content_search_view_model.dart';
-import 'views/content_search_bar_section.dart';
-import 'views/content_search_result_section.dart';
+import 'package:pancake_app/content/bookmark/bookmark_screen.dart';
+import 'package:pancake_app/content/search/content_search_screen.dart';
+import 'package:pancake_app/content/search/view_models/content_search_view_model.dart';
+import 'package:pancake_app/widgets/overflow_navigation_bar.dart';
 
 class ContentScreen extends StatefulWidget {
   const ContentScreen({super.key});
@@ -14,17 +13,48 @@ class ContentScreen extends StatefulWidget {
 }
 
 class _ContentScreenState extends State<ContentScreen> {
-  final SearchViewModel _viewModel = SearchViewModel(api);
-  Future<SearchResult>? _searchResult;
+  late final List<_Menu> _menu = [
+    _Menu(
+      ContentSearchScreen(onSelected: _onSearchContentSelected),
+      icon: const Icon(Icons.search),
+      label: const Text('검색'),
+    ),
+    const _Menu(
+      BookmarkScreen(),
+      icon: Icon(Icons.bookmark),
+      label: Text('북마크'),
+    ),
+  ];
 
-  void onSearched(String query) {
-    setState(() {
-      _searchResult = _viewModel.searchBy(query);
-    });
+  int _currentIndex = 0;
+
+  Future<void> _onMenuSelected(int index) async {
+    setState(() => _currentIndex = index);
+    _clearSavedMessages();
   }
 
-  void onAddToBookmark(SearchContent content) {
-    _viewModel.addToBookmark(content);
+  Future<void> _onSearchContentSelected(SearchContent searchContent) async {
+    await _addToBookmark(searchContent);
+    _alertSavedMessage();
+  }
+
+  void _alertSavedMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('저장 되었습니다.')),
+    );
+  }
+
+  void _clearSavedMessages() {
+    ScaffoldMessenger.of(context).clearSnackBars();
+  }
+
+  Future<void> _addToBookmark(SearchContent searchContent) async {
+    await api.post('bookmarks', body: {
+      'contentSource': 'TMDB', // TODO: 하드코딩
+      'contentId': searchContent.id,
+      'contentType': 'movie', // TODO: 하드코딩, tv도 생길 예정임
+      'title': searchContent.title,
+    });
   }
 
   @override
@@ -34,23 +64,23 @@ class _ContentScreenState extends State<ContentScreen> {
         title: const Text('컨텐츠'),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 80.0),
-        child: ListView(
-          children: [
-            ContentSearchBarSection(onSubmitted: onSearched),
-            const SizedBox(height: 30),
-            MyFutureBuilder<SearchResult>(
-              future: _searchResult,
-              builder: (_, data) {
-                return ContentSearchResultSection(
-                  onItemAdded: onAddToBookmark,
-                  result: data,
-                );
-              },
-            )
-          ],
+        padding: const EdgeInsets.only(top: 15),
+        child: OverflowNavigationBar(
+          onDestinationSelected: _onMenuSelected,
+          destinations: _menu,
+          selectedIndex: _currentIndex,
+          body: Padding(
+            padding: const EdgeInsets.all(30),
+            child: _menu[_currentIndex].screen,
+          ),
         ),
       ),
     );
   }
+}
+
+class _Menu extends NavigationRailDestination {
+  const _Menu(this.screen, {required super.icon, required super.label});
+
+  final Widget screen;
 }

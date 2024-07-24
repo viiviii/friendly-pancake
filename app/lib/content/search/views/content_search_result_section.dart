@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../view_models/content_search_view_model.dart';
 
-typedef ContentSelected<SearchContent> = void Function(SearchContent content);
-
 class ContentSearchResultSection extends StatelessWidget {
   const ContentSearchResultSection({
     super.key,
@@ -11,8 +9,8 @@ class ContentSearchResultSection extends StatelessWidget {
     required this.result,
   });
 
-  final ContentSelected<SearchContent> onItemAdded;
-  final SearchResult result;
+  final ValueSetter<SearchContent> onItemAdded;
+  final ContentSearchResult result;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +39,7 @@ class _SearchItemView extends StatelessWidget {
     required this.content,
   });
 
-  final ContentSelected<SearchContent> onAdded;
+  final ValueSetter<SearchContent> onAdded;
   final SearchContent content;
 
   @override

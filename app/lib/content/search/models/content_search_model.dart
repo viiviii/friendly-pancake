@@ -1,20 +1,20 @@
-class SearchResponse {
+class ContentSearchResponse {
   final bool hasNext;
-  final List<SearchResponseItem> contents;
+  final List<ContentSearchResponseItem> contents;
 
-  SearchResponse(dynamic json)
+  ContentSearchResponse(dynamic json)
       : hasNext = json['hasNext'] as bool,
         contents = json['contents']
-            .map<SearchResponseItem>(SearchResponseItem.new)
+            .map<ContentSearchResponseItem>(ContentSearchResponseItem.new)
             .toList();
 
   @override
   String toString() {
-    return 'SearchResponse{hasNext: $hasNext, contents: $contents}';
+    return 'ContentSearchResponse{hasNext: $hasNext, contents: $contents}';
   }
 }
 
-class SearchResponseItem {
+class ContentSearchResponseItem {
   final String id;
   final String title;
   final String originalTitle;
@@ -22,7 +22,7 @@ class SearchResponseItem {
   final String imageUrl;
   final String releaseDate;
 
-  SearchResponseItem(dynamic json)
+  ContentSearchResponseItem(dynamic json)
       : id = json['id'] as String,
         title = json['title'] as String,
         originalTitle = json['originalTitle'] as String,
@@ -32,7 +32,7 @@ class SearchResponseItem {
 
   @override
   String toString() {
-    return 'SearchResponseItem{id: $id, title: $title, originalTitle: $originalTitle, '
+    return 'ContentSearchResponseItem{id: $id, title: $title, originalTitle: $originalTitle, '
         'description: $description, imageUrl: $imageUrl, releaseDate: $releaseDate}';
   }
 }
