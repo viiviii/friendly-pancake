@@ -1,6 +1,5 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.content.domain.Content;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,8 +18,4 @@ public class ContentMetadata {
     private String description;
     private String imageUrl;
     private LocalDate releaseDate;
-
-    public Content toContent() {
-        return new Content(title, description, imageUrl);
-    }
 }

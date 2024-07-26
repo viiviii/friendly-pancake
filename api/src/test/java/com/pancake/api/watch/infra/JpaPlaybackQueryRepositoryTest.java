@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import static com.pancake.api.content.Builders.aMetadata;
+import static com.pancake.api.content.Builders.aContentSaveCommand;
 import static com.pancake.api.content.Builders.aPlayback;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +64,7 @@ class JpaPlaybackQueryRepositoryTest {
     }
 
     private Content contentWith(Builders.PlaybackBuilder playback) {
-        var content = aMetadata().build().toContent();
+        var content = aContentSaveCommand().build().toContent();
         content.add(playback.build());
 
         return content;

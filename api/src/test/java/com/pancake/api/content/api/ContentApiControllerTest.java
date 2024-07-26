@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static com.pancake.api.content.Builders.aMetadata;
+import static com.pancake.api.content.Builders.aContentSaveCommand;
 import static com.pancake.api.content.Builders.aStreaming;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -32,7 +32,7 @@ class ContentApiControllerTest {
     @Test
     void saveContent() {
         //given
-        var request = aMetadata().build();
+        var request = aContentSaveCommand().build();
         var content = request.toContent();
 
         given(contentService.save(request)).willReturn(content);

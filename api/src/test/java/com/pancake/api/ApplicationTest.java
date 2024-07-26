@@ -5,6 +5,7 @@ import com.pancake.api.bookmark.BookmarkService;
 import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.AddPlayback;
+import com.pancake.api.content.application.ContentSaveCommand;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.Playback;
@@ -25,8 +26,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
-import static com.pancake.api.content.Builders.aMetadata;
-import static com.pancake.api.content.Builders.aStreaming;
+import static com.pancake.api.content.Builders.*;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
@@ -108,14 +108,14 @@ class ApplicationTest {
         @Test
         void 컨텐츠의_메타데이터를_저장한다() {
             //given
-            var metadata = aMetadata()
+            var command = aContentSaveCommand()
                     .title("토토로")
                     .description("설명")
                     .imageUrl("http://some.image")
                     .build();
 
             //when
-            var content = contentService.save(metadata);
+            var content = contentService.save(command);
 
             //then
             assertThat(actualBy(content.getId(), Content.class))
@@ -127,7 +127,7 @@ class ApplicationTest {
         @Test
         void 컨텐츠에_시청주소를_추가한다() {
             //given
-            var contentId = save(aMetadata());
+            var contentId = save(aContentSaveCommand());
 
             //when
             addPlayback.command(
@@ -149,7 +149,7 @@ class ApplicationTest {
         @Test
         void 컨텐츠를_시청_처리한다() {
             //given
-            var contentId = save(aMetadata());
+            var contentId = save(aContentSaveCommand());
 
             //when
             contentService.watch(contentId);
@@ -162,7 +162,7 @@ class ApplicationTest {
         @Test
         void 컨텐츠의_이미지를_변경한다() {
             //given
-            var contentId = save(aMetadata().imageUrl("원래 이미지 주소"));
+            var contentId = save(aContentSaveCommand().imageUrl("원래 이미지 주소"));
 
             //when
             contentService.changeImage(contentId, "바뀐 이미지 주소");
@@ -185,7 +185,7 @@ class ApplicationTest {
         @Test
         void 시청주소를_조회한다() {
             //given
-            var contentId = save(aMetadata());
+            var contentId = save(aContentSaveCommand());
             add(contentId, aStreaming().url("https://www.netflix.com/watch/100000001"));
 
             //when
@@ -198,8 +198,8 @@ class ApplicationTest {
         @Test
         void 시청할_컨텐츠_목록을_조회한다() {
             //given
-            save(aMetadata().title("스파이더맨"));
-            add(save(aMetadata().title("토르")), aStreaming());
+            save(aContentSaveCommand().title("스파이더맨"));
+            add(save(aContentSaveCommand().title("토르")), aStreaming());
 
             //when
             var actual = getContentsToWatch.query();
@@ -231,7 +231,7 @@ class ApplicationTest {
         }
     }
 
-    private Long save(Builders.ContentMetadataBuilder builder) {
+    private Long save(ContentSaveCommand.ContentSaveCommandBuilder builder) {
         return contentService.save(builder.build()).getId();
     }
 

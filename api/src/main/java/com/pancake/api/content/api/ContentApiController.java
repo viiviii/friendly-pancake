@@ -1,7 +1,7 @@
 package com.pancake.api.content.api;
 
 import com.pancake.api.content.application.AddPlayback;
-import com.pancake.api.content.application.ContentMetadata;
+import com.pancake.api.content.application.ContentSaveCommand;
 import com.pancake.api.content.application.ContentService;
 import com.pancake.api.content.application.ContentStreaming;
 import com.pancake.api.content.domain.ContentRepository;
@@ -33,8 +33,8 @@ public class ContentApiController {
     }
 
     @PostMapping
-    public ResponseEntity<ContentResponse> save(@RequestBody ContentMetadata metadata) {
-        final var content = contentService.save(metadata);
+    public ResponseEntity<ContentResponse> save(@RequestBody ContentSaveCommand command) {
+        final var content = contentService.save(command);
         final var response = new ContentResponse(content);
 
         return status(CREATED).body(response);
