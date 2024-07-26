@@ -3,6 +3,7 @@ package com.pancake.api;
 import com.pancake.api.bookmark.BookmarkResponse;
 import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.api.ContentResponse;
+import com.pancake.api.content.application.ContentSaveCommand.ContentSaveCommandBuilder;
 import com.pancake.api.content.domain.Playback;
 import com.pancake.api.search.SearchContentMetadata;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
@@ -90,7 +91,7 @@ class AcceptanceTest {
     @Test
     void 나는_컨텐츠를_관리할_수_있다() {
         //준비
-        컨텐츠를_등록한다().apply(aMetadata());
+        컨텐츠를_등록한다().apply(aContentSaveCommand());
 
         //목표
         var 컨텐츠_목록 = 컨텐츠_목록을_조회한다();
@@ -146,7 +147,7 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private Function<ContentMetadataBuilder, ContentResponse> 컨텐츠를_등록한다() {
+    private Function<ContentSaveCommandBuilder, ContentResponse> 컨텐츠를_등록한다() {
         return builder -> client.post().uri("/api/contents")
                 .contentType(APPLICATION_JSON)
                 .bodyValue(builder.build())
@@ -227,7 +228,7 @@ class AcceptanceTest {
     }
 
     private void 컨텐츠를_등록하고(Consumer<ContentResponse> fn) {
-        var response = 컨텐츠를_등록한다().apply(aMetadata());
+        var response = 컨텐츠를_등록한다().apply(aContentSaveCommand());
 
         fn.accept(response);
     }

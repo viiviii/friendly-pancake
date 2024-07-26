@@ -1,6 +1,7 @@
 package com.pancake.api.content;
 
 import com.pancake.api.content.application.ContentMetadata;
+import com.pancake.api.content.application.ContentSaveCommand;
 import com.pancake.api.content.application.ContentStreaming;
 import com.pancake.api.content.domain.Platform;
 import com.pancake.api.content.domain.Playback;
@@ -20,8 +21,10 @@ public abstract class Builders {
                 .id("99999")
                 .contentType("movie")
                 .title("테스트용 제목")
+                .originalTitle("테스트용 원제목")
                 .description("테스트용 설명")
-                .imageUrl("테스트용 이미지 주소");
+                .imageUrl("테스트용 이미지 주소")
+                .releaseDate(LocalDate.of(2099, 12, 31));
     }
 
     public static ContentStreamingBuilder aStreaming() {
@@ -59,9 +62,16 @@ public abstract class Builders {
                 .voteCount(7599);
     }
 
+    public static ContentSaveCommand.ContentSaveCommandBuilder aContentSaveCommand() {
+        return ContentSaveCommand.builder()
+                .title("테스트용 제목")
+                .description("테스트용 설명")
+                .imageUrl("테스트용 이미지 주소");
+    }
+
     @Builder(builderMethodName = "contentMetadata")
-    private static ContentMetadata create(String id, String contentType, String title, String description, String imageUrl) {
-        return new ContentMetadata(id, contentType, title, "original title", description, imageUrl, LocalDate.of(2099, 12, 31));
+    private static ContentMetadata create(String id, String contentType, String title, String originalTitle, String description, String imageUrl, LocalDate releaseDate) {
+        return new ContentMetadata(id, contentType, title, originalTitle, description, imageUrl, releaseDate);
     }
 
     @Builder(builderMethodName = "contentStreaming")

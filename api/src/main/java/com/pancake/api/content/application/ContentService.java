@@ -12,8 +12,8 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
 
-    public Content save(ContentMetadata metadata) {
-        return contentRepository.save(metadata.toContent());
+    public Content save(ContentSaveCommand command) {
+        return contentRepository.save(command.toContent());
     }
 
     public Content get(long id) {
