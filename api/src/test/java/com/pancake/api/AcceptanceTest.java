@@ -75,7 +75,7 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자는_컨텐츠를_검색하고_북마크에_저장할_수_있다(@Autowired MemoryMetadataRepository 메타데이터) {
+    void 사용자는_컨텐츠를_검색하고_북마크_할_수_있다(@Autowired MemoryMetadataRepository 메타데이터) {
         //given
         메타데이터.존재한다(aMetadata().title("귀여븐 포뇨"));
 
@@ -86,6 +86,19 @@ class AcceptanceTest {
         //then
         then(북마크_목록을_조회한다()).singleElement()
                 .is(제목은("귀여븐 포뇨"));
+    }
+
+    @Test
+    void 사용자는_직접_입력한_컨텐츠를_북마크_할_수_있다() {
+        //given
+        var 직접_입력한_컨텐츠 = aContentSaveCommand().title("고독한 포뇨").build();
+
+        //when
+        북마크_한다().accept(직접_입력한_컨텐츠);
+
+        //then
+        then(북마크_목록을_조회한다()).singleElement()
+                .is(제목은("고독한 포뇨"));
     }
 
     @Test

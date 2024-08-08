@@ -29,6 +29,7 @@ import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
 import static com.pancake.api.content.Builders.*;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -60,7 +61,7 @@ class ApplicationTest {
         MemoryMetadataRepository metadata;
 
         @Test
-        void 컨텐츠를_북마크에_추가한다() {
+        void 컨텐츠를_북마크한다() {
             //given
             var bookmark = aBookmarkSaveCommand()
                     .title("토토로")
@@ -80,6 +81,31 @@ class ApplicationTest {
                     .returns("8392", Bookmark::getContentId)
                     .returns("movie", Bookmark::getContentType)
                     .returns("TMDB", Bookmark::getContentSource);
+        }
+
+        @Test
+        void 직접_입력한_컨텐츠를_북마크한다() {
+            //given
+            var command = aContentSaveCommand()
+                    .title("고독한 토토로")
+                    .description("설명")
+//                    .url("https://www.netflix.com/watch/0")
+                    .imageUrl("http://some.image")
+                    .build();
+
+            //when
+            var actual = bookmarkService.save(command);
+
+            //then
+            assertAll(
+                    () -> assertThat(actual)
+                            .doesNotReturn(null, Bookmark::getContentId)
+                            .returns("고독한 토토로", Bookmark::getRecordTitle),
+                    () -> assertThat(actualBy(actual.getContentId(), Content.class))
+                            .returns("고독한 토토로", Content::getTitle)
+                            .returns("설명", Content::getDescription)
+                            .returns("http://some.image", Content::getImageUrl)
+            );
         }
 
         @Test
