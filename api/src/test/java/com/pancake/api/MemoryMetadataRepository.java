@@ -1,5 +1,6 @@
 package com.pancake.api;
 
+import com.pancake.api.bookmark.FindMovieMetadata;
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.ContentMetadata;
 import com.pancake.api.search.FindContentMetadata;
@@ -11,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @TestComponent
-public class MemoryMetadataRepository implements FindContentMetadata {
+public class MemoryMetadataRepository implements FindContentMetadata, FindMovieMetadata {
 
     private final Map<String, ContentMetadata> map = new HashMap<>();
 

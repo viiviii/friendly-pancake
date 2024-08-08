@@ -14,7 +14,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     public Bookmark save(BookmarkSaveCommand command) {
-        final var metadata = getContentMetadata.queryBy(command.contentId());
+        final var metadata = getContentMetadata.queryBy(command.contentId(), command.contentType());
         if (metadata == null || !metadata.getTitle().equals(command.title())) {
             throw new IllegalArgumentException();
         }

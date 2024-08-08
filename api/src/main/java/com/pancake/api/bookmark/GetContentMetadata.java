@@ -1,17 +1,27 @@
 package com.pancake.api.bookmark;
 
 import com.pancake.api.content.application.ContentMetadata;
-import com.pancake.api.search.FindContentMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
 public class GetContentMetadata {
 
-    private final FindContentMetadata findContentMetadata; // TODO: 위치
+    private final List<ContentProvider> providers;
 
-    public ContentMetadata queryBy(String contentId) {
-        return findContentMetadata.findById(contentId);
+    public ContentMetadata queryBy(String contentId, String contentType) {
+        final var provider = providers.stream()
+                .filter(isProviderFor(contentType))
+                .findAny().orElseThrow();
+
+        return provider.getBy(contentId);
+    }
+
+    private Predicate<ContentProvider> isProviderFor(String contentType) {
+        return e -> e.provideType().equals(contentType);
     }
 }

@@ -1,6 +1,5 @@
 package com.pancake.api;
 
-import com.pancake.api.search.FindContentMetadata;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -10,7 +9,7 @@ public class TestConfig {
 
     @Bean
     @Primary
-    public FindContentMetadata findContentMetadata() {
+    public MemoryMetadataRepository memoryMetadataRepository() {
         return new MemoryMetadataRepository();
     }
 }

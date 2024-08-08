@@ -1,5 +1,6 @@
 package com.pancake.api.content.infra.api;
 
+import com.pancake.api.bookmark.FindMovieMetadata;
 import com.pancake.api.content.application.ContentMetadata;
 import com.pancake.api.search.FindContentMetadata;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-class ContentMetadataAdapter implements FindContentMetadata {
+class ContentMetadataAdapter implements FindContentMetadata, FindMovieMetadata {
 
     private final TmdbClient tmdbApiClient;
 

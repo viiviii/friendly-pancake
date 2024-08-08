@@ -1,6 +1,7 @@
 package com.pancake.api;
 
 import com.pancake.api.bookmark.Bookmark;
+import com.pancake.api.bookmark.BookmarkCustomContent;
 import com.pancake.api.bookmark.BookmarkService;
 import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.Builders;
@@ -58,6 +59,9 @@ class ApplicationTest {
         BookmarkService bookmarkService;
 
         @Autowired
+        BookmarkCustomContent bookmarkCustomContent;
+
+        @Autowired
         MemoryMetadataRepository metadata;
 
         @Test
@@ -86,7 +90,7 @@ class ApplicationTest {
         @Test
         void 직접_입력한_컨텐츠를_북마크한다() {
             //given
-            var command = aContentSaveCommand()
+            var command = BookmarkCustomContent.Command.builder()
                     .title("고독한 토토로")
                     .description("설명")
 //                    .url("https://www.netflix.com/watch/0")
@@ -94,13 +98,12 @@ class ApplicationTest {
                     .build();
 
             //when
-            var actual = bookmarkService.save(command);
+            var actualId = bookmarkCustomContent.command(command);
 
             //then
+            var actual = actualBy(actualId, Bookmark.class);
             assertAll(
-                    () -> assertThat(actual)
-                            .doesNotReturn(null, Bookmark::getContentId)
-                            .returns("고독한 토토로", Bookmark::getRecordTitle),
+                    () -> assertThat(actual.getRecordTitle()).isEqualTo("고독한 토토로"),
                     () -> assertThat(actualBy(actual.getContentId(), Content.class))
                             .returns("고독한 토토로", Content::getTitle)
                             .returns("설명", Content::getDescription)
@@ -109,7 +112,7 @@ class ApplicationTest {
         }
 
         @Test
-        void 북마크_목록을_조회한다() {
+        void 목록을_조회한다() {
             //given
             metadata.존재한다(aMetadata().id("8392").title("토토로"));
             metadata.존재한다(aMetadata().id("9090").title("토토로"));

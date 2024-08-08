@@ -21,9 +21,10 @@ class BookmarkServiceTest {
         //given
         var bookmark = aBookmarkSaveCommand()
                 .contentId("8392")
+                .contentType("movie")
                 .build();
 
-        given(getContentMetadata.queryBy("8392")).willReturn(null);
+        given(getContentMetadata.queryBy("8392", "movie")).willReturn(null);
 
         //when
         ThrowingCallable actual = () -> bookmarkService.save(bookmark);
@@ -39,10 +40,9 @@ class BookmarkServiceTest {
                 .title("저장할 제목")
                 .contentId("8392")
                 .contentType("movie")
-                .contentSource("TMDB")
                 .build();
 
-        given(getContentMetadata.queryBy("8392"))
+        given(getContentMetadata.queryBy("8392", "movie"))
                 .willReturn(aMetadata().title("다른 제목").build());
 
 

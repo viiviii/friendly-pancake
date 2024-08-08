@@ -91,10 +91,10 @@ class AcceptanceTest {
     @Test
     void 사용자는_직접_입력한_컨텐츠를_북마크_할_수_있다() {
         //given
-        var 직접_입력한_컨텐츠 = aContentSaveCommand().title("고독한 포뇨").build();
+        var 컨텐츠 = aContentSaveCommand().title("고독한 포뇨");
 
         //when
-        북마크_한다().accept(직접_입력한_컨텐츠);
+        직접_입력한_컨텐츠를_북마크한다().accept(컨텐츠);
 
         //then
         then(북마크_목록을_조회한다()).singleElement()
@@ -148,6 +148,14 @@ class AcceptanceTest {
                     .title(content.getTitle())
             );
         };
+    }
+
+    private Consumer<ContentSaveCommandBuilder> 직접_입력한_컨텐츠를_북마크한다() {
+        return request -> client.post().uri("/api/bookmarks/customs")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(request.build())
+                .exchange()
+                .expectStatus().is2xxSuccessful();
     }
 
     private Function<BookmarkSaveCommandBuilder, BookmarkResponse> 북마크를_등록한다() {
