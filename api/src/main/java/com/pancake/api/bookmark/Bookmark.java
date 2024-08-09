@@ -22,8 +22,6 @@ public class Bookmark {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private String contentSource;
-
     private String contentId;
 
     private String contentType;

@@ -1,7 +1,7 @@
 package com.pancake.api;
 
 import com.pancake.api.bookmark.BookmarkResponse;
-import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
+import com.pancake.api.bookmark.BookmarkSaveCommand.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.application.ContentSaveCommand.ContentSaveCommandBuilder;
 import com.pancake.api.content.domain.Playback;
@@ -142,7 +142,6 @@ class AcceptanceTest {
         return result -> {
             var content = 첫번째를_선택(result.contents());
             북마크를_등록한다().apply(aBookmarkSaveCommand()
-                    .contentSource(result.getContentSource())
                     .contentId(content.getId())
                     .contentType(content.getContentType())
                     .title(content.getTitle())

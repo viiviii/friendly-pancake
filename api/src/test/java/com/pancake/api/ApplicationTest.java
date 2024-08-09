@@ -2,8 +2,8 @@ package com.pancake.api;
 
 import com.pancake.api.bookmark.Bookmark;
 import com.pancake.api.bookmark.BookmarkCustomContent;
+import com.pancake.api.bookmark.BookmarkSaveCommand;
 import com.pancake.api.bookmark.BookmarkService;
-import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentSaveCommand;
@@ -71,7 +71,6 @@ class ApplicationTest {
                     .title("토토로")
                     .contentId("8392")
                     .contentType("movie")
-                    .contentSource("TMDB")
                     .build();
 
             metadata.존재한다(aMetadata().id("8392").title("토토로"));
@@ -83,8 +82,7 @@ class ApplicationTest {
             assertThat(actual)
                     .returns("토토로", Bookmark::getRecordTitle)
                     .returns("8392", Bookmark::getContentId)
-                    .returns("movie", Bookmark::getContentType)
-                    .returns("TMDB", Bookmark::getContentSource);
+                    .returns("movie", Bookmark::getContentType);
         }
 
         @Test
@@ -98,10 +96,9 @@ class ApplicationTest {
                     .build();
 
             //when
-            var actualId = bookmarkCustomContent.command(command);
+            var actual = bookmarkCustomContent.command(command);
 
             //then
-            var actual = actualBy(actualId, Bookmark.class);
             assertAll(
                     () -> assertThat(actual.getRecordTitle()).isEqualTo("고독한 토토로"),
                     () -> assertThat(actualBy(actual.getContentId(), Content.class))
@@ -126,7 +123,7 @@ class ApplicationTest {
             assertThat(actual).hasSize(2);
         }
 
-        private Bookmark save(BookmarkSaveCommandBuilder builder) {
+        private Bookmark save(BookmarkSaveCommand.BookmarkSaveCommandBuilder builder) {
             return bookmarkService.save(builder.build());
         }
     }
