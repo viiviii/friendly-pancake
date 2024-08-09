@@ -1,5 +1,8 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.bookmark.application;
 
+import com.pancake.api.bookmark.domain.Bookmark;
+import com.pancake.api.bookmark.domain.BookmarkRepository;
+import com.pancake.api.content.GetContent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,13 +12,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookmarkService {
 
-    private final GetContentMetadata getContentMetadata;
+    private final GetContent getContent;
 
     private final BookmarkRepository bookmarkRepository;
 
     public Bookmark save(BookmarkSaveCommand command) {
-        final var metadata = getContentMetadata.queryBy(command.contentId(), command.contentType());
-        if (metadata == null || !metadata.getTitle().equals(command.title())) {
+        final var content = getContent.queryBy(command.contentId(), command.contentType());
+        if (content == null || !content.getTitle().equals(command.title())) {
             throw new IllegalArgumentException();
         }
         final var bookmark = command.toBookmark();

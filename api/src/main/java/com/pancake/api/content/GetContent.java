@@ -1,4 +1,4 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.content;
 
 import com.pancake.api.content.application.ContentMetadata;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
-public class GetContentMetadata {
+public class GetContent {
 
     private final List<ContentProvider> providers;
 

@@ -1,4 +1,6 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.bookmark.api;
+
+import com.pancake.api.bookmark.domain.Bookmark;
 
 public record BookmarkResponse(Long id, String contentId, String contentType, String recordTitle) {
     public BookmarkResponse(Bookmark bookmark) {

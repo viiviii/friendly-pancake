@@ -1,4 +1,4 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.content;
 
 import com.pancake.api.content.application.ContentMetadata;
 

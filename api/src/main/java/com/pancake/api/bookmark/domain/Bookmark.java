@@ -1,4 +1,4 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.bookmark.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

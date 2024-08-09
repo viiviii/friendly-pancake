@@ -1,5 +1,7 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.bookmark.api;
 
+import com.pancake.api.bookmark.application.BookmarkSaveCommand;
+import com.pancake.api.bookmark.application.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

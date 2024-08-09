@@ -1,5 +1,8 @@
 package com.pancake.api.bookmark;
 
+import com.pancake.api.bookmark.application.BookmarkService;
+import com.pancake.api.bookmark.domain.BookmarkRepository;
+import com.pancake.api.content.GetContent;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 
@@ -12,9 +15,9 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("NonAsciiCharacters")
 class BookmarkServiceTest {
 
-    private final GetContentMetadata getContentMetadata = mock(GetContentMetadata.class);
+    private final GetContent getContent = mock(GetContent.class);
     private final BookmarkRepository bookmarkRepository = mock(BookmarkRepository.class);
-    private final BookmarkService bookmarkService = new BookmarkService(getContentMetadata, bookmarkRepository);
+    private final BookmarkService bookmarkService = new BookmarkService(getContent, bookmarkRepository);
 
     @Test
     void 메타데이터가_존재하지_않으면_예외가_발생한다() {
@@ -24,7 +27,7 @@ class BookmarkServiceTest {
                 .contentType("movie")
                 .build();
 
-        given(getContentMetadata.queryBy("8392", "movie")).willReturn(null);
+        given(getContent.queryBy("8392", "movie")).willReturn(null);
 
         //when
         ThrowingCallable actual = () -> bookmarkService.save(bookmark);
@@ -42,7 +45,7 @@ class BookmarkServiceTest {
                 .contentType("movie")
                 .build();
 
-        given(getContentMetadata.queryBy("8392", "movie"))
+        given(getContent.queryBy("8392", "movie"))
                 .willReturn(aMetadata().title("다른 제목").build());
 
 

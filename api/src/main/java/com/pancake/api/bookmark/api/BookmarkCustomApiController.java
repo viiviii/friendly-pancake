@@ -1,5 +1,6 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.bookmark.api;
 
+import com.pancake.api.bookmark.application.BookmarkCustom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +16,11 @@ import static org.springframework.http.ResponseEntity.status;
 @RequiredArgsConstructor
 public class BookmarkCustomApiController {
 
-    private final BookmarkCustomContent bookmarkCustomContent;
+    private final BookmarkCustom bookmarkCustom;
 
     @PostMapping
-    public ResponseEntity<Void> post(@RequestBody BookmarkCustomContent.Command command) {
-        bookmarkCustomContent.command(command);
+    public ResponseEntity<Void> post(@RequestBody BookmarkCustom.Command command) {
+        bookmarkCustom.command(command);
 
         return status(CREATED).build();
     }

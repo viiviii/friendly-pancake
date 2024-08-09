@@ -1,5 +1,8 @@
 package com.pancake.api.bookmark;
 
+import com.pancake.api.bookmark.api.BookmarkApiController;
+import com.pancake.api.bookmark.api.BookmarkResponse;
+import com.pancake.api.bookmark.application.BookmarkService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

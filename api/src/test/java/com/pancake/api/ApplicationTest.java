@@ -1,9 +1,9 @@
 package com.pancake.api;
 
-import com.pancake.api.bookmark.Bookmark;
-import com.pancake.api.bookmark.BookmarkCustomContent;
-import com.pancake.api.bookmark.BookmarkSaveCommand;
-import com.pancake.api.bookmark.BookmarkService;
+import com.pancake.api.bookmark.application.BookmarkCustom;
+import com.pancake.api.bookmark.application.BookmarkSaveCommand;
+import com.pancake.api.bookmark.application.BookmarkService;
+import com.pancake.api.bookmark.domain.Bookmark;
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentSaveCommand;
@@ -61,7 +61,7 @@ class ApplicationTest {
         BookmarkService bookmarkService;
 
         @Autowired
-        BookmarkCustomContent bookmarkCustom;
+        BookmarkCustom bookmarkCustom;
 
         @Autowired
         MemoryMovies movies;
@@ -90,7 +90,7 @@ class ApplicationTest {
         @Test
         void 직접_입력한_컨텐츠를_북마크한다() {
             //given
-            var command = BookmarkCustomContent.Command.builder()
+            var command = BookmarkCustom.Command.builder()
                     .title("고독한 토토로")
                     .description("설명")
 //                    .url("https://www.netflix.com/watch/0")

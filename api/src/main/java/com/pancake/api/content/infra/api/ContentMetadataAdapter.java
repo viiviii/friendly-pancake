@@ -1,8 +1,8 @@
 package com.pancake.api.content.infra.api;
 
 
-import com.pancake.api.bookmark.FindMovie;
 import com.pancake.api.content.application.ContentMetadata;
+import com.pancake.api.content.movie.FindMovie;
 import com.pancake.api.search.SearchMovie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

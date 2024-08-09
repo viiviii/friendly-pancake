@@ -1,6 +1,6 @@
 package com.pancake.api.content.application;
 
-import com.pancake.api.bookmark.ContentProvider;
+import com.pancake.api.content.ContentProvider;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.ContentRepository;
 import lombok.RequiredArgsConstructor;

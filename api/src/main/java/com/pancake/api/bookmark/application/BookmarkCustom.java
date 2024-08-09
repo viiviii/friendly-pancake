@@ -1,5 +1,6 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.bookmark.application;
 
+import com.pancake.api.bookmark.domain.Bookmark;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.ContentRepository;
 import lombok.Builder;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BookmarkCustomContent {
+public class BookmarkCustom {
     private final ContentRepository contentRepository;
     private final BookmarkService bookmarkService;
 

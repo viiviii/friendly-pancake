@@ -1,5 +1,6 @@
-package com.pancake.api.bookmark;
+package com.pancake.api.bookmark.application;
 
+import com.pancake.api.bookmark.domain.Bookmark;
 import lombok.Builder;
 
 @Builder
