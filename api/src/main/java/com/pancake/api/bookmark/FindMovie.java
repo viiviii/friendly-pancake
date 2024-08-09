@@ -2,7 +2,7 @@ package com.pancake.api.bookmark;
 
 import com.pancake.api.content.application.ContentMetadata;
 
-public interface FindMovieMetadata {
+public interface FindMovie {
 
     ContentMetadata findById(String id);
 }

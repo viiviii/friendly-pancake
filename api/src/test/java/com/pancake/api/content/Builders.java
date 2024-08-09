@@ -44,7 +44,7 @@ public abstract class Builders {
                 .totalResults(1);
     }
 
-    public static TmdbMovie.Builder aTmdbMovie() {
+    public static TmdbMovie.TmdbMovieBuilder aTmdbMovie() {
         return TmdbMovie.builder()
                 .adult(false)
                 .backdropPath("/fxYazFVeOCHpHwu.jpg")

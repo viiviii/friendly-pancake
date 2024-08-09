@@ -15,11 +15,11 @@ import static org.springframework.http.ResponseEntity.status;
 @RequiredArgsConstructor
 public class SearchApiController {
 
-    private final SearchContentMetadata searchContentMetadata;
+    private final SearchMovie searchMovie;
 
     @GetMapping("contents")
-    public ResponseEntity<SearchContentMetadata.Result> searchContents(@RequestParam String query) {
-        final var result = searchContentMetadata.queryBy(query);
+    public ResponseEntity<SearchMovie.Result> get(@RequestParam String query) {
+        final var result = searchMovie.query(query);
 
         return status(OK).body(result);
     }

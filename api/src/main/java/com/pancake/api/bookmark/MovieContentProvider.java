@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MovieContentProvider implements ContentProvider {
 
-    private final FindMovieMetadata findMovieMetadata;
+    private final FindMovie findMovie;
 
     @Override
     public String provideType() {
@@ -17,6 +17,6 @@ public class MovieContentProvider implements ContentProvider {
 
     @Override
     public ContentMetadata getBy(String contentId) {
-        return findMovieMetadata.findById(contentId);
+        return findMovie.findById(contentId);
     }
 }

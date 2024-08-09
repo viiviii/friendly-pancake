@@ -1,18 +1,16 @@
 package com.pancake.api;
 
-import com.pancake.api.bookmark.FindMovieMetadata;
+import com.pancake.api.bookmark.FindMovie;
 import com.pancake.api.content.Builders;
 import com.pancake.api.content.application.ContentMetadata;
-import com.pancake.api.search.FindContentMetadata;
+import com.pancake.api.search.SearchMovie;
 import org.springframework.boot.test.context.TestComponent;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @TestComponent
-public class MemoryMetadataRepository implements FindContentMetadata, FindMovieMetadata {
+public class MemoryMetadataRepository implements SearchMovie, FindMovie {
 
     private final Map<String, ContentMetadata> map = new HashMap<>();
 
@@ -27,9 +25,10 @@ public class MemoryMetadataRepository implements FindContentMetadata, FindMovieM
     }
 
     @Override
-    public Page<ContentMetadata> findAllByTitle(String title) {
-        return new PageImpl<>(map.values().stream()
+    public Result query(String title) {
+        var page = map.values().stream()
                 .filter(e -> e.getTitle().equals(title))
-                .toList());
+                .toList();
+        return null; // TODO
     }
 }

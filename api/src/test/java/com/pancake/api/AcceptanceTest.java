@@ -5,7 +5,7 @@ import com.pancake.api.bookmark.BookmarkSaveCommand.BookmarkSaveCommandBuilder;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.application.ContentSaveCommand.ContentSaveCommandBuilder;
 import com.pancake.api.content.domain.Playback;
-import com.pancake.api.search.SearchContentMetadata;
+import com.pancake.api.search.SearchMovie;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
 import com.pancake.api.watch.domain.WatchContent;
@@ -138,13 +138,13 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private Consumer<SearchContentMetadata.Result> 첫번째_결과를_북마크로_등록한다() {
+    private Consumer<SearchMovie.Result> 첫번째_결과를_북마크로_등록한다() {
         return result -> {
             var content = 첫번째를_선택(result.contents());
             북마크를_등록한다().apply(aBookmarkSaveCommand()
-                    .contentId(content.getId())
-                    .contentType(content.getContentType())
-                    .title(content.getTitle())
+                    .contentId(content.id())
+                    .contentType(content.mediaType())
+                    .title(content.title())
             );
         };
     }
@@ -177,11 +177,11 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private SearchContentMetadata.Result 컨텐츠를_검색한다(String title) {
+    private SearchMovie.Result 컨텐츠를_검색한다(String title) {
         return client.get().uri("/api/search/contents?query={title}", title)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(SearchContentMetadata.Result.class)
+                .expectBody(SearchMovie.Result.class)
                 .returnResult().getResponseBody();
 
     }
