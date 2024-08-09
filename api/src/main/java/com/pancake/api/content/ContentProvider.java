@@ -4,7 +4,7 @@ import com.pancake.api.content.application.ContentMetadata;
 
 public interface ContentProvider {
 
-    String provideType();
+    ContentType provideType();
 
     ContentMetadata getBy(String contentId);
 }

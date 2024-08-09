@@ -1,11 +1,14 @@
 package com.pancake.api.bookmark.application;
 
 import com.pancake.api.bookmark.domain.Bookmark;
+import com.pancake.api.bookmark.domain.BookmarkContent;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.ContentRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.pancake.api.content.ContentType.custom;
 
 @Service
 @RequiredArgsConstructor
@@ -14,22 +17,23 @@ public class BookmarkCustom {
     private final BookmarkService bookmarkService;
 
 
-    public Bookmark command(Command command) {
-        final var content = contentRepository.save(toContent(command));
+    public Bookmark command(BookmarkCustom.Command command) {
+        final var savedContent = saveContentWith(command);
 
-        return bookmarkService.save(toBookmark(content));
+        return bookmarkThe(savedContent);
     }
 
-    private Content toContent(Command command) {
-        return new Content(command.title(), command.description(), command.imageUrl());
+    private Content saveContentWith(BookmarkCustom.Command command) {
+        final var content = new Content(command.title(), command.description(), command.imageUrl());
+
+        return contentRepository.save(content);
     }
 
-    private BookmarkSaveCommand toBookmark(Content content) {
-        return BookmarkSaveCommand.builder()
-                .contentId(content.getId().toString())
-                .contentType("custom")
-                .title(content.getTitle())
-                .build();
+    private Bookmark bookmarkThe(Content content) {
+        final var bookmarkContent = new BookmarkContent(content.getId().toString(), custom); // TODO: type이 왜 흩어져 계신지..
+        final var bookmark = new Bookmark(bookmarkContent, content.getTitle());
+
+        return bookmarkService.save(bookmark);
     }
 
     @Builder

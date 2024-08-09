@@ -13,15 +13,18 @@ public class GetContent {
 
     private final List<ContentProvider> providers;
 
-    public ContentMetadata queryBy(String contentId, String contentType) {
+    public ContentMetadata query(Query query) {
         final var provider = providers.stream()
-                .filter(isProviderFor(contentType))
+                .filter(isProviderFor(query.contentType()))
                 .findAny().orElseThrow();
 
-        return provider.getBy(contentId);
+        return provider.getBy(query.contentId());
     }
 
-    private Predicate<ContentProvider> isProviderFor(String contentType) {
+    private Predicate<ContentProvider> isProviderFor(ContentType contentType) {
         return e -> e.provideType().equals(contentType);
+    }
+
+    public record Query(String contentId, ContentType contentType) {
     }
 }

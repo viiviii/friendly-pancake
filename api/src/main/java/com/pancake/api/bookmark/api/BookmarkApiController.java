@@ -1,6 +1,5 @@
 package com.pancake.api.bookmark.api;
 
-import com.pancake.api.bookmark.application.BookmarkSaveCommand;
 import com.pancake.api.bookmark.application.BookmarkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +19,8 @@ public class BookmarkApiController {
     private final BookmarkService bookmarkService;
 
     @PostMapping
-    public ResponseEntity<BookmarkResponse> save(@RequestBody BookmarkSaveCommand command) {
-        final var bookmark = bookmarkService.save(command);
+    public ResponseEntity<BookmarkResponse> save(@RequestBody BookmarkRequest request) {
+        final var bookmark = bookmarkService.save(request.toBookmark());
 
         return status(CREATED).body(new BookmarkResponse(bookmark));
     }

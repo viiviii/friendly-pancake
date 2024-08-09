@@ -1,10 +1,11 @@
 package com.pancake.api;
 
 import com.pancake.api.bookmark.application.BookmarkCustom;
-import com.pancake.api.bookmark.application.BookmarkSaveCommand;
 import com.pancake.api.bookmark.application.BookmarkService;
 import com.pancake.api.bookmark.domain.Bookmark;
+import com.pancake.api.bookmark.domain.BookmarkContent;
 import com.pancake.api.content.Builders;
+import com.pancake.api.content.ContentType;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentSaveCommand;
 import com.pancake.api.content.application.ContentService;
@@ -26,10 +27,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Instant;
 import java.util.List;
 
+import static com.pancake.api.bookmark.Builders.aBookmark;
 import static com.pancake.api.bookmark.Builders.aBookmarkCustom;
-import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
 import static com.pancake.api.content.Builders.aContentSaveCommand;
 import static com.pancake.api.content.Builders.aStreaming;
+import static com.pancake.api.content.ContentType.movie;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -71,20 +73,18 @@ class ApplicationTest {
             //given
             movies.존재한다(MemoryMovies.Item.aItem().id("1").title("토토로").build());
 
-            var bookmark = aBookmarkSaveCommand()
-                    .title("토토로")
-                    .contentId("1")
-                    .contentType("movie")
-                    .build();
-
             //when
-            var actual = bookmarkService.save(bookmark);
+            var actual = bookmarkCommand(aBookmark()
+                    .contentType(movie)
+                    .contentId("1")
+                    .title("토토로")
+                    .build());
 
             //then
-            assertThat(actual)
-                    .returns("토토로", Bookmark::getRecordTitle)
-                    .returns("1", Bookmark::getContentId)
-                    .returns("movie", Bookmark::getContentType);
+            assertThat(actual).returns("토토로", Bookmark::getRecordTitle)
+                    .extracting(Bookmark::getContent)
+                    .returns("1", BookmarkContent::id)
+                    .returns(movie, BookmarkContent::type);
         }
 
         @Test
@@ -103,7 +103,7 @@ class ApplicationTest {
             //then
             assertAll(
                     () -> assertThat(actual.getRecordTitle()).isEqualTo("고독한 토토로"),
-                    () -> assertThat(actualBy(actual.getContentId(), Content.class))
+                    () -> assertThat(actualBy(actual.getContent().id(), Content.class))
                             .returns("고독한 토토로", Content::getTitle)
                             .returns("설명", Content::getDescription)
                             .returns("http://some.image", Content::getImageUrl)
@@ -116,7 +116,11 @@ class ApplicationTest {
             var movie = MemoryMovies.Item.aItem().build();
             movies.존재한다(movie);
 
-            bookmarkCommand(aBookmarkSaveCommand().contentId(movie.id()).title(movie.title()));
+            bookmarkCommand(aBookmark()
+                    .contentType(ContentType.movie)
+                    .contentId(movie.id())
+                    .title(movie.title())
+                    .build());
             bookmarkCustom.command(aBookmarkCustom().build());
 
             //when
@@ -126,8 +130,8 @@ class ApplicationTest {
             assertThat(actual).hasSize(2);
         }
 
-        private Bookmark bookmarkCommand(BookmarkSaveCommand.BookmarkSaveCommandBuilder builder) {
-            return bookmarkService.save(builder.build());
+        private Bookmark bookmarkCommand(Bookmark bookmark) {
+            return bookmarkService.save(bookmark);
         }
     }
 

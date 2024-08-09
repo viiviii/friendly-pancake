@@ -1,6 +1,7 @@
 package com.pancake.api.content.application;
 
 import com.pancake.api.content.ContentProvider;
+import com.pancake.api.content.ContentType;
 import com.pancake.api.content.domain.Content;
 import com.pancake.api.content.domain.ContentRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,14 +36,14 @@ public class ContentService implements ContentProvider {
     }
 
     @Override
-    public String provideType() {
-        return "custom";
+    public ContentType provideType() {
+        return ContentType.custom;
     }
 
     @Override
     public ContentMetadata getBy(String contentId) {
         final var content = get(Long.parseLong(contentId));
-        return new ContentMetadata(content.getId().toString(), provideType(),
+        return new ContentMetadata(content.getId().toString(), provideType().name(),
                 content.getTitle(), content.getTitle(),
                 content.getDescription(), content.getImageUrl(), null);
     }

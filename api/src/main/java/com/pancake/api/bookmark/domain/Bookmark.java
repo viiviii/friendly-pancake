@@ -1,10 +1,8 @@
 package com.pancake.api.bookmark.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,15 +14,19 @@ import static lombok.AccessLevel.PROTECTED;
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @Getter
+@EqualsAndHashCode
 public class Bookmark {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private String contentId;
-
-    private String contentType;
+    @Embedded
+    private BookmarkContent content;
 
     private String recordTitle;
+
+    public Bookmark(BookmarkContent content, String recordTitle) {
+        this(null, content, recordTitle);
+    }
 }

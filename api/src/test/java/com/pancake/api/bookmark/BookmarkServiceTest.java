@@ -6,9 +6,10 @@ import com.pancake.api.content.GetContent;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 
-import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
+import static com.pancake.api.bookmark.Builders.aBookmark;
 import static com.pancake.api.content.Builders.aMetadata;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -22,15 +23,12 @@ class BookmarkServiceTest {
     @Test
     void 메타데이터가_존재하지_않으면_예외가_발생한다() {
         //given
-        var bookmark = aBookmarkSaveCommand()
-                .contentId("8392")
-                .contentType("movie")
-                .build();
+        var command = aBookmark().contentId("1").build();
 
-        given(getContent.queryBy("8392", "movie")).willReturn(null);
+        given(getContent.query(any())).willReturn(null);
 
         //when
-        ThrowingCallable actual = () -> bookmarkService.save(bookmark);
+        ThrowingCallable actual = () -> bookmarkService.save(command);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
@@ -39,18 +37,12 @@ class BookmarkServiceTest {
     @Test
     void 저장한_제목과_검색결과의_제목이_다른_경우_예외가_발생한다() {
         //given
-        var bookmark = aBookmarkSaveCommand()
-                .title("저장할 제목")
-                .contentId("8392")
-                .contentType("movie")
-                .build();
+        var command = aBookmark().title("저장할 제목").build();
 
-        given(getContent.queryBy("8392", "movie"))
-                .willReturn(aMetadata().title("다른 제목").build());
-
+        given(getContent.query(any())).willReturn(aMetadata().title("다른 제목").build());
 
         //when
-        ThrowingCallable actual = () -> bookmarkService.save(bookmark);
+        ThrowingCallable actual = () -> bookmarkService.save(command);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);

@@ -1,7 +1,8 @@
 package com.pancake.api;
 
+import com.pancake.api.bookmark.api.BookmarkRequest;
 import com.pancake.api.bookmark.api.BookmarkResponse;
-import com.pancake.api.bookmark.application.BookmarkSaveCommand.BookmarkSaveCommandBuilder;
+import com.pancake.api.content.ContentType;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.application.ContentSaveCommand.ContentSaveCommandBuilder;
 import com.pancake.api.content.domain.Playback;
@@ -23,7 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
+import static com.pancake.api.bookmark.Builders.aBookmarkCommand;
 import static com.pancake.api.content.Builders.aContentSaveCommand;
 import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.setting.Builders.aEnableSetting;
@@ -142,9 +143,9 @@ class AcceptanceTest {
     private Consumer<SearchMovie.Result> 첫번째_결과를_북마크로_등록한다() {
         return result -> {
             var content = 첫번째를_선택(result.contents());
-            북마크를_등록한다().apply(aBookmarkSaveCommand()
+            북마크를_등록한다().apply(aBookmarkCommand()
                     .contentId(content.id())
-                    .contentType(content.mediaType())
+                    .contentType(ContentType.valueOf(content.mediaType()))
                     .title(content.title())
             );
         };
@@ -158,7 +159,7 @@ class AcceptanceTest {
                 .expectStatus().is2xxSuccessful();
     }
 
-    private Function<BookmarkSaveCommandBuilder, BookmarkResponse> 북마크를_등록한다() {
+    private Function<BookmarkRequest.BookmarkRequestBuilder, BookmarkResponse> 북마크를_등록한다() {
         return builder -> client.post().uri("/api/bookmarks")
                 .contentType(APPLICATION_JSON)
                 .bodyValue(builder.build())
