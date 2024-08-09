@@ -2,7 +2,6 @@ package com.pancake.api.content.infra.api;
 
 import org.junit.jupiter.api.Test;
 
-import static com.pancake.api.content.Builders.aTmdbPage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -12,7 +11,7 @@ class TmdbPageTest {
     @Test
     void 다음_페이지가_없을_때() {
         //given
-        var page = aTmdbPage()
+        var page = TmdbPage.builder()
                 .page(1)
                 .totalPages(1)
                 .totalResults(20)
@@ -33,7 +32,7 @@ class TmdbPageTest {
     @Test
     void 다음_페이지가_있을_때() {
         //given
-        var page = aTmdbPage()
+        var page = TmdbPage.builder()
                 .page(3)
                 .totalPages(9)
                 .totalResults(176)

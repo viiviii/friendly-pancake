@@ -26,8 +26,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Instant;
 import java.util.List;
 
+import static com.pancake.api.bookmark.Builders.aBookmarkCustom;
 import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
-import static com.pancake.api.content.Builders.*;
+import static com.pancake.api.content.Builders.aContentSaveCommand;
+import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -59,21 +61,21 @@ class ApplicationTest {
         BookmarkService bookmarkService;
 
         @Autowired
-        BookmarkCustomContent bookmarkCustomContent;
+        BookmarkCustomContent bookmarkCustom;
 
         @Autowired
-        MemoryMetadataRepository metadata;
+        MemoryMovies movies;
 
         @Test
-        void 컨텐츠를_북마크한다() {
+        void 영화를_북마크한다() {
             //given
+            movies.존재한다(MemoryMovies.Item.aItem().id("1").title("토토로").build());
+
             var bookmark = aBookmarkSaveCommand()
                     .title("토토로")
-                    .contentId("8392")
+                    .contentId("1")
                     .contentType("movie")
                     .build();
-
-            metadata.존재한다(aMetadata().id("8392").title("토토로"));
 
             //when
             var actual = bookmarkService.save(bookmark);
@@ -81,7 +83,7 @@ class ApplicationTest {
             //then
             assertThat(actual)
                     .returns("토토로", Bookmark::getRecordTitle)
-                    .returns("8392", Bookmark::getContentId)
+                    .returns("1", Bookmark::getContentId)
                     .returns("movie", Bookmark::getContentType);
         }
 
@@ -96,7 +98,7 @@ class ApplicationTest {
                     .build();
 
             //when
-            var actual = bookmarkCustomContent.command(command);
+            var actual = bookmarkCustom.command(command);
 
             //then
             assertAll(
@@ -111,10 +113,11 @@ class ApplicationTest {
         @Test
         void 목록을_조회한다() {
             //given
-            metadata.존재한다(aMetadata().id("8392").title("토토로"));
-            metadata.존재한다(aMetadata().id("9090").title("토토로"));
-            save(aBookmarkSaveCommand().contentId("8392").title("토토로"));
-            save(aBookmarkSaveCommand().contentId("9090").title("토토로"));
+            var movie = MemoryMovies.Item.aItem().build();
+            movies.존재한다(movie);
+
+            bookmarkCommand(aBookmarkSaveCommand().contentId(movie.id()).title(movie.title()));
+            bookmarkCustom.command(aBookmarkCustom().build());
 
             //when
             var actual = bookmarkService.getList();
@@ -123,7 +126,7 @@ class ApplicationTest {
             assertThat(actual).hasSize(2);
         }
 
-        private Bookmark save(BookmarkSaveCommand.BookmarkSaveCommandBuilder builder) {
+        private Bookmark bookmarkCommand(BookmarkSaveCommand.BookmarkSaveCommandBuilder builder) {
             return bookmarkService.save(builder.build());
         }
     }

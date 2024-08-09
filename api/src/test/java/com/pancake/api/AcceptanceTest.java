@@ -24,7 +24,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
-import static com.pancake.api.content.Builders.*;
+import static com.pancake.api.content.Builders.aContentSaveCommand;
+import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.setting.Builders.aEnableSetting;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -75,9 +76,9 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자는_컨텐츠를_검색하고_북마크_할_수_있다(@Autowired MemoryMetadataRepository 메타데이터) {
+    void 사용자는_영화를_검색하고_북마크_할_수_있다(@Autowired MemoryMovies 영화) {
         //given
-        메타데이터.존재한다(aMetadata().title("귀여븐 포뇨"));
+        영화.존재한다(MemoryMovies.Item.aItem().title("귀여븐 포뇨").build());
 
         //when
         var 검색_결과 = 컨텐츠를_검색한다("귀여븐 포뇨");

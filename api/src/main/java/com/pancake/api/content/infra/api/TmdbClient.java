@@ -6,7 +6,7 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
 @HttpExchange("https://api.themoviedb.org/3")
-interface TmdbClient {
+public interface TmdbClient {
 
     @GetExchange("/search/movie")
     TmdbPage<TmdbMovie> searchMoviesBy(@RequestParam String query);

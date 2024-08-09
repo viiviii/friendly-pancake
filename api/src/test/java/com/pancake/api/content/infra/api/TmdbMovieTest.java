@@ -2,7 +2,6 @@ package com.pancake.api.content.infra.api;
 
 import org.junit.jupiter.api.Test;
 
-import static com.pancake.api.content.Builders.aTmdbMovie;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TmdbMovieTest {
@@ -10,7 +9,9 @@ class TmdbMovieTest {
     @Test
     void posterUrl() {
         //given
-        var movie = aTmdbMovie().posterPath("/some").build();
+        var movie = TmdbMovie.builder()
+                .posterPath("/some")
+                .build();
 
         //when
         var actual = movie.posterUrl();
