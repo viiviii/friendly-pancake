@@ -60,10 +60,10 @@ class ContentMetadataAdapterTest {
                         """, APPLICATION_JSON));
 
         //when
-        var actual = adapter.findAllByTitle(query);
+        var actual = adapter.query(query);
 
         //then
-        assertThat(actual.getContent()).singleElement().hasNoNullFieldsOrProperties();
+        assertThat(actual.contents()).singleElement().hasNoNullFieldsOrProperties();
     }
 
     @Test

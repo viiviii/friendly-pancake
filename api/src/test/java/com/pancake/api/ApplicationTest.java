@@ -1,9 +1,12 @@
 package com.pancake.api;
 
-import com.pancake.api.bookmark.Bookmark;
-import com.pancake.api.bookmark.BookmarkService;
-import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
+import com.pancake.api.bookmark.application.BookmarkCustom;
+import com.pancake.api.bookmark.application.BookmarkService;
+import com.pancake.api.bookmark.domain.Bookmark;
+import com.pancake.api.bookmark.domain.BookmarkContent;
 import com.pancake.api.content.Builders;
+import com.pancake.api.content.ContentProvider;
+import com.pancake.api.content.ContentType;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentSaveCommand;
 import com.pancake.api.content.application.ContentService;
@@ -25,10 +28,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Instant;
 import java.util.List;
 
-import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
-import static com.pancake.api.content.Builders.*;
+import static com.pancake.api.bookmark.Builders.aBookmark;
+import static com.pancake.api.bookmark.Builders.aBookmarkCustom;
+import static com.pancake.api.content.Builders.aContentSaveCommand;
+import static com.pancake.api.content.Builders.aStreaming;
+import static com.pancake.api.content.ContentType.movie;
 import static com.pancake.api.content.domain.Platform.NETFLIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -57,38 +64,65 @@ class ApplicationTest {
         BookmarkService bookmarkService;
 
         @Autowired
-        MemoryMetadataRepository metadata;
+        BookmarkCustom bookmarkCustom;
+
+        @Autowired
+        MemoryMovies movies;
 
         @Test
-        void 컨텐츠를_북마크에_추가한다() {
+        void 영화를_북마크한다() {
             //given
-            var bookmark = aBookmarkSaveCommand()
-                    .title("토토로")
-                    .contentId("8392")
-                    .contentType("movie")
-                    .contentSource("TMDB")
-                    .build();
-
-            metadata.존재한다(aMetadata().id("8392").title("토토로"));
+            movies.존재한다(MemoryMovies.Item.aItem().id("1").title("토토로").build());
 
             //when
-            var actual = bookmarkService.save(bookmark);
+            var actual = bookmarkCommand(aBookmark()
+                    .contentType(movie)
+                    .contentId("1")
+                    .title("토토로")
+                    .build());
 
             //then
-            assertThat(actual)
-                    .returns("토토로", Bookmark::getRecordTitle)
-                    .returns("8392", Bookmark::getContentId)
-                    .returns("movie", Bookmark::getContentType)
-                    .returns("TMDB", Bookmark::getContentSource);
+            assertThat(actual).returns("토토로", Bookmark::getRecordTitle)
+                    .extracting(Bookmark::getContent)
+                    .returns("1", BookmarkContent::id)
+                    .returns(movie, BookmarkContent::type);
         }
 
         @Test
-        void 북마크_목록을_조회한다() {
+        void 직접_입력한_컨텐츠를_북마크한다() {
             //given
-            metadata.존재한다(aMetadata().id("8392").title("토토로"));
-            metadata.존재한다(aMetadata().id("9090").title("토토로"));
-            save(aBookmarkSaveCommand().contentId("8392").title("토토로"));
-            save(aBookmarkSaveCommand().contentId("9090").title("토토로"));
+            var command = BookmarkCustom.Command.builder()
+                    .title("고독한 토토로")
+                    .description("설명")
+//                    .url("https://www.netflix.com/watch/0")
+                    .imageUrl("http://some.image")
+                    .build();
+
+            //when
+            var actual = bookmarkCustom.command(command);
+
+            //then
+            assertAll(
+                    () -> assertThat(actual.getRecordTitle()).isEqualTo("고독한 토토로"),
+                    () -> assertThat(actualBy(actual.getContent().id(), Content.class))
+                            .returns("고독한 토토로", Content::getTitle)
+                            .returns("설명", Content::getDescription)
+                            .returns("http://some.image", Content::getImageUrl)
+            );
+        }
+
+        @Test
+        void 목록을_조회한다() {
+            //given
+            var movie = MemoryMovies.Item.aItem().build();
+            movies.존재한다(movie);
+
+            bookmarkCommand(aBookmark()
+                    .contentType(ContentType.movie)
+                    .contentId(movie.id())
+                    .title(movie.title())
+                    .build());
+            bookmarkCustom.command(aBookmarkCustom().build());
 
             //when
             var actual = bookmarkService.getList();
@@ -97,8 +131,8 @@ class ApplicationTest {
             assertThat(actual).hasSize(2);
         }
 
-        private Bookmark save(BookmarkSaveCommandBuilder builder) {
-            return bookmarkService.save(builder.build());
+        private Bookmark bookmarkCommand(Bookmark bookmark) {
+            return bookmarkService.save(bookmark);
         }
     }
 
@@ -229,6 +263,13 @@ class ApplicationTest {
         private Instant disableFrom(String value) {
             return Instant.parse(value);
         }
+    }
+
+    @Test
+    void 컨텐츠_타입별_제공자가_모두_존재한다(@Autowired List<ContentProvider> providers) {
+        assertThat(providers)
+                .extracting(ContentProvider::provideType)
+                .containsOnlyOnce(ContentType.values());
     }
 
     private Long save(ContentSaveCommand.ContentSaveCommandBuilder builder) {

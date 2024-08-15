@@ -1,5 +1,8 @@
 package com.pancake.api.bookmark;
 
+import com.pancake.api.bookmark.api.BookmarkApiController;
+import com.pancake.api.bookmark.api.BookmarkResponse;
+import com.pancake.api.bookmark.application.BookmarkService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -8,7 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
-import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
+import static com.pancake.api.bookmark.Builders.aBookmarkCommand;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -24,15 +27,15 @@ class BookmarkApiControllerTest {
     @Test
     void post() {
         //given
-        var request = aBookmarkSaveCommand().build();
-        var bookmark = request.toBookmark();
+        var command = aBookmarkCommand().build();
+        var bookmark = command.toBookmark();
 
-        given(bookmarkService.save(request)).willReturn(bookmark);
+        given(bookmarkService.save(bookmark)).willReturn(bookmark);
 
         //when
         var response = client.post().uri("/api/bookmarks")
                 .contentType(APPLICATION_JSON)
-                .bodyValue(request)
+                .bodyValue(command)
                 .exchange();
 
         //then
@@ -45,7 +48,7 @@ class BookmarkApiControllerTest {
     @Test
     void getList() {
         //given
-        var bookmark = aBookmarkSaveCommand().build().toBookmark();
+        var bookmark = aBookmarkCommand().build().toBookmark();
 
         given(bookmarkService.getList()).willReturn(List.of(bookmark));
 

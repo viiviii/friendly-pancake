@@ -1,11 +1,12 @@
 package com.pancake.api;
 
-import com.pancake.api.bookmark.BookmarkResponse;
-import com.pancake.api.bookmark.Builders.BookmarkSaveCommandBuilder;
+import com.pancake.api.bookmark.api.BookmarkRequest;
+import com.pancake.api.bookmark.api.BookmarkResponse;
+import com.pancake.api.content.ContentType;
 import com.pancake.api.content.api.ContentResponse;
 import com.pancake.api.content.application.ContentSaveCommand.ContentSaveCommandBuilder;
 import com.pancake.api.content.domain.Playback;
-import com.pancake.api.search.SearchContentMetadata;
+import com.pancake.api.search.SearchMovie;
 import com.pancake.api.setting.api.SettingApiController.PlatformSettingResponse;
 import com.pancake.api.watch.application.Catalog;
 import com.pancake.api.watch.domain.WatchContent;
@@ -23,8 +24,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.pancake.api.bookmark.Builders.aBookmarkSaveCommand;
-import static com.pancake.api.content.Builders.*;
+import static com.pancake.api.bookmark.Builders.aBookmarkCommand;
+import static com.pancake.api.content.Builders.aContentSaveCommand;
+import static com.pancake.api.content.Builders.aStreaming;
 import static com.pancake.api.setting.Builders.aEnableSetting;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -75,9 +77,9 @@ class AcceptanceTest {
     }
 
     @Test
-    void 사용자는_컨텐츠를_검색하고_북마크에_저장할_수_있다(@Autowired MemoryMetadataRepository 메타데이터) {
+    void 사용자는_영화를_검색하고_북마크_할_수_있다(@Autowired MemoryMovies 영화) {
         //given
-        메타데이터.존재한다(aMetadata().title("귀여븐 포뇨"));
+        영화.존재한다(MemoryMovies.Item.aItem().title("귀여븐 포뇨").build());
 
         //when
         var 검색_결과 = 컨텐츠를_검색한다("귀여븐 포뇨");
@@ -86,6 +88,19 @@ class AcceptanceTest {
         //then
         then(북마크_목록을_조회한다()).singleElement()
                 .is(제목은("귀여븐 포뇨"));
+    }
+
+    @Test
+    void 사용자는_직접_입력한_컨텐츠를_북마크_할_수_있다() {
+        //given
+        var 컨텐츠 = aContentSaveCommand().title("고독한 포뇨");
+
+        //when
+        직접_입력한_컨텐츠를_북마크한다().accept(컨텐츠);
+
+        //then
+        then(북마크_목록을_조회한다()).singleElement()
+                .is(제목은("고독한 포뇨"));
     }
 
     @Test
@@ -125,19 +140,26 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private Consumer<SearchContentMetadata.Result> 첫번째_결과를_북마크로_등록한다() {
+    private Consumer<SearchMovie.Result> 첫번째_결과를_북마크로_등록한다() {
         return result -> {
             var content = 첫번째를_선택(result.contents());
-            북마크를_등록한다().apply(aBookmarkSaveCommand()
-                    .contentSource(result.getContentSource())
-                    .contentId(content.getId())
-                    .contentType(content.getContentType())
-                    .title(content.getTitle())
+            북마크를_등록한다().apply(aBookmarkCommand()
+                    .contentId(content.id())
+                    .contentType(ContentType.valueOf(content.mediaType()))
+                    .title(content.title())
             );
         };
     }
 
-    private Function<BookmarkSaveCommandBuilder, BookmarkResponse> 북마크를_등록한다() {
+    private Consumer<ContentSaveCommandBuilder> 직접_입력한_컨텐츠를_북마크한다() {
+        return request -> client.post().uri("/api/bookmarks/customs")
+                .contentType(APPLICATION_JSON)
+                .bodyValue(request.build())
+                .exchange()
+                .expectStatus().is2xxSuccessful();
+    }
+
+    private Function<BookmarkRequest.BookmarkRequestBuilder, BookmarkResponse> 북마크를_등록한다() {
         return builder -> client.post().uri("/api/bookmarks")
                 .contentType(APPLICATION_JSON)
                 .bodyValue(builder.build())
@@ -157,11 +179,11 @@ class AcceptanceTest {
                 .returnResult().getResponseBody();
     }
 
-    private SearchContentMetadata.Result 컨텐츠를_검색한다(String title) {
+    private SearchMovie.Result 컨텐츠를_검색한다(String title) {
         return client.get().uri("/api/search/contents?query={title}", title)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody(SearchContentMetadata.Result.class)
+                .expectBody(SearchMovie.Result.class)
                 .returnResult().getResponseBody();
 
     }

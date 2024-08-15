@@ -5,11 +5,11 @@ import lombok.Builder;
 import java.time.LocalDate;
 import java.util.List;
 
-@Builder(builderClassName = "Builder")
+@Builder
 public record TmdbMovie(
-        boolean adult, String backdropPath, List<Integer> genreIds, int id,
-        String originalLanguage, String originalTitle, String overview, float popularity,
-        String posterPath, LocalDate releaseDate, String title, boolean video, float voteAverage, int voteCount) {
+        Boolean adult, String backdropPath, List<Integer> genreIds, Integer id,
+        String originalLanguage, String originalTitle, String overview, Float popularity,
+        String posterPath, LocalDate releaseDate, String title, Boolean video, Float voteAverage, Integer voteCount) {
 
     public String posterUrl() {
         return String.format("https://image.tmdb.org/t/p/w500%s", posterPath());

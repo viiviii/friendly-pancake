@@ -14,7 +14,7 @@ import static org.mockito.BDDMockito.given;
 class SearchApiControllerTest {
 
     @MockBean
-    SearchContentMetadata searchContentMetadata;
+    SearchMovie searchMovie;
 
     @Autowired
     WebTestClient client;
@@ -22,23 +22,23 @@ class SearchApiControllerTest {
     @Test
     void searchContentsByTitle() {
         //given
-        var expected = aSearchMetadataResult();
+        var expected = aSearchResult();
 
-        given(searchContentMetadata.queryBy("토토로")).willReturn(expected);
+        given(searchMovie.query("토토로")).willReturn(expected);
 
         //when
-        var response = client.get().
-                uri("/api/search/contents?query={title}", "토토로")
+        var response = client.get()
+                .uri("/api/search/contents?query={title}", "토토로")
                 .exchange();
 
         //then
         response.expectAll(
                 spec -> spec.expectStatus().isOk(),
-                spec -> spec.expectBody(SearchContentMetadata.Result.class).isEqualTo(expected)
+                spec -> spec.expectBody(SearchMovie.Result.class).isEqualTo(expected)
         );
     }
 
-    private SearchContentMetadata.Result aSearchMetadataResult() {
-        return new SearchContentMetadata.Result(false, emptyList());
+    private SearchMovie.Result aSearchResult() {
+        return new SearchMovie.Result(false, emptyList());
     }
 }
