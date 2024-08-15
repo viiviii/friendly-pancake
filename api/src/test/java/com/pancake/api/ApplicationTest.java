@@ -5,6 +5,7 @@ import com.pancake.api.bookmark.application.BookmarkService;
 import com.pancake.api.bookmark.domain.Bookmark;
 import com.pancake.api.bookmark.domain.BookmarkContent;
 import com.pancake.api.content.Builders;
+import com.pancake.api.content.ContentProvider;
 import com.pancake.api.content.ContentType;
 import com.pancake.api.content.application.AddPlayback;
 import com.pancake.api.content.application.ContentSaveCommand;
@@ -262,6 +263,13 @@ class ApplicationTest {
         private Instant disableFrom(String value) {
             return Instant.parse(value);
         }
+    }
+
+    @Test
+    void 컨텐츠_타입별_제공자가_모두_존재한다(@Autowired List<ContentProvider> providers) {
+        assertThat(providers)
+                .extracting(ContentProvider::provideType)
+                .containsOnlyOnce(ContentType.values());
     }
 
     private Long save(ContentSaveCommand.ContentSaveCommandBuilder builder) {
